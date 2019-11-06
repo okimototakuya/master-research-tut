@@ -10,9 +10,9 @@ EVAR = 0  # 整数値
 #TVAR = 2  # 鉛直方向の加速度(上が+)
 #TVAR = 3  # 前後方向の加速度(前が+)
 #TVAR = 4  # 左右方向の加速度(右が+)
-TVAR = 5  # 左右回転の角速度(右が+)
+#TVAR = 5  # 左右回転の角速度(右が+)
 #TVAR = 6  # 側方回転の角速度(右手側への回転が+)
-#TVAR = 7  # 前傾後傾の角速度(後傾が+)
+TVAR = 7  # 前傾後傾の角速度(後傾が+)
 
 print("サンプルファイル名を入力してください↓")
 str = input()
@@ -58,6 +58,7 @@ else:
   #stry ="前傾後傾の角速度(後傾が+)"
   stry = "AngularRate z[dps]"
  
+plt.title(str)
 plt.xlabel(strx)
 plt.ylabel(stry)
 plt.plot(x,y)
