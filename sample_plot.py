@@ -3,8 +3,10 @@ import matplotlib.pyplot as plt
 
 x = []  # グラフの横軸(整数値)
 y = []  # グラフの縦軸
+
 EVAR = 0  # 整数値
 #EVAR = 1  # 時刻
+
 #TVAR = 2  # 鉛直方向の加速度(上が+)
 #TVAR = 3  # 前後方向の加速度(前が+)
 #TVAR = 4  # 左右方向の加速度(右が+)
@@ -21,12 +23,12 @@ with open("./" + str) as f:
   i = 0
   for row in reader:
     i = i + 1
-    if i <= 3:
+    if i <= 3:  # csvファイル:データに関与しない箇所は省略.
       pass
     else:
-      if EVAR == 0:
+      if EVAR == 0: # 横軸が整数値
         x.append(int(row[EVAR]))
-      else:
+      else:         # 横軸が時刻表示
         x.append(row[EVAR])
       y.append(float(row[TVAR]))
 
