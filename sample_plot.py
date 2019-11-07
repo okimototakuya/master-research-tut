@@ -16,21 +16,19 @@ TVAR = 7  # 前傾後傾の角速度(後傾が+)
 
 print("サンプルファイル名を入力してください↓")
 str = input()
-with open("./" + str) as f:
+with open("./" + str, mode='r') as f:
 
-  reader = csv.reader(f)
+  reader = list(csv.reader(f))  # csv.readerはインデックス作成をサポートしていない.
 
-  i = 0
-  for row in reader:
-    i = i + 1
-    if i <= 3:  # csvファイル:データに関与しない箇所は省略.
-      pass
-    else:
-      if EVAR == 0: # 横軸が整数値
-        x.append(int(row[EVAR]))
-      else:         # 横軸が時刻表示
-        x.append(row[EVAR])
-      y.append(float(row[TVAR]))
+  for row in reader[3:]:
+    if EVAR == 0: # 横軸が整数値
+      x.append(int(row[EVAR]))
+    else:         # 横軸が時刻表示
+      x.append(row[EVAR])
+    y.append(float(row[TVAR]))
+    
+print(x[:10])
+print(y[:10])
 
 if EVAR == 0:
   #strx = "整数値"
