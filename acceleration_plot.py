@@ -20,9 +20,13 @@ def main():
                                'Temperture':float, 'Pressure':float, 'MagnetCount':int, 'MagnetSwitch':int,}
                   )
   #print(df)
-  ax = df.plot(x='time', y='Acceleration_x') 
-  #ax = df.plot(x='time', y='AngularRate_x') 
-  ax.set_title(filename)
+  #ax1 = df.plot(x='time', y='Acceleration_x') 
+  #ax2 = df.plot(y='Acceleration_y', ax=ax1) 
+  #ax3 = df.plot(y='Acceleration_z', ax=ax2) 
+  ax1 = df.plot(x='time', y='AngularRate_x') 
+  ax2 = df.plot(y='AngularRate_y', ax=ax1) 
+  ax3 = df.plot(y='AngularRate_z', ax=ax2) 
+  ax3.set_title(filename)
   plt.show()
 
 if __name__ == '__main__':
