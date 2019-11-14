@@ -23,10 +23,10 @@ def main():
                   )
 
   df.index = [i[:19] for i in df.index] # recvDate:「+09」の削除
-  df.index = pd.to_datetime(df.index)
-  #ax = df.plot(y='lat', secondary_y='lon') 
-  ax = df.plot(y='lat') 
-  ax.set_title(filename)
+  df.index = pd.to_datetime(df.index) # DataFrame型のインデックス:string型 → DataTime型
+  ax1 = df.plot(y='lat') 
+  ax2 = df.plot(y='lon', secondary_y=['lat','lon'], ax=ax1) 
+  ax2.set_title(filename)
   #ax.set_ylabel('lat')
   #ax.right_ax.set_ylabel('lon')
   plt.show()
