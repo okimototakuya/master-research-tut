@@ -14,6 +14,7 @@ def main():
   df = pd.read_csv(filename,
                    names=col_names,
                    skiprows=3, 
+                   parse_dates=['time'],
                    index_col=1, # 0:整数値, 1:時刻
                    converters={'line':int, 'time':str, 
                                'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
@@ -21,7 +22,6 @@ def main():
                                'Temperture':float, 'Pressure':float, 'MagnetCount':int, 'MagnetSwitch':int,
                               }
                   )
-  df.index = pd.to_datetime(df.index, format='%H:%M:%S.%f')
   #ax1 = df.plot(y='Acceleration_x') 
   #ax2 = df.plot(y='Acceleration_y', ax=ax1) 
   #ax3 = df.plot(y='Acceleration_z', ax=ax2) 

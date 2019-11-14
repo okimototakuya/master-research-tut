@@ -13,6 +13,7 @@ def main():
               ]
   df = pd.read_csv(filename,
                    names=col_names,
+                   #parse_dates=['recvDate'],
                    skiprows=1, 
                    index_col=8,
                    converters={'btx_id':int, 'timestamp':float, 
