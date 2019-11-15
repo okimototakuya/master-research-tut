@@ -1,13 +1,23 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# ID16
+# 登校
+#start = "2018-12-19 07:37:22+09"
+#end = "2018-12-19 07:47:10+09"
+# 下校
+start = "2018-12-19 15:57:47+09"
+end = "2018-12-19 16:05:35+09"
+
 def main():
-  print("サンプルファイル名を入力してください")
-  print(":", end="")
-  filename = input()
-  print("表示する時間帯を入力してください")
-  print(":", end="")
-  time = input()
+  #print("サンプルファイル名を入力してください")
+  #print(":", end="")
+  #filename = input()
+  filename = "location_20181219_16.csv"
+
+  #print("表示する時間帯を入力してください")
+  #print(":", end="")
+  #time = input()
   #print(filename)
   #print(time)
 
@@ -36,7 +46,7 @@ def main():
   #print(df.index['2018-12-19 07:37:22':'2018-12-19 07:47:10'])
   #print(df.index[0:10])
   #print(df.loc[:'2018-12-19 07:47:10'])
-  df_time = df.loc[:time]
+  df_time = df.loc[start:end]
   #print(df_time)
 
   ax1 = (df_time).plot(y=['lat']) 
