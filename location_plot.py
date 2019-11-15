@@ -1,19 +1,23 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# ID16
+## ID16
+# ファイル名
+filename = "location_20181219_16.csv"
+# 1日
+start = "2018-12-19 07:37:22+09"
+end = "2018-12-19 16:05:35+09"
 # 登校
 #start = "2018-12-19 07:37:22+09"
 #end = "2018-12-19 07:47:10+09"
 # 下校
-start = "2018-12-19 15:57:47+09"
-end = "2018-12-19 16:05:35+09"
+#start = "2018-12-19 15:57:47+09"
+#end = "2018-12-19 16:05:35+09"
 
 def main():
   #print("サンプルファイル名を入力してください")
   #print(":", end="")
   #filename = input()
-  filename = "location_20181219_16.csv"
 
   #print("表示する時間帯を入力してください")
   #print(":", end="")
