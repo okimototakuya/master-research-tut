@@ -41,7 +41,7 @@ end = "2018-12-19 16:07:49+09"
 class dataframe_maker():
   df = None # DataFrame型インスタンスを格納
 
-  def init():
+  def init(self):
     # 列名を明示的に指定することにより, 欠損値をNaNで補完.
     col_names = ['btx_id', 'timestamp', 
                  'major', 'minor', 'pos_id',
@@ -68,10 +68,10 @@ class dataframe_maker():
     (self.df).index = [i[:19] for i in (self.df).index] # recvDate:「+09」の削除
     (self.df).index = pd.to_datetime((self.df).index) # DataFrame型のインデックス:string型 → DataTime型
 
-  def makeTimeLatLon():
+  def makeTimeLatLon(self):
     self.df = (self.df).loc[start:end]
         
-  def makeLatLon():
+  def makeLatLon(self):
     # Series型の各要素への関数適用:基本演算(+,-など) +,- / 一般的な関数(三角関数など) map
     (self.df).loc[:, 'lat'] = ((self.df).loc[:, 'lat']-35).map(radians).map(sin)
     (self.df).loc[:, 'lon'] = ((self.df).loc[:, 'lon']-137).map(radians).map(sin)
@@ -79,7 +79,7 @@ class dataframe_maker():
 
 
 class dataframe_plotter():
-  def plotTimeLatLon(df):
+  def plotTimeLatLon(self, df):
     ## 緯度(lat)経度(lon)の時系列変化をプロット
     ax1 = df.plot(y=['lat']) 
     ax2 = df.plot(y='lon', secondary_y=['lat','lon'], ax=ax1) 
@@ -88,7 +88,7 @@ class dataframe_plotter():
     #ax.right_ax.set_ylabel('lon')
     plt.show()
 
-  def plotLatLon(df):
+  def plotLatLon(self, df):
     ## 緯度(lat)経度(lon)の射影から,２次元位置座標をプロット
     # DataFrame型plot() : xのラベル名(列名)は[]で囲まない. 
     # yはどっちでも.→ ラベル/リスト
