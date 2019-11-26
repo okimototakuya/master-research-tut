@@ -1,6 +1,7 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.cm as cm
 import acceleration_plot as ap 
 import location_plot as lp
 
@@ -11,22 +12,30 @@ def main():
   dm_loc.init()
   dm_loc.makeLatLon()
 
-  #print((dm_loc.df).loc[:,['lat','lon']])
+  fig = plt.figure(figsize=(10, 10))
+  ax = fig.add_subplot(111)
 
-  fig = plt.figure()
-  #ax = fig.gca(projection='3d')
-  ax = Axes3D(fig)
-  #ax.plot((dm_loc.df).loc[:,['lat','lon']],3)
+  x = (dm_loc.df).loc[:,['lat']]
+  y = (dm_loc.df).loc[:,['lon']]
+  z = (dm_acc.df).iloc[:len(x),1]  # 1:Acceleration_x
+  #z = np.random.rand(len(x))
+  #z = pd.DataFrame(z)
+  
+  for i in range(len(x)):
+    #color = cm.Set1(z.iloc[i])
+    color = cm.Accent(z.iloc[i])
+    ax.scatter(x.iloc[i], y.iloc[i], c=color)
+    #ax.plot(x.iloc[i], y.iloc[i], c=color)
+    #print(x.iloc[i], y.iloc[i])
+  
+  ## zに「Acceleration_x」を指定するとエラーが出る.
+  #ax.scatter(x,y,c=z)
+  #ax.scatter(x,y)
 
-  ax.plot((dm_loc.df).loc[:,['lat']],
-          (dm_loc.df).loc[:,['lon']],
-          (dm_acc.df).iloc[:len(dm_loc.df),1],
-          color='green')  # 1:Acceleration_x
-  #print(len(dm_loc.df))
-  #print(len((dm_acc.df).iloc[:len(dm_loc.df),1]))
-
-  #print((dm_acc.df).iloc[:5,1])
-  #print(len(dm_loc.df))
+  #fig.colorbar(im)
+  #plt.colorbar()
+  plt.xlim(-0.0001, 0.0001)
+  plt.ylim(-0.0001, 0.0001)
   plt.show()
 
 if __name__ == '__main__':

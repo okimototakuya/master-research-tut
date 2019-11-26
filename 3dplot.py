@@ -18,10 +18,10 @@ def main():
   ax = Axes3D(fig)
   #ax.plot((dm_loc.df).loc[:,['lat','lon']],3)
 
-  ax.plot((dm_loc.df).loc[:,['lat']],
-          (dm_loc.df).loc[:,['lon']],
-          (dm_acc.df).iloc[:len(dm_loc.df),1],
-          color='green')  # 1:Acceleration_x
+  x = (dm_loc.df).loc[:,['lat']]
+  y = (dm_loc.df).loc[:,['lon']]
+  z = (dm_acc.df).iloc[:len(dm_loc.df),1]  # 1:Acceleration_x
+  ax.plot(x, y, z, color='green')
   #print(len(dm_loc.df))
   #print(len((dm_acc.df).iloc[:len(dm_loc.df),1]))
 
