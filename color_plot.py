@@ -19,7 +19,7 @@ def main():
 	y = (dm_loc.df).loc[:,['lon']]
 	## Acceleration_xのみ
 	z = (dm_acc.df).iloc[:len(x),1]  # 1:Acceleration_x
-	z = round(-z,2)		#加速度を正にし, 有効数字2桁で丸める(rgb値(0~128)に対応)
+	z = round(-z,4)		#加速度を正にし, 有効数字2桁で丸める(rgb値(0~128)に対応)
 	z.loc[z>1] = 1			#加速度が１を超えたものは１を代入し,
 	z.loc[z<0] = 0			#０を下回ったものは０を代入する.
 
