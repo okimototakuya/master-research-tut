@@ -81,6 +81,8 @@ class dataframe_maker():
 class dataframe_plotter():
   def plotTimeLatLon(self, df):
     ## 緯度(lat)経度(lon)の時系列変化をプロット
+    #ax1 = df.plot(y=['lat']) 
+    #ax2 = df.plot(y='lon', secondary_y=['lat','lon'], ax=ax1) 
     ax1 = df.plot(y=['lat']) 
     ax2 = df.plot(y='lon', secondary_y=['lat','lon'], ax=ax1) 
     ax2.set_title(filename)
@@ -92,9 +94,20 @@ class dataframe_plotter():
     ## 緯度(lat)経度(lon)の射影から,２次元位置座標をプロット
     # DataFrame型plot() : xのラベル名(列名)は[]で囲まない. 
     # yはどっちでも.→ ラベル/リスト
+    
+    ## 線分補間グラフ
     ax = df.plot(x='lat', y=['lon'])
     plt.show()
 
+    """
+    ## 散布図グラフ
+    fig = plt.figure(figsize=(5,5))
+    ax = fig.add_subplot(111)
+    ax.scatter(df.loc[:,'lat'], df.loc[:,'lon'])
+    plt.xlim(-0.0001, 0.0001)
+    plt.ylim(-0.0001, 0.0001)
+    plt.show()
+    """
 
 def main():
   #plotTimeLatLon(df) # 緯度(lat)経度(lon)の時系列変化をプロット
