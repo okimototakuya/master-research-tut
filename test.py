@@ -16,8 +16,8 @@ y=pd.DataFrame(y)
 z=pd.DataFrame(z)
 """
 for i in range(n):
-  color = cm.Set1(i / n*0.5)
-  ax.scatter(x[i], y[i], c=color)
+	color = cm.Set1(i / n*0.5)
+	ax.scatter(x[i], y[i], c=color)
 """
 color = "inferno"
 ax.scatter(x, y, c=z)
