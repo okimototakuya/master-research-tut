@@ -51,11 +51,11 @@ class dataframe_maker():
 		self.df = pd.read_csv(filename,
 									names=col_names,
 									## 原データの時刻表示の余計な部分を削るため, 一旦str型で読込.
-									#parse_dates=['recvDate'], 
-									skiprows=1, 
+									#parse_dates=['recvDate'],
+									skiprows=1,
 									index_col=8, # recvData(時刻)
 									#index_col=6,  # lat(緯度)
-									converters={'btx_id':int, 'timestamp':float, 
+									converters={'btx_id':int, 'timestamp':float,
 													'major':int, 'minor':int, 'pos_id':int,
 													'deviceid':int, 'lat':float, 'lon':float,
 													'recvDate':str,
@@ -81,10 +81,10 @@ class dataframe_maker():
 class dataframe_plotter():
 	def plotTimeLatLon(self, df):
 		## 緯度(lat)経度(lon)の時系列変化をプロット
-		#ax1 = df.plot(y=['lat']) 
-		#ax2 = df.plot(y='lon', secondary_y=['lat','lon'], ax=ax1) 
-		ax1 = df.plot(y=['lat']) 
-		ax2 = df.plot(y='lon', secondary_y=['lat','lon'], ax=ax1) 
+		#ax1 = df.plot(y=['lat'])
+		#ax2 = df.plot(y='lon', secondary_y=['lat','lon'], ax=ax1)
+		ax1 = df.plot(y=['lat'])
+		ax2 = df.plot(y='lon', secondary_y=['lat','lon'], ax=ax1)
 		ax2.set_title(filename)
 		#ax.set_ylabel('lat')
 		#ax.right_ax.set_ylabel('lon')
@@ -92,7 +92,7 @@ class dataframe_plotter():
 
 	def plotLatLon(self, df):
 		## 緯度(lat)経度(lon)の射影から,２次元位置座標をプロット
-		# DataFrame型plot() : xのラベル名(列名)は[]で囲まない. 
+		# DataFrame型plot() : xのラベル名(列名)は[]で囲まない.
 		# yはどっちでも.→ ラベル/リスト
 
 		## 線分補間グラフ

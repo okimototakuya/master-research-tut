@@ -14,14 +14,15 @@ z = np.random.rand(n)
 x=pd.DataFrame(x)
 y=pd.DataFrame(y)
 z=pd.DataFrame(z)
-"""
+
 for i in range(n):
-	color = cm.Set1(i / n*0.5)
-	ax.scatter(x[i], y[i], c=color)
-"""
-color = "inferno"
-ax.scatter(x, y, c=z)
+	#color = cm.Set1(i / n*0.5)
+	#ax.scatter(x.iloc[i], y.iloc[i], c=color)
+	ax.scatter(x.iloc[i], y.iloc[i], label='Gray scale', color='0.3')
+
+#color = "inferno"
+#ax.scatter(x, y, c=y)
 #ax.scatter(x, y, cmap=color)
 
-print(color)
+#print(color)
 plt.show()

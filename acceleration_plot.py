@@ -34,28 +34,28 @@ class dataframe_maker():
 class dataframe_plotter():
 	def plotTimeAcc(self, df):
 		## 加速度の時系列変化をプロット
-		ax1 = df.plot(y='Acceleration_x') 
-		ax2 = df.plot(y='Acceleration_y', ax=ax1) 
-		ax3 = df.plot(y='Acceleration_z', ax=ax2) 
+		ax1 = df.plot(y='Acceleration_x')
+		ax2 = df.plot(y='Acceleration_y', ax=ax1)
+		ax3 = df.plot(y='Acceleration_z', ax=ax2)
 		ax3.set_title(filename)
 		plt.show()
 
 	def plotTimeAng(self, df):
 		## 角速度の時系列変化をプロット
-		ax1 = df.plot(y='AngularRate_x') 
-		ax2 = df.plot(y='AngularRate_y', ax=ax1) 
-		ax3 = df.plot(y='AngularRate_z', ax=ax2) 
+		ax1 = df.plot(y='AngularRate_x')
+		ax2 = df.plot(y='AngularRate_y', ax=ax1)
+		ax3 = df.plot(y='AngularRate_z', ax=ax2)
 		ax3.set_title(filename)
 		plt.show()
 
 	def plotTimeAccAng(self, df):
 		## 加速度・角速度の時系列変化をプロット
-		ax1 = df.plot(y='Acceleration_x') 
-		ax2 = df.plot(y='Acceleration_y', ax=ax1) 
-		ax3 = df.plot(y='Acceleration_z', ax=ax2) 
-		ax4 = df.plot(y='AngularRate_x', ax=ax3) 
-		ax5 = df.plot(y='AngularRate_y', ax=ax4) 
-		ax6 = df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5) 
+		ax1 = df.plot(y='Acceleration_x')
+		ax2 = df.plot(y='Acceleration_y', ax=ax1)
+		ax3 = df.plot(y='Acceleration_z', ax=ax2)
+		ax4 = df.plot(y='AngularRate_x', ax=ax3)
+		ax5 = df.plot(y='AngularRate_y', ax=ax4)
+		ax6 = df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5)
 		ax6.set_title(filename)
 		plt.show()
 
