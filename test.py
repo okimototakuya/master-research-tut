@@ -6,7 +6,7 @@ import pandas as pd
 fig = plt.figure(figsize=(4.5, 2))
 ax = fig.add_subplot(111)
 
-n = 20
+n = 10
 x = np.arange(n)
 y = np.ones(n)
 #z = x*y
@@ -18,7 +18,7 @@ z=pd.DataFrame(z)
 for i in range(n):
 	#color = cm.Set1(i / n*0.5)
 	#ax.scatter(x.iloc[i], y.iloc[i], c=color)
-	ax.scatter(x.iloc[i], y.iloc[i], label='Gray scale', color='0.3')
+	ax.scatter(x.iloc[i], y.iloc[i], label='Gray scale', color=str(i/10))
 
 #color = "inferno"
 #ax.scatter(x, y, c=y)
