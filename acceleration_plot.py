@@ -23,7 +23,7 @@ class dataframe_maker():
 									names=col_names,
 									skiprows=3,
 									parse_dates=['time'],
-									index_col=1, # 0:整数値, 1:時刻
+									index_col=0, # 0:整数値, 1:時刻
 									converters={'line':int, 'time':str,
 													'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
 													'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,

@@ -3,8 +3,8 @@ import matplotlib.cm as cm
 import numpy as np
 import pandas as pd
 
-fig = plt.figure(figsize=(4.5, 2))
-ax = fig.add_subplot(111)
+#fig = plt.figure(figsize=(4.5, 2))
+#ax = fig.add_subplot(111)
 
 n = 10
 x = np.arange(n)
@@ -18,7 +18,8 @@ z=pd.DataFrame(z)
 for i in range(n):
 	#color = cm.Set1(i / n*0.5)
 	#ax.scatter(x.iloc[i], y.iloc[i], c=color)
-	ax.scatter(x.iloc[i], y.iloc[i], label='Gray scale', color=str(i/10))
+	#ax.scatter(x.iloc[i], y.iloc[i], label='Gray scale', color=str(i/10))
+	print("aaa ")
 
 #color = "inferno"
 #ax.scatter(x, y, c=y)
