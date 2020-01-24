@@ -1,5 +1,8 @@
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')		# pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
+import os
 
 ## ID16
 # ファイル名
@@ -8,6 +11,9 @@ filename = "LOG_20181219141837_00010533_0021002B401733434E45.csv"
 ## ID19
 # ファイル名
 #filename = "LOG_20181219141901_00007140_00140064401733434E45.csv"
+
+## 画像ファイルの保存先
+PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/加速度・角加速度の時系列変化プロット"
 
 class dataframe_maker():
 	df = None # DataFrame型インスタンスを格納
@@ -50,23 +56,30 @@ class dataframe_plotter():
 
 	def plotTimeAccAng(self, df):
 		## 加速度・角速度の時系列変化をプロット
-		ax1 = df.plot(y='Acceleration_x')
-		ax2 = df.plot(y='Acceleration_y', ax=ax1)
-		ax3 = df.plot(y='Acceleration_z', ax=ax2)
-		ax4 = df.plot(y='AngularRate_x', ax=ax3)
-		ax5 = df.plot(y='AngularRate_y', ax=ax4)
-		ax6 = df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5)
-		ax6.set_title(filename)
-		plt.show()
+		for i in range(500):
+			# 13万近くあるサンプルデータから,250個ずつを抽出
+			df.loc[:, 'Acceleration_x'] = df.iloc[250*i:250*(i+1), 2]		# 加速度x
+			df.loc[:, 'AngularRate_x'] = df.iloc[250*i:250*(i+1), 5]			# 角加速度x
+			print(df.loc[:, 'Acceleration_x'])
+
+			ax1 = df.plot(y='Acceleration_x')
+			#ax2 = df.plot(y='Acceleration_y', ax=ax1)
+			#ax3 = df.plot(y='Acceleration_z', ax=ax2)
+			ax2 = df.plot(y='AngularRate_x', ax=ax1)
+			#ax5 = df.plot(y='AngularRate_y', ax=ax4)
+			#ax6 = df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5)
+			ax2.set_title(filename)
+			#plt.show()
+			plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
 
 
 def main():
 	dm = dataframe_maker()
 	dm.init()
 	dp = dataframe_plotter()
-	dp.plotTimeAcc(dm.df)
+	#dp.plotTimeAcc(dm.df)
 	#dp.plotTimeAng(dm.df)
-	#dp.plotTimeAccAng(dm.df)
+	dp.plotTimeAccAng(dm.df)
 
 if __name__ == '__main__':
 	main()
