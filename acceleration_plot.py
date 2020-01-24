@@ -56,19 +56,21 @@ class dataframe_plotter():
 
 	def plotTimeAccAng(self, df):
 		## 加速度・角速度の時系列変化をプロット
-		# 13万近くあるサンプルデータから,一部を抽出
-		df.loc[:, 'Acceleration_x'] = df.loc[:250, 'Acceleration_x']
-		df.loc[:, 'AngularRate_x'] = df.loc[:250, 'AngularRate_x']
+		for i in range(500):
+			# 13万近くあるサンプルデータから,250個ずつを抽出
+			df.loc[:, 'Acceleration_x'] = df.iloc[250*i:250*(i+1), 2]		# 加速度x
+			df.loc[:, 'AngularRate_x'] = df.iloc[250*i:250*(i+1), 5]			# 角加速度x
+			print(df.loc[:, 'Acceleration_x'])
 
-		ax1 = df.plot(y='Acceleration_x')
-		#ax2 = df.plot(y='Acceleration_y', ax=ax1)
-		#ax3 = df.plot(y='Acceleration_z', ax=ax2)
-		ax2 = df.plot(y='AngularRate_x', ax=ax1)
-		#ax5 = df.plot(y='AngularRate_y', ax=ax4)
-		#ax6 = df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5)
-		ax2.set_title(filename)
-		#plt.show()
-		plt.savefig(os.path.join(PATH, "demo.png"))
+			ax1 = df.plot(y='Acceleration_x')
+			#ax2 = df.plot(y='Acceleration_y', ax=ax1)
+			#ax3 = df.plot(y='Acceleration_z', ax=ax2)
+			ax2 = df.plot(y='AngularRate_x', ax=ax1)
+			#ax5 = df.plot(y='AngularRate_y', ax=ax4)
+			#ax6 = df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5)
+			ax2.set_title(filename)
+			#plt.show()
+			plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
 
 
 def main():
