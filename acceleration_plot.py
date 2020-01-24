@@ -13,8 +13,8 @@ filename = "LOG_20181219141837_00010533_0021002B401733434E45.csv"
 #filename = "LOG_20181219141901_00007140_00140064401733434E45.csv"
 
 ## 画像ファイルの保存先
-#PATH = "/Users/okimototakuya/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/"
-PATH = "/Users/okimototakuya/Desktop"
+PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/"
+#PATH = "/Users/okimototakuya/Desktop"
 
 class dataframe_maker():
 	df = None # DataFrame型インスタンスを格納
