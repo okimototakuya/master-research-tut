@@ -3,7 +3,8 @@ import matplotlib
 matplotlib.use('Agg')		# pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
 import os
-import hmm
+import hmm_learn
+import numpy as np
 
 ## ID16
 # ファイル名
@@ -75,7 +76,10 @@ class dataframe_plotter():
 
 
 def main():
-	hmm.main()
+	hmm_learn.main()
+	np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
+	print((hmm_learn.init.getX(hmm_learn)))
+
 	dm = dataframe_maker()
 	dm.init()
 	dp = dataframe_plotter()

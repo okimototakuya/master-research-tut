@@ -3,6 +3,15 @@ import acceleration_plot as ap
 from hmmlearn import hmm
 import pandas as pd
 
+global model
+global X
+
+class init():
+	def getX(self):
+		return self.X
+	def getModel(self):
+		return self.model
+
 def main():
 	acc = ap.dataframe_maker()
 	acc.init()
