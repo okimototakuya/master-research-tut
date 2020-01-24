@@ -56,6 +56,10 @@ class dataframe_plotter():
 
 	def plotTimeAccAng(self, df):
 		## 加速度・角速度の時系列変化をプロット
+		# 13万近くあるサンプルデータから,一部を抽出
+		df.loc[:, 'Acceleration_x'] = df.loc[:250, 'Acceleration_x']
+		df.loc[:, 'AngularRate_x'] = df.loc[:250, 'AngularRate_x']
+
 		ax1 = df.plot(y='Acceleration_x')
 		#ax2 = df.plot(y='Acceleration_y', ax=ax1)
 		#ax3 = df.plot(y='Acceleration_z', ax=ax2)
