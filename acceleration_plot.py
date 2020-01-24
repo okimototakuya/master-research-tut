@@ -3,6 +3,7 @@ import matplotlib
 matplotlib.use('Agg')		# pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
 import os
+import hmm
 
 ## ID16
 # ファイル名
@@ -74,6 +75,7 @@ class dataframe_plotter():
 
 
 def main():
+	hmm.main()
 	dm = dataframe_maker()
 	dm.init()
 	dp = dataframe_plotter()
