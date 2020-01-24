@@ -1,5 +1,8 @@
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')		# pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
+import os
 
 ## ID16
 # ファイル名
@@ -8,6 +11,9 @@ filename = "LOG_20181219141837_00010533_0021002B401733434E45.csv"
 ## ID19
 # ファイル名
 #filename = "LOG_20181219141901_00007140_00140064401733434E45.csv"
+
+## 画像ファイルの保存先
+PATH = "/Users/okimototakuya/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/"
 
 class dataframe_maker():
 	df = None # DataFrame型インスタンスを格納
@@ -57,16 +63,17 @@ class dataframe_plotter():
 		ax5 = df.plot(y='AngularRate_y', ax=ax4)
 		ax6 = df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5)
 		ax6.set_title(filename)
-		plt.show()
+		#plt.show()
+		plt.savefig(os.path.join(os.getcwd(), "demo.png"))
 
 
 def main():
 	dm = dataframe_maker()
 	dm.init()
 	dp = dataframe_plotter()
-	dp.plotTimeAcc(dm.df)
+	#dp.plotTimeAcc(dm.df)
 	#dp.plotTimeAng(dm.df)
-	#dp.plotTimeAccAng(dm.df)
+	dp.plotTimeAccAng(dm.df)
 
 if __name__ == '__main__':
 	main()
