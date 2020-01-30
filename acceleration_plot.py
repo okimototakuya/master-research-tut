@@ -57,12 +57,13 @@ class dataframe_plotter():
 		plt.show()
 
 	def plotTimeAccAng(self, df):
+		df.join(pd.DataFrame(pred))
 		## 加速度・角速度の時系列変化をプロット
 		for i in range(500):
 			# 13万近くあるサンプルデータから,250個ずつを抽出
 			df.loc[:, 'Acceleration_x'] = df.iloc[250*i:250*(i+1), 2]		# 加速度x
 			df.loc[:, 'AngularRate_x'] = df.iloc[250*i:250*(i+1), 5]			# 角加速度x
-			print(df.loc[:, 'Acceleration_x'])
+			#print(df.loc[:, 'Acceleration_x'])
 
 			ax1 = df.plot(y='Acceleration_x')
 			#ax2 = df.plot(y='Acceleration_y', ax=ax1)
@@ -79,7 +80,7 @@ def main():
 	global pred
 	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
 	pred = hmm_learn.getPred()
-	print(pred)
+	#print(pred)
 
 	dm = dataframe_maker()
 	dm.init()
