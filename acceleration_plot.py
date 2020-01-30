@@ -76,9 +76,10 @@ class dataframe_plotter():
 
 
 def main():
-	hmm_learn.main()
-	np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
-	print((hmm_learn.init.getX(hmm_learn)))
+	global pred
+	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
+	pred = hmm_learn.getPred()
+	print(pred)
 
 	dm = dataframe_maker()
 	dm.init()
@@ -88,4 +89,6 @@ def main():
 	dp.plotTimeAccAng(dm.df)
 
 if __name__ == '__main__':
+	# 予測値を取得する変数.
+	pred = None
 	main()
