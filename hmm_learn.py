@@ -22,14 +22,14 @@ def hmmLearn():
 	X = X1.join(X2)
 	model.fit(X)
 
-	np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
+	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
 	#print("初期確率\n", model.startprob_)
 	#print("平均値\n", model.means_)
 	#print("共分散値\n", model.covars_)
 	#print("遷移確率\n", model.transmat_)
 	#print("対数尤度\n", model.score(X))
 	pred = model.predict(X)
-	#print("状態系列の復号\n", pred)
+	print("状態系列の復号\n", pred)
 
 def main():
 	#hmmLearn()

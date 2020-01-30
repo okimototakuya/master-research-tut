@@ -57,12 +57,19 @@ class dataframe_plotter():
 		plt.show()
 
 	def plotTimeAccAng(self, df):
-		df.join(pd.DataFrame(pred))
+		global pred
+		predict = pd.DataFrame(pred, columns=['pred'])
+		#df.join(predict.loc[:,'pred'])
+		#df = pd.merge(df, predict, how='left', left_on=None, right_on=None, left_index=False, right_index=False)
+		df = pd.concat([df, predict], axis=1)
+		#print(df)
+		#print(predict)
 		## 加速度・角速度の時系列変化をプロット
 		for i in range(500):
 			# 13万近くあるサンプルデータから,250個ずつを抽出
 			df.loc[:, 'Acceleration_x'] = df.iloc[250*i:250*(i+1), 2]		# 加速度x
 			df.loc[:, 'AngularRate_x'] = df.iloc[250*i:250*(i+1), 5]			# 角加速度x
+			df.loc[:, 'pred'] = df.loc[250*i:250*(i+1), 'pred']			# 予測値x
 			#print(df.loc[:, 'Acceleration_x'])
 
 			ax1 = df.plot(y='Acceleration_x')
@@ -71,7 +78,8 @@ class dataframe_plotter():
 			ax2 = df.plot(y='AngularRate_x', ax=ax1)
 			#ax5 = df.plot(y='AngularRate_y', ax=ax4)
 			#ax6 = df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5)
-			ax2.set_title(filename)
+			ax_pred = df.plot(y='pred', ax=ax2)
+			ax_pred.set_title(filename)
 			#plt.show()
 			plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
 
