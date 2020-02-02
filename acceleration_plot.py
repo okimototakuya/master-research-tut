@@ -8,11 +8,11 @@ import numpy as np
 
 ## ID16
 # ファイル名
-filename = "LOG_20181219141837_00010533_0021002B401733434E45.csv"
+filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
 
 ## ID19
 # ファイル名
-#filename = "LOG_20181219141901_00007140_00140064401733434E45.csv"
+#filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
 
 ## 画像ファイルの保存先
 PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/加速度・角加速度の時系列変化プロット"
@@ -40,6 +40,7 @@ class dataframe_maker():
 									)
 
 class dataframe_plotter():
+	"""
 	def plotTimeAcc(self, df):
 		## 加速度の時系列変化をプロット
 		ax1 = df.plot(y='Acceleration_x')
@@ -55,15 +56,12 @@ class dataframe_plotter():
 		ax3 = df.plot(y='AngularRate_z', ax=ax2)
 		ax3.set_title(filename)
 		plt.show()
+	"""
 
 	def plotTimeAccAng(self, df):
 		global pred
 		predict = pd.DataFrame(pred, columns=['pred'])
-		#df.join(predict.loc[:,'pred'])
-		#df = pd.merge(df, predict, how='left', left_on=None, right_on=None, left_index=False, right_index=False)
 		df = pd.concat([df, predict], axis=1)
-		#print(df)
-		#print(predict)
 		## 加速度・角速度の時系列変化をプロット
 		for i in range(500):
 			# 13万近くあるサンプルデータから,250個ずつを抽出
@@ -88,7 +86,6 @@ def main():
 	global pred
 	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
 	pred = hmm_learn.getPred()
-	#print(pred)
 
 	dm = dataframe_maker()
 	dm.init()
