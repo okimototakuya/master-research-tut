@@ -40,46 +40,17 @@ class dataframe_maker():
 									)
 
 class dataframe_plotter():
-	def plotTimeAcc(self, df):
-		## 加速度の時系列変化をプロット
-		ax1 = df.plot(y='Acceleration_x')
-		ax2 = df.plot(y='Acceleration_y', ax=ax1)
-		ax3 = df.plot(y='Acceleration_z', ax=ax2)
-		ax3.set_title(filename)
-		plt.show()
-
-	def plotTimeAng(self, df):
-		## 角速度の時系列変化をプロット
-		ax1 = df.plot(y='AngularRate_x')
-		ax2 = df.plot(y='AngularRate_y', ax=ax1)
-		ax3 = df.plot(y='AngularRate_z', ax=ax2)
-		ax3.set_title(filename)
-		plt.show()
-
-	def plotTimeAccAng(self, df):
+	def plotTimeAccAng(self, df, delta, *args):
 		global pred
 		predict = pd.DataFrame(pred, columns=['pred'])
-		#df.join(predict.loc[:,'pred'])
-		#df = pd.merge(df, predict, how='left', left_on=None, right_on=None, left_index=False, right_index=False)
-		df = pd.concat([df, predict], axis=1)
-		#print(df)
-		#print(predict)
-		## 加速度・角速度の時系列変化をプロット
-		for i in range(500):
-			# 13万近くあるサンプルデータから,250個ずつを抽出
-			df.loc[:, 'Acceleration_x'] = df.iloc[250*i:250*(i+1), 2]		# 加速度x
-			df.loc[:, 'AngularRate_x'] = df.iloc[250*i:250*(i+1), 5]			# 角加速度x
-			df.loc[:, 'pred'] = df.loc[250*i:250*(i+1), 'pred']			# 予測値x
-			#print(df.loc[:, 'Acceleration_x'])
+		df = pd.concat([df[list(args)], predict], axis=1)
 
-			ax1 = df.plot(y='Acceleration_x')
-			#ax2 = df.plot(y='Acceleration_y', ax=ax1)
-			#ax3 = df.plot(y='Acceleration_z', ax=ax2)
-			ax2 = df.plot(y='AngularRate_x', ax=ax1)
-			#ax5 = df.plot(y='AngularRate_y', ax=ax4)
-			#ax6 = df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5)
-			ax_pred = df.plot(y='pred', ax=ax2)
-			ax_pred.set_title(filename)
+		## 加速度・角速度の時系列変化をプロット
+		for i in range(int(len(df)/delta)):
+			copy_df = df.loc[delta*i:delta*(i+1), :]
+			copy_df.dropna(how='all')
+			ax = copy_df.plot()
+			ax.set_title(filename)
 			#plt.show()
 			plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
 
@@ -88,16 +59,15 @@ def main():
 	global pred
 	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
 	pred = hmm_learn.getPred()
-	#print(pred)
 
 	dm = dataframe_maker()
 	dm.init()
 	dp = dataframe_plotter()
 	#dp.plotTimeAcc(dm.df)
 	#dp.plotTimeAng(dm.df)
-	dp.plotTimeAccAng(dm.df)
+	dp.plotTimeAccAng(dm.df, 250, 'Acceleration_x', 'AngularRate_x')
+	#dp.plotTimeAccAng(dm.df, 250, 1, 4)
 
 if __name__ == '__main__':
-	# 予測値を取得する変数.
-	pred = None
+	pred = None		# 予測値を取得する変数.
 	main()
