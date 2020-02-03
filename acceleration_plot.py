@@ -8,11 +8,11 @@ import numpy as np
 
 ## ID16
 # ファイル名
-filename = "LOG_20181219141837_00010533_0021002B401733434E45.csv"
+filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
 
 ## ID19
 # ファイル名
-#filename = "LOG_20181219141901_00007140_00140064401733434E45.csv"
+#filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
 
 ## 画像ファイルの保存先
 PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/加速度・角加速度の時系列変化プロット"
