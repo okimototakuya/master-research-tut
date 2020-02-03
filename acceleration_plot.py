@@ -19,8 +19,10 @@ PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Docume
 
 class dataframe_maker():
 	df = None # DataFrame型インスタンスを格納
+	#global df
 
 	def init(self):
+		#global df
 		# 列名を明示的に指定することにより, 欠損値をNaNで補完.
 		col_names = ['line', 'time',
 						'Acceleration_x', 'Acceleration_y', 'Acceleration_z',
@@ -58,24 +60,29 @@ class dataframe_plotter():
 		plt.show()
 	"""
 
-	def plotTimeAccAng(self, df):
+	#def plotTimeAccAng(self, df, delta, acc_x=None, acc_y=None, acc_z=None, ang_x=None, ang_y=None, ang_z=None):
+	def plotTimeAccAng(self, df, delta, *args):
 		global pred
 		predict = pd.DataFrame(pred, columns=['pred'])
 		df = pd.concat([df, predict], axis=1)
 		## 加速度・角速度の時系列変化をプロット
 		for i in range(500):
-			# 13万近くあるサンプルデータから,250個ずつを抽出
-			df.loc[:, 'Acceleration_x'] = df.iloc[250*i:250*(i+1), 2]		# 加速度x
-			df.loc[:, 'AngularRate_x'] = df.iloc[250*i:250*(i+1), 5]			# 角加速度x
-			df.loc[:, 'pred'] = df.loc[250*i:250*(i+1), 'pred']			# 予測値x
-			#print(df.loc[:, 'Acceleration_x'])
+			for arg in args:
+				df.loc[:, arg] = df.loc[delta*i:delta*(i+1), arg]		# 加速度x
+			df.loc[:, 'pred'] = df.loc[delta*i:delta*(i+1), 'pred']			# 予測値x
 
+			
 			ax1 = df.plot(y='Acceleration_x')
 			#ax2 = df.plot(y='Acceleration_y', ax=ax1)
 			#ax3 = df.plot(y='Acceleration_z', ax=ax2)
 			ax2 = df.plot(y='AngularRate_x', ax=ax1)
 			#ax5 = df.plot(y='AngularRate_y', ax=ax4)
 			#ax6 = df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5)
+			
+			#i = 0
+			#for arg in args:
+			
+			
 			ax_pred = df.plot(y='pred', ax=ax2)
 			ax_pred.set_title(filename)
 			#plt.show()
@@ -92,9 +99,10 @@ def main():
 	dp = dataframe_plotter()
 	#dp.plotTimeAcc(dm.df)
 	#dp.plotTimeAng(dm.df)
-	dp.plotTimeAccAng(dm.df)
+	dp.plotTimeAccAng(dm.df, 250, 'Acceleration_x', 'AngularRate_x')
+	#dp.plotTimeAccAng(dm.df, 250, 1, 4)
 
 if __name__ == '__main__':
-	# 予測値を取得する変数.
-	pred = None
+	pred = None		# 予測値を取得する変数.
+	#df = None		# DataFrame型を格納する変数.
 	main()
