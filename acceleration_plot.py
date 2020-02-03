@@ -64,26 +64,24 @@ class dataframe_plotter():
 	def plotTimeAccAng(self, df, delta, *args):
 		global pred
 		predict = pd.DataFrame(pred, columns=['pred'])
-		df = pd.concat([df, predict], axis=1)
+		df = pd.concat([df[list(args)], predict], axis=1)
+		copy_df = df
+		#print(copy_df)
 		## 加速度・角速度の時系列変化をプロット
 		for i in range(500):
 			for arg in args:
-				df.loc[:, arg] = df.loc[delta*i:delta*(i+1), arg]		# 加速度x
-			df.loc[:, 'pred'] = df.loc[delta*i:delta*(i+1), 'pred']			# 予測値x
+				copy_df.loc[:, arg] = df.loc[delta*i:delta*(i+1), arg]		# 加速度x
 
-			
-			ax1 = df.plot(y='Acceleration_x')
-			#ax2 = df.plot(y='Acceleration_y', ax=ax1)
-			#ax3 = df.plot(y='Acceleration_z', ax=ax2)
-			ax2 = df.plot(y='AngularRate_x', ax=ax1)
-			#ax5 = df.plot(y='AngularRate_y', ax=ax4)
-			#ax6 = df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5)
-			
-			#i = 0
-			#for arg in args:
-			
-			
-			ax_pred = df.plot(y='pred', ax=ax2)
+			copy_df.loc[:, 'pred'] = df.loc[delta*i:delta*(i+1), 'pred']			# 予測値x
+
+			ax1 = copy_df.plot(y='Acceleration_x')
+			#ax2 = copy_df.plot(y='Acceleration_y', ax=ax1)
+			#ax3 = copy_df.plot(y='Acceleration_z', ax=ax2)
+			ax2 = copy_df.plot(y='AngularRate_x', ax=ax1)
+			#ax5 = copy_df.plot(y='AngularRate_y', ax=ax4)
+			#ax6 = copy_df.plot(y='AngularRate_z', secondary_y=['Acceleration_x','AngularRate_x'], ax=ax5)
+
+			ax_pred = copy_df.plot(y='pred', ax=ax2)
 			ax_pred.set_title(filename)
 			#plt.show()
 			plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
