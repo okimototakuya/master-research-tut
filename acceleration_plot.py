@@ -49,7 +49,7 @@ class dataframe_plotter():
 		for i in range(int(len(df)/delta)):
 			copy_df = df.loc[delta*i:delta*(i+1), :]
 			copy_df.dropna(how='all')
-			ax = copy_df.plot()
+			ax = copy_df.plot(secondary_y=['pred'])
 			ax.set_title(filename)
 			#plt.show()
 			plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
