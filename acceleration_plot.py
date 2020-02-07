@@ -16,9 +16,6 @@ filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
 # ファイル名
 #filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
 
-## 画像ファイルの保存先
-PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/"
-
 class dataframe_maker():
 	df = None # DataFrame型インスタンスを格納
 
@@ -59,15 +56,17 @@ class dataframe_plotter():
 
 def main():
 	global pred
-	if sys.argv[1] == 0:		# 隠れマルコフモデル
+	global PATH
+	if sys.argv[1] == '0':		# 隠れマルコフモデル
 		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
-		PATH = PATH + 'hmm加速度・角加速度の時系列変化プロット'
-		print(PATH)
+		PATH = PATH + "hmm加速度・角加速度の時系列変化プロット"
 		pred = hmm_learn.getPred()
-	elif sys.argv[1] == 1:		# クラスタリング
+	elif sys.argv[1] == '1':		# クラスタリング
 		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
-		PATH = PATH + 'cluster加速度・角加速度の時系列変化プロット'
+		PATH = PATH + "cluster加速度・角加速度の時系列変化プロット"
 		pred = cluster_learn.getPred()
+	else:
+		print("Error is here.")
 
 	dm = dataframe_maker()
 	dm.init()
@@ -79,4 +78,6 @@ def main():
 
 if __name__ == '__main__':
 	pred = None		# 予測値を取得する変数.
+## 画像ファイルの保存先
+	PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/"
 	main()
