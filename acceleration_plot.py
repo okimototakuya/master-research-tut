@@ -4,7 +4,9 @@ matplotlib.use('Agg')		# pyplotで生成した画像を保存するためのイ�
 import matplotlib.pyplot as plt
 import os
 import hmm_learn
+import cluster_learn
 import numpy as np
+import sys
 
 ## ID16
 # ファイル名
@@ -15,7 +17,7 @@ filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
 #filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
 
 ## 画像ファイルの保存先
-PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/加速度・角加速度の時系列変化プロット"
+PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/"
 
 class dataframe_maker():
 	df = None # DataFrame型インスタンスを格納
@@ -57,8 +59,15 @@ class dataframe_plotter():
 
 def main():
 	global pred
-	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
-	pred = hmm_learn.getPred()
+	if sys.argv[1] == 0:		# 隠れマルコフモデル
+		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
+		PATH = PATH + 'hmm加速度・角加速度の時系列変化プロット'
+		print(PATH)
+		pred = hmm_learn.getPred()
+	elif sys.argv[1] == 1:		# クラスタリング
+		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
+		PATH = PATH + 'cluster加速度・角加速度の時系列変化プロット'
+		pred = cluster_learn.getPred()
 
 	dm = dataframe_maker()
 	dm.init()
