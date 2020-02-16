@@ -8,23 +8,14 @@ import cluster_learn
 import numpy as np
 import sys
 
-## ID16
-# ファイル名
-filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
-
-## ID19
-# ファイル名
-#filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
-
 class dataframe_maker():
-	df = None # DataFrame型インスタンスを格納
+	#df = None # DataFrame型インスタンスを格納
 
-	def init(self):
+	def __init__(self, filename):
 		# 列名を明示的に指定することにより, 欠損値をNaNで補完.
 		col_names = ['line', 'time',
 						'Acceleration_x', 'Acceleration_y', 'Acceleration_z',
-						'AngularRate_x', 'AngularRate_y', 'AngularRate_z',
-						'Temperture', 'Pressure', 'MagnetCount', 'MagnetSwitch',
+						'AngularRate_x', 'AngularRate_y', 'AngularRate_z', 'Temperture', 'Pressure', 'MagnetCount', 'MagnetSwitch',
 						]
 		self.df = pd.read_csv(filename,
 									names=col_names,
@@ -57,6 +48,8 @@ class dataframe_plotter():
 def main():
 	global pred
 	global PATH
+	global filename
+
 	if sys.argv[1] == '0':		# 隠れマルコフモデル
 		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
 		PATH = PATH + "hmm加速度・角加速度の時系列変化プロット"
@@ -68,7 +61,7 @@ def main():
 	else:
 		print("Error is here.")
 
-	dm = dataframe_maker()
+	dm = dataframe_maker(filename)
 	dm.init()
 	dp = dataframe_plotter()
 	#dp.plotTimeAcc(dm.df)
@@ -77,7 +70,15 @@ def main():
 	#dp.plotTimeAccAng(dm.df, 250, 1, 4)
 
 if __name__ == '__main__':
-	pred = None		# 予測値を取得する変数.
+## 予測値を取得する変数
+	pred = None
 ## 画像ファイルの保存先
 	PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/"
+## ID16
+# ファイル名
+	filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
+## ID19
+# ファイル名
+	#filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
+
 	main()

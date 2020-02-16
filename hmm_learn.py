@@ -10,9 +10,10 @@ def getPred():
 
 def hmmLearn():
 	global pred
+	global filename
 	# 加速度データのDataFrame型変数を作成.
-	acc = ap.dataframe_maker()
-	acc.init()
+	acc = ap.dataframe_maker(filename)
+	#acc.init()
 	# 確率モデル(隠れマルコフモデルの作成.
 	model = hmm.GaussianHMM(n_components=3, covariance_type="full")
 	# DataFrame型変数から学習に用いる加速度データを抽出.
@@ -36,7 +37,13 @@ def main():
 	getPred()
 
 if __name__ == '__main__':
-	# 予測値を格納する変数
+# 予測値を格納する変数
 	pred = None
-	# main関数の実行
+## ID16
+# ファイル名
+	filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
+## ID19
+# ファイル名
+	#filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
+# main関数の実行
 	main()
