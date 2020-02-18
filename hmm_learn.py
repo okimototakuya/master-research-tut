@@ -1,5 +1,6 @@
 import numpy as np
-import acceleration_plot as ap
+#import acceleration_plot as ap
+import acceleration_plot2 as ap
 from hmmlearn import hmm
 import pandas as pd
 
@@ -12,8 +13,7 @@ def hmmLearn():
 	global pred
 	global filename
 	# 加速度データのDataFrame型変数を作成.
-	acc = ap.dataframe_maker(filename)
-	#acc.init()
+	acc = ap.DataframeMaker(ap.filename)
 	# 確率モデル(隠れマルコフモデルの作成.
 	model = hmm.GaussianHMM(n_components=3, covariance_type="full")
 	# DataFrame型変数から学習に用いる加速度データを抽出.
