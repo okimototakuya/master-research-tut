@@ -9,7 +9,7 @@ import numpy as np
 import sys
 
 ## この位置でグローバル変数扱いになる.
-## 予測値を取得する変数
+## 予測値を格納する変数
 pred = None
 ## 画像ファイルの保存先
 PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/"
@@ -56,8 +56,8 @@ class DataframePlotter():
 
 def main():
 	global filename
-	global pred
 	global PATH
+	global pred
 
 	if sys.argv[1] == '0':		# 隠れマルコフモデル
 		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
@@ -67,7 +67,8 @@ def main():
 	elif sys.argv[1] == '1':		# クラスタリング
 		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
 		PATH = PATH + "cluster加速度・角加速度の時系列変化プロット"
-		pred = cluster_learn.getPred()
+		cluster_learn.clusterLearn()
+		pred = cluster_learn.pred
 	else:
 		print("Error is here.")
 

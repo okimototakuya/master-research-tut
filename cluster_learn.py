@@ -1,24 +1,21 @@
 import numpy as np
-import acceleration_plot as ap
+import acceleration_plot2 as ap
 from sklearn.cluster import KMeans
 import pandas as pd
 
-def getPred():
-	global pred
-	clusterLearn()
-	return pred
+# 予測値を格納する変数
+pred = None
 
 def clusterLearn():
 	global pred
 	# 加速度データのDataFrame型変数を作成.
-	acc = ap.dataframe_maker()
-	acc.init()
+	acc = ap.DataframeMaker(ap.filename)
 	# 確率モデル(Kmeansアルゴリズムの作成.
 	model = KMeans(n_clusters = 3)
 	# DataFrame型変数から学習に用いる加速度データを抽出.
-	X1 = (acc.df).iloc[:,1]
+	X1 = (acc.df).loc[:,'Acceleration_x']
 	X1 = pd.DataFrame(X1)
-	X2 = (acc.df).iloc[:,4]
+	X2 = (acc.df).loc[:,'AngularRate_x']
 	X = X1.join(X2)
 	X = np.array(X)		# KMeansの引数はpd.DataFrameではなくnp.array
 	model.fit(X)
@@ -33,11 +30,7 @@ def clusterLearn():
 	print("状態系列の復号\n", pred)
 
 def main():
-	#clusterLearn()
-	getPred()
+	clusterLearn()
 
 if __name__ == '__main__':
-	# 予測値を格納する変数
-	pred = None
-	# main関数の実行
 	main()
