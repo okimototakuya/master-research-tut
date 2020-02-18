@@ -59,16 +59,17 @@ def main():
 	global pred
 	global PATH
 
-	#if sys.argv[1] == '0':		# 隠れマルコフモデル
-	#	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
-	#	PATH = PATH + "hmm加速度・角加速度の時系列変化プロット"
-	#	pred = hmm_learn.getPred()
-	#elif sys.argv[1] == '1':		# クラスタリング
-	#	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
-	#	PATH = PATH + "cluster加速度・角加速度の時系列変化プロット"
-	#	pred = cluster_learn.getPred()
-	#else:
-	#	print("Error is here.")
+	if sys.argv[1] == '0':		# 隠れマルコフモデル
+		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
+		PATH = PATH + "hmm加速度・角加速度の時系列変化プロット"
+		hmm_learn.hmmLearn()
+		pred = hmm_learn.pred
+	elif sys.argv[1] == '1':		# クラスタリング
+		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
+		PATH = PATH + "cluster加速度・角加速度の時系列変化プロット"
+		pred = cluster_learn.getPred()
+	else:
+		print("Error is here.")
 
 	dataframe = DataframeMaker(filename)
 	DataframePlotter.plot(dataframe.df, 250, 'Acceleration_x', 'AngularRate_x')
