@@ -31,7 +31,7 @@ class DataframeMaker():
 									names=col_names,
 									skiprows=3,
 									parse_dates=['time'],
-									index_col=0, # 0:整数値, 1:時刻
+									index_col='line',
 									converters={'line':int, 'time':str,
 													'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
 													'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,
@@ -39,10 +39,39 @@ class DataframeMaker():
 													}
 									)
 
+class DataframePlotter():
+	@staticmethod
+	def plot(df, delta, *args):		# delta:グラフの定義域,*args:グラフを描く列のリスト
+		global pred
+		predict = pd.DataFrame(pred, columns=['pred'])
+		df = pd.concat([df[list(args)], predict], axis=1)
+		## 加速度・角速度の時系列変化をプロット
+		for i in range(int(len(df)/delta)):
+			copy_df = df.loc[delta*i:delta*(i+1), :]
+			copy_df.dropna(how='all')
+			ax = copy_df.plot(secondary_y=['pred'])
+			ax.set_title(filename)
+			#plt.show()
+			plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
+
 def main():
 	global filename
+	global pred
+	global PATH
+
+	#if sys.argv[1] == '0':		# 隠れマルコフモデル
+	#	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
+	#	PATH = PATH + "hmm加速度・角加速度の時系列変化プロット"
+	#	pred = hmm_learn.getPred()
+	#elif sys.argv[1] == '1':		# クラスタリング
+	#	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
+	#	PATH = PATH + "cluster加速度・角加速度の時系列変化プロット"
+	#	pred = cluster_learn.getPred()
+	#else:
+	#	print("Error is here.")
+
 	dataframe = DataframeMaker(filename)
-	print(dataframe.df)
+	DataframePlotter.plot(dataframe.df, 250, 'Acceleration_x', 'AngularRate_x')
 
 if __name__ == '__main__':
 	main()
