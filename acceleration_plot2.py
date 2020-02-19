@@ -22,11 +22,11 @@ filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
 ## 加速度のリスト
 acc = [
 		'Acceleration_x',
-		'Acceleration_y',
-		'Acceleration_z',
+#		'Acceleration_y',
+#		'Acceleration_z',
 		'AngularRate_x',
-		'AngularRate_y',
-		'AngularRate_z',
+#		'AngularRate_y',
+#		'AngularRate_z',
 		]
 
 class DataframeMaker():
@@ -50,7 +50,7 @@ class DataframeMaker():
 
 class DataframePlotter():
 	@staticmethod
-	def plot(df, delta, *args):		# delta:グラフの定義域,*args:グラフを描く列のリスト
+	def plot(df, delta, args):		# delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
 		global pred
 		predict = pd.DataFrame(pred, columns=['pred'])
 		df = pd.concat([df[list(args)], predict], axis=1)
@@ -83,7 +83,7 @@ def main():
 		print("Error is here.")
 
 	dataframe = DataframeMaker(filename)
-	DataframePlotter.plot(dataframe.df, 250, acc[0], acc[3])
+	DataframePlotter.plot(dataframe.df, 250, tuple(acc))
 
 if __name__ == '__main__':
 	main()
