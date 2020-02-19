@@ -10,14 +10,18 @@ pred = None
 def hmmLearn():
 	global pred
 	# 加速度データのDataFrame型変数を作成.
-	acc = ap.DataframeMaker(ap.filename)
+	dataframe = ap.DataframeMaker(ap.filename)
 	# 確率モデル(隠れマルコフモデルの作成.
 	model = hmm.GaussianHMM(n_components=3, covariance_type="full")
 	# DataFrame型変数から学習に用いる加速度データを抽出.
-	X1 = (acc.df).loc[:,'Acceleration_x']
-	X1 = pd.DataFrame(X1)
-	X2 = (acc.df).loc[:,'AngularRate_x']
-	X = X1.join(X2)
+	X = (dataframe.df).loc[:,ap.acc[0]]
+	X = pd.DataFrame(X)
+	if len(ap.acc) > 1:
+		for str in ap.acc[1:]:
+			X_ = (dataframe.df).loc[:,str]
+			X = X.join(X_)
+	else:
+		pass
 	model.fit(X)
 
 	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)

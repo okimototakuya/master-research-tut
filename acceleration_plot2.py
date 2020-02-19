@@ -22,7 +22,7 @@ filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
 ## 加速度のリスト
 acc = [
 		'Acceleration_x',
-#		'Acceleration_y',
+		'Acceleration_y',
 #		'Acceleration_z',
 		'AngularRate_x',
 #		'AngularRate_y',
