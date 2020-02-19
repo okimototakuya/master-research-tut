@@ -19,6 +19,15 @@ filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
 ## ID19
 # ファイル名
 #filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
+## 加速度のリスト
+acc = [
+		'Acceleration_x',
+		'Acceleration_y',
+		'Acceleration_z',
+		'AngularRate_x',
+		'AngularRate_y',
+		'AngularRate_z',
+		]
 
 class DataframeMaker():
 	def __init__(self, filename):
@@ -58,6 +67,7 @@ def main():
 	global filename
 	global PATH
 	global pred
+	global acc
 
 	if sys.argv[1] == '0':		# 隠れマルコフモデル
 		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
@@ -73,7 +83,7 @@ def main():
 		print("Error is here.")
 
 	dataframe = DataframeMaker(filename)
-	DataframePlotter.plot(dataframe.df, 250, 'Acceleration_x', 'AngularRate_x')
+	DataframePlotter.plot(dataframe.df, 250, acc[0], acc[3])
 
 if __name__ == '__main__':
 	main()
