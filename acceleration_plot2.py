@@ -22,18 +22,18 @@ acc = [
 		'Acceleration_x',
 		'Acceleration_y',
 		'Acceleration_z',
-		'AngularRate_x',
-		'AngularRate_y',
-		'AngularRate_z',
+#		'AngularRate_x',
+#		'AngularRate_y',
+#		'AngularRate_z',
 		]
 ## 画像ファイルの保存先
 #PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm 1x1y1z2x2y2z(3)_100"
 PATH = "/Users/okimototakuya/Desktop/tmp"
 ## 一つのグラフのプロット数
-PLOT_SEG = 100
+PLOT_SEG = 200
 ## 隠れマルコフモデルを適用させる範囲
-HMM_RANGE_START = 60000
-HMM_RANGE_END = 90000
+HMM_RANGE_START = 75000
+HMM_RANGE_END = 80000
 
 class DataframeMaker():
 	def __init__(self, filename):
@@ -58,6 +58,7 @@ class DataframePlotter():
 	@staticmethod
 	def plot(df, delta, args):		# delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
 		global pred
+		df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
 		predict = pd.DataFrame(pred, columns=['pred'])
 		df = pd.concat([df[list(args)], predict], axis=1)
 		## 加速度・角速度の時系列変化をプロット
