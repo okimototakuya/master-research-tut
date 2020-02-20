@@ -22,6 +22,7 @@ def hmmLearn():
 			X = X.join(X_)
 	else:
 		pass
+	X = X[ap.HMM_RANGE_START:ap.HMM_RANGE_END]
 	model.fit(X)
 
 	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
