@@ -11,8 +11,6 @@ import sys
 ## この位置でグローバル変数扱いになる.
 ## 予測値を格納する変数
 pred = None
-## 画像ファイルの保存先
-PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/"
 ## ID16
 # ファイル名
 filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
@@ -23,11 +21,19 @@ filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
 acc = [
 		'Acceleration_x',
 		'Acceleration_y',
-#		'Acceleration_z',
-		'AngularRate_x',
+		'Acceleration_z',
+#		'AngularRate_x',
 #		'AngularRate_y',
 #		'AngularRate_z',
 		]
+## 画像ファイルの保存先
+#PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm 1x1y1z2x2y2z(3)_100"
+PATH = "/Users/okimototakuya/Desktop/tmp"
+## 一つのグラフのプロット数
+PLOT_SEG = 100
+## 隠れマルコフモデルを適用させる範囲
+HMM_RANGE_START = 75000
+HMM_RANGE_END = 80000
 
 class DataframeMaker():
 	def __init__(self, filename):
@@ -52,6 +58,7 @@ class DataframePlotter():
 	@staticmethod
 	def plot(df, delta, args):		# delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
 		global pred
+		df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
 		predict = pd.DataFrame(pred, columns=['pred'])
 		df = pd.concat([df[list(args)], predict], axis=1)
 		## 加速度・角速度の時系列変化をプロット
@@ -60,6 +67,7 @@ class DataframePlotter():
 			copy_df.dropna(how='all')
 			ax = copy_df.plot(secondary_y=['pred'])
 			ax.set_title(filename)
+			ax.set_ylim([-2.0, 0.5])
 			#plt.show()
 			plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
 
@@ -68,22 +76,21 @@ def main():
 	global PATH
 	global pred
 	global acc
+	global PLOT_SEG
 
 	if sys.argv[1] == '0':		# 隠れマルコフモデル
 		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
-		PATH = PATH + "hmm加速度・角加速度の時系列変化プロット"
 		hmm_learn.hmmLearn()
 		pred = hmm_learn.pred
 	elif sys.argv[1] == '1':		# クラスタリング
 		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
-		PATH = PATH + "cluster加速度・角加速度の時系列変化プロット"
 		cluster_learn.clusterLearn()
 		pred = cluster_learn.pred
 	else:
 		print("Error is here.")
 
 	dataframe = DataframeMaker(filename)
-	DataframePlotter.plot(dataframe.df, 250, tuple(acc))
+	DataframePlotter.plot(dataframe.df, PLOT_SEG, tuple(acc))
 
 if __name__ == '__main__':
 	main()
