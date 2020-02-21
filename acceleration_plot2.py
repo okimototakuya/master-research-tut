@@ -65,9 +65,15 @@ class DataframePlotter():
 		for i in range(int(len(df)/delta)):
 			copy_df = df.loc[delta*i:delta*(i+1), :]
 			copy_df.dropna(how='all')
-			ax = copy_df.plot(secondary_y=['pred'])
+			#ax = copy_df.plot(secondary_y=['pred'])
+			ax1 = copy_df[list(args)].plot()
+			if i == 3:
+				#print(copy_df['pred'])
+				break
+			ax = copy_df[['pred']].plot.bar(ax=ax1, width=1.0)
+			#ax = copy_df[['pred']].plot(ax=ax1)
 			ax.set_title(filename)
-			ax.set_ylim([-2.0, 0.5])
+			ax.set_ylim([-2.0, 2.0])
 			#plt.show()
 			plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
 
