@@ -27,13 +27,16 @@ acc = [
 #		'AngularRate_z',
 		]
 ## 画像ファイルの保存先
-#PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm 1x1y1z2x2y2z(3)_100"
-PATH = "/Users/okimototakuya/Desktop/tmp"
+PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
+#PATH = "/Users/okimototakuya/Desktop/tmp"
 ## 一つのグラフのプロット数
 PLOT_SEG = 100
+#PLOT_SEG = 131663
 ## 隠れマルコフモデルを適用させる範囲
-HMM_RANGE_START = 75000
+HMM_RANGE_START = 70000
 HMM_RANGE_END = 80000
+#HMM_RANGE_START = 0
+#HMM_RANGE_END = 131663
 
 class DataframeMaker():
 	def __init__(self, filename):
@@ -46,7 +49,7 @@ class DataframeMaker():
 									names=col_names,
 									skiprows=3,
 									parse_dates=['time'],
-									index_col='line',
+									index_col='time',
 									converters={'line':int, 'time':str,
 													'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
 													'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,
@@ -66,12 +69,12 @@ class DataframePlotter():
 			copy_df = df.loc[delta*i:delta*(i+1), :]
 			copy_df.dropna(how='all')
 			ax1 = copy_df[list(args)].plot()
-			if i == 3:
-				break
+			#if i == 3:
+			#	break
 			#ax = copy_df[['pred']].plot.bar(ax=ax1, width=1.0)
 			ax = copy_df[['pred']].plot(ax=ax1)
 			ax.set_title(filename)
-			ax.set_ylim([-2.0, 2.0])
+			ax.set_ylim([-5.0, 2.5])
 			#plt.show()
 			plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
 
