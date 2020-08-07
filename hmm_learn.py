@@ -26,10 +26,13 @@ def hmmLearn():
 		pass
 	X = X.iloc[ap.HMM_RANGE_START:ap.HMM_RANGE_END, :]
 	# 加速度の平均値を格納するためのDataFrame型変数
-	X_ave = pd.DataFrame(np.arange(int(len(X)/AVERAGE)*len(X.columns)).reshape(int(len(X)/AVERAGE), len(X.columns)))
+	#X_ave = pd.DataFrame(np.arange(int(len(X)/AVERAGE)*len(X.columns)).reshape(int(len(X)/AVERAGE), len(X.columns)))
+	X_ave = pd.DataFrame(index=[], columns=ap.acc)
 	for i in range(int(len(X)/AVERAGE)):
 		print(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean())
-		X_ave.iloc[i, :] = pd.DataFrame(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean())
+		#X_ave.iloc[i, :] = pd.DataFrame(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean())
+		#X_ave.iloc[i, :] = X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean()
+		X_ave = X_ave.append(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean(), ignore_index=True)
 	#model.fit(X)
 	model.fit(X_ave)
 
