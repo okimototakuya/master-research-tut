@@ -25,7 +25,10 @@ def hmmLearn():
 	X = X.iloc[ap.HMM_RANGE_START:ap.HMM_RANGE_END, :]
 	#a = [i*10 for i in range(len(X))]
 	#pd.cut(X['Acceleration_x'], [i*10 for i in range(int(len(X)/10))])
-	X = X.groupby(pd.cut(pd.Series(X.index), [i*10 for i in range(int(len(X)/10)+1)])).mean()
+	#X = X.groupby(pd.cut(pd.Series(X.index), [i*10 for i in range(int(len(X)/10)+1)])).mean()
+	#s_cut = pd.cut()
+	for i in range(int(len(X)/10)):
+		print(X.iloc[i*10:i*10+10, :].mean())
 	model.fit(X)
 
 	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
