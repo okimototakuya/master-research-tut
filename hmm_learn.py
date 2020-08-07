@@ -6,6 +6,8 @@ import pandas as pd
 
 # 予測値を格納する変数
 pred = None
+# 平均値をとる要素数
+AVERAGE = 10
 
 def hmmLearn():
 	global pred
@@ -23,7 +25,12 @@ def hmmLearn():
 	else:
 		pass
 	X = X.iloc[ap.HMM_RANGE_START:ap.HMM_RANGE_END, :]
-	model.fit(X)
+	# 加速度の平均値を格納するためのDataFrame型変数
+	X_ave = pd.DataFrame(index=[], columns=ap.acc)
+	for i in range(int(len(X)/AVERAGE)):
+		X_ave = X_ave.append(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean(), ignore_index=True)
+	#model.fit(X)
+	model.fit(X_ave)
 
 	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
 	#print("初期確率\n", model.startprob_)
