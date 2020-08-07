@@ -25,13 +25,13 @@ def hmmLearn():
 	else:
 		pass
 	X = X.iloc[ap.HMM_RANGE_START:ap.HMM_RANGE_END, :]
-	#a = [i*10 for i in range(len(X))]
-	#pd.cut(X['Acceleration_x'], [i*10 for i in range(int(len(X)/10))])
-	#X = X.groupby(pd.cut(pd.Series(X.index), [i*10 for i in range(int(len(X)/10)+1)])).mean()
-	#s_cut = pd.cut()
+	# 加速度の平均値を格納するためのDataFrame型変数
+	X_ave = pd.DataFrame(np.arange(int(len(X)/AVERAGE)*len(X.columns)).reshape(int(len(X)/AVERAGE), len(X.columns)))
 	for i in range(int(len(X)/AVERAGE)):
 		print(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean())
-	model.fit(X)
+		X_ave.iloc[i, :] = pd.DataFrame(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean())
+	#model.fit(X)
+	model.fit(X_ave)
 
 	#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
 	#print("初期確率\n", model.startprob_)
