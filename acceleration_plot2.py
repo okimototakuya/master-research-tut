@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib
-matplotlib.use('Agg')		# pyplotで生成した画像を保存するためのインポート
+#matplotlib.use('Agg')		# pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
 import os
 import hmm_learn
@@ -60,23 +60,28 @@ class DataframeMaker():
 class DataframePlotter():
 	@staticmethod
 	def plot(df, delta, args):		# delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
-		global pred
-		df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
-		predict = pd.DataFrame(pred, columns=['pred'])
-		df = pd.concat([df[list(args)], predict], axis=1)
-		## 加速度・角速度の時系列変化をプロット
-		for i in range(int(len(df)/delta)):
-			copy_df = df.loc[delta*i:delta*(i+1), :]
-			copy_df.dropna(how='all')
-			ax1 = copy_df[list(args)].plot()
-			#if i == 3:
-			#	break
-			#ax = copy_df[['pred']].plot.bar(ax=ax1, width=1.0)
-			ax = copy_df[['pred']].plot(ax=ax1)
+		if sys.argv[1] != '2':
+			global pred
+			df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
+			predict = pd.DataFrame(pred, columns=['pred'])
+			df = pd.concat([df[list(args)], predict], axis=1)
+			## 加速度・角速度の時系列変化をプロット
+			for i in range(int(len(df)/delta)):
+				copy_df = df.loc[delta*i:delta*(i+1), :]
+				copy_df.dropna(how='all')
+				ax1 = copy_df[list(args)].plot()
+				#if i == 3:
+				#	break
+				#ax = copy_df[['pred']].plot.bar(ax=ax1, width=1.0)
+				ax = copy_df[['pred']].plot(ax=ax1)
+				ax.set_title(filename)
+				ax.set_ylim([-5.0, 2.5])
+				#plt.show()
+				plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
+		else:
+			ax = df.plot(x=acc[0], y=acc[1])
 			ax.set_title(filename)
-			ax.set_ylim([-5.0, 2.5])
-			#plt.show()
-			plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
+			plt.show()
 
 def main():
 	global filename
@@ -93,7 +98,7 @@ def main():
 		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
 		cluster_learn.clusterLearn()
 		pred = cluster_learn.pred
-	elif sys.argv[2] == '2':		# 加速度を２次元プロット
+	elif sys.argv[1] == '2':		# 加速度を２次元プロット
 		pass
 	else:
 		print("Error is here.")
