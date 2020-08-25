@@ -93,6 +93,8 @@ def main():
 		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
 		cluster_learn.clusterLearn()
 		pred = cluster_learn.pred
+	elif sys.argv[2] == '2':		# 加速度を２次元プロット
+		pass
 	else:
 		print("Error is here.")
 
