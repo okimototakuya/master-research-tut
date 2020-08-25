@@ -79,9 +79,12 @@ class DataframePlotter():
 				#plt.show()
 				plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
 		else:
-			ax = df.plot(x=acc[0], y=acc[1])
-			ax.set_title(filename)
-			plt.show()
+			for i in range(int(len(df)/delta)):
+				copy_df = df.iloc[delta*i:delta*(i+1), :]
+				copy_df.dropna(how='all')
+				ax = copy_df.plot(x=acc[0], y=acc[1])
+				ax.set_title(filename)
+				plt.show()
 
 def main():
 	global filename
