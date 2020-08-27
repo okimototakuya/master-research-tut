@@ -82,7 +82,8 @@ class DataframePlotter():
 			for i in range(int(len(df)/delta)):
 				copy_df = df.iloc[delta*i:delta*(i+1), :]
 				copy_df.dropna(how='all')
-				ax = copy_df.plot(x=acc[0], y=acc[1])
+				#ax = copy_df.plot(x=acc[0], y=acc[1])			# 折れ線グラフ
+				ax = copy_df.plot.scatter(x=acc[0], y=acc[1])		# 散布図
 				ax.set_title(filename)
 				plt.show()
 
