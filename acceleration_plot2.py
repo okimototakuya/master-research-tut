@@ -79,6 +79,8 @@ class DataframePlotter():
 				#plt.show()
 				plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
 		else:
+			df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()		# 2次元プロットする範囲を指定
+			df = hmm_learn.aveData(df)			# 加速度データを平均化
 			for i in range(int(len(df)/delta)):
 				copy_df = df.iloc[delta*i:delta*(i+1), :]
 				copy_df.dropna(how='all')

@@ -21,7 +21,7 @@ class dataframe_maker():
 									names=col_names,
 									skiprows=3,
 									parse_dates=['time'],
-									index_col=0, # 0:整数値, 1:時刻
+									index_col=1, # 0:整数値, 1:時刻
 									converters={'line':int, 'time':str,
 													'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
 													'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,
@@ -76,9 +76,9 @@ if __name__ == '__main__':
 	PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/"
 ## ID16
 # ファイル名
-	filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
+	#filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
 ## ID19
 # ファイル名
-	#filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
+	filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
 
 	main()
