@@ -9,6 +9,13 @@ pred = None
 # 平均値をとる要素数
 AVERAGE = 10
 
+def aveData(X):
+	# 加速度の平均値を格納するためのDataFrame型変数
+	X_ave = pd.DataFrame(index=[], columns=ap.acc)
+	for i in range(int(len(X)/AVERAGE)):
+		X_ave = X_ave.append(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean(), ignore_index=True)
+	return X_ave
+
 def hmmLearn():
 	global pred
 	# 加速度データのDataFrame型変数を作成.
@@ -26,9 +33,7 @@ def hmmLearn():
 		pass
 	X = X.iloc[ap.HMM_RANGE_START:ap.HMM_RANGE_END, :]
 	# 加速度の平均値を格納するためのDataFrame型変数
-	X_ave = pd.DataFrame(index=[], columns=ap.acc)
-	for i in range(int(len(X)/AVERAGE)):
-		X_ave = X_ave.append(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean(), ignore_index=True)
+	X_ave = aveData(X)
 	#model.fit(X)
 	model.fit(X_ave)
 
