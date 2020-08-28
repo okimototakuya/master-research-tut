@@ -30,7 +30,7 @@ acc = [
 PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
 #PATH = "/Users/okimototakuya/Desktop/tmp"
 ## 一つのグラフのプロット数
-PLOT_SEG = 100
+PLOT_SEG = 10000
 #PLOT_SEG = 131663
 ## 隠れマルコフモデルを適用させる範囲
 HMM_RANGE_START = 70000
@@ -81,7 +81,8 @@ class DataframePlotter():
 		else:
 			df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()		# 2次元プロットする範囲を指定
 			df = hmm_learn.aveData(df)			# 加速度データを平均化
-			for i in range(int(len(df)/delta)):
+			#for i in range(int(len(df)/delta)):
+			for i in range(int(len(df)/(delta/hmm_learn.AVERAGE))):
 				copy_df = df.iloc[delta*i:delta*(i+1), :]
 				copy_df.dropna(how='all')
 				#ax = copy_df.plot(x=acc[0], y=acc[1])			# 折れ線グラフ
