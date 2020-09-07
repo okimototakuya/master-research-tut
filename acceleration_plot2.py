@@ -27,7 +27,9 @@ acc = [
 #		'AngularRate_z',
 		]
 ## 画像ファイルの保存先
-PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
+#PATH = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
+PATH = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge"
+#PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
 #PATH = "/Users/okimototakuya/Desktop/tmp"
 ## 一つのグラフのプロット数
 #PLOT_SEG = 10000
