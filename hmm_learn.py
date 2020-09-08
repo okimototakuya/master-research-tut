@@ -43,7 +43,8 @@ def hmmLearn():
 	#print("共分散値\n", model.covars_)
 	#print("遷移確率\n", model.transmat_)
 	#print("対数尤度\n", model.score(X))
-	pred = model.predict(X)
+	#pred = model.predict(X)
+	pred = model.predict(X_ave)
 	print("状態系列の復号\n", pred)
 
 def main():

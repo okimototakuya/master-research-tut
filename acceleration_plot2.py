@@ -32,13 +32,13 @@ PATH = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16
 #PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
 #PATH = "/Users/okimototakuya/Desktop/tmp"
 ## 一つのグラフのプロット数
-#PLOT_SEG = 10000
-PLOT_SEG = 131663
+PLOT_SEG = 10000
+#PLOT_SEG = 131663
 ## 隠れマルコフモデルを適用させる範囲
-#HMM_RANGE_START = 70000
-#HMM_RANGE_END = 80000
-HMM_RANGE_START = 0
-HMM_RANGE_END = 131663
+HMM_RANGE_START = 60000
+HMM_RANGE_END = 70000
+#HMM_RANGE_START = 0
+#HMM_RANGE_END = 131663
 
 class DataframeMaker():
 	def __init__(self, filename):
@@ -78,8 +78,8 @@ class DataframePlotter():
 				ax = copy_df[['pred']].plot(ax=ax1)
 				ax.set_title(filename)
 				ax.set_ylim([-5.0, 2.5])
-				#plt.show()
-				plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
+				plt.show()
+				#plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
 		else:
 			df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()		# 2次元プロットする範囲を指定
 
