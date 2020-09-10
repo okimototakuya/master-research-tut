@@ -1,0 +1,21 @@
+************* Module hmm_learn
+hmm_learn.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+hmm_learn.py:8:0: C0103: Constant name "pred" doesn't conform to UPPER_CASE naming style (invalid-name)
+hmm_learn.py:12:0: C0103: Function name "aveData" doesn't conform to snake_case naming style (invalid-name)
+hmm_learn.py:12:0: C0103: Argument name "X" doesn't conform to snake_case naming style (invalid-name)
+hmm_learn.py:15:4: C0103: Variable name "X_ave" doesn't conform to snake_case naming style (invalid-name)
+hmm_learn.py:17:8: C0103: Variable name "X_ave" doesn't conform to snake_case naming style (invalid-name)
+hmm_learn.py:20:0: C0103: Function name "hmmLearn" doesn't conform to snake_case naming style (invalid-name)
+hmm_learn.py:22:4: W0603: Using the global statement (global-statement)
+hmm_learn.py:22:4: C0103: Constant name "pred" doesn't conform to UPPER_CASE naming style (invalid-name)
+hmm_learn.py:28:4: C0103: Variable name "X" doesn't conform to snake_case naming style (invalid-name)
+hmm_learn.py:29:4: C0103: Variable name "X" doesn't conform to snake_case naming style (invalid-name)
+hmm_learn.py:32:12: C0103: Variable name "X_" doesn't conform to snake_case naming style (invalid-name)
+hmm_learn.py:33:12: C0103: Variable name "X" doesn't conform to snake_case naming style (invalid-name)
+hmm_learn.py:36:4: C0103: Variable name "X" doesn't conform to snake_case naming style (invalid-name)
+hmm_learn.py:38:4: C0103: Variable name "X_ave" doesn't conform to snake_case naming style (invalid-name)
+hmm_learn.py:1:0: W0611: Unused numpy imported as np (unused-import)
+
+------------------------------------------------------------------
+Your code has been rated at 4.84/10 (previous run: 4.52/10, +0.32)
+
