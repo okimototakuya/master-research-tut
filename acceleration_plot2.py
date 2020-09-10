@@ -41,6 +41,7 @@ HMM_RANGE_END = 70000
 #HMM_RANGE_END = 131663
 
 class DataframeMaker():
+    'excelファイルを読み込み、DataFrame型変数を生成する'
     def __init__(self, filename):
     # 列名を明示的に指定することにより, 欠損値をNaNで補完.
         col_names = [
@@ -64,8 +65,10 @@ class DataframeMaker():
             )
 
 class DataframePlotter():
+    'DataFrameMakerクラスから生成したDataFrame型変数をプロットする'
     @staticmethod
     def plot(df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
+        'DataFrame型変数をプロットする'
         global pred
         df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
         df = hmm_learn.aveData(df)  # 加速度データを平均化
@@ -98,6 +101,8 @@ class DataframePlotter():
                 plt.show()
 
 def main():
+    '確率モデルを適用し、学習結果を時系列表示する'
+    'もしくは、加速度データを2次元プロットする'
     global filename
     global PATH
     global pred
