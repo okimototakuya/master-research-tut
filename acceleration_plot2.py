@@ -1,7 +1,7 @@
 import os
 import sys
 import pandas as pd
-#matplotlib.use('Agg')		# pyplotで生成した画像を保存するためのインポート
+#matplotlib.use('Agg')  # pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
 import numpy as np
 import hmm_learn
@@ -18,13 +18,13 @@ filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
 #filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
 ## 加速度のリスト
 acc = [
-		'Acceleration_x',
-		'Acceleration_y',
-		'Acceleration_z',
-#		'AngularRate_x',
-#		'AngularRate_y',
-#		'AngularRate_z',
-		]
+    'Acceleration_x',
+    'Acceleration_y',
+    'Acceleration_z',
+    #'AngularRate_x',
+    #'AngularRate_y',
+    #'AngularRate_z',
+    ]
 ## 画像ファイルの保存先
 #PATH = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
 PATH = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge"
@@ -40,80 +40,82 @@ HMM_RANGE_END = 70000
 #HMM_RANGE_END = 131663
 
 class DataframeMaker():
-	def __init__(self, filename):
-		# 列名を明示的に指定することにより, 欠損値をNaNで補完.
-		col_names = ['line', 'time',
-						'Acceleration_x', 'Acceleration_y', 'Acceleration_z',
-						'AngularRate_x', 'AngularRate_y', 'AngularRate_z', 'Temperture', 'Pressure', 'MagnetCount', 'MagnetSwitch',
-						]
-		self.df = pd.read_csv(filename,
-									names=col_names,
-									skiprows=3,
-									parse_dates=['time'],
-									index_col='time',
-									converters={'line':int, 'time':str,
-													'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
-													'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,
-													'Temperture':float, 'Pressure':float, 'MagnetCount':int, 'MagnetSwitch':int,
-													}
-									)
+    def __init__(self, filename):
+    # 列名を明示的に指定することにより, 欠損値をNaNで補完.
+        col_names = [
+                'line', 'time',
+                'Acceleration_x', 'Acceleration_y', 'Acceleration_z',
+                'AngularRate_x', 'AngularRate_y', 'AngularRate_z',
+                'Temperture', 'Pressure', 'MagnetCount', 'MagnetSwitch',
+                ]
+        self.df = pd.read_csv(filename,
+                names=col_names,
+                skiprows=3,
+                parse_dates=['time'],
+                index_col='time',
+                converters={'line':int, 'time':str,
+                    'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
+                    'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,
+                    'Temperture':float, 'Pressure':float, 'MagnetCount':int, 'MagnetSwitch':int,
+                    }
+                )
 
 class DataframePlotter():
-	@staticmethod
-	def plot(df, delta, args):		# delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
-		global pred
-		df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
-		df = hmm_learn.aveData(df)			# 加速度データを平均化
-		delta = int(delta/hmm_learn.AVERAGE)		# 平均値をとる要素数で区間を割る
-		if sys.argv[1] != '2':		# 隠れマルコフモデルorクラスタリングの時系列データを表示
-			predict = pd.DataFrame(pred, columns=['pred'])
-			df = pd.concat([df[list(args)], predict], axis=1)
-			## 加速度・角速度の時系列変化をプロット
-			for i in range(int(len(df)/delta)):
-				copy_df = df.loc[delta*i:delta*(i+1), :]
-				copy_df.dropna(how='all')
-				ax1 = copy_df[list(args)].plot()
-				#if i == 3:
-				#	break
-				#ax = copy_df[['pred']].plot.bar(ax=ax1, width=1.0)
-				ax = copy_df[['pred']].plot(ax=ax1)
-				ax.set_title(filename)
-				ax.set_ylim([-5.0, 2.5])
-				plt.show()
-				#plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
-		else:		# 加速度データを2次元プロット
-			for i in range(int(len(df)/delta)):
-				copy_df = df.iloc[delta*i:delta*(i+1), :]
-				copy_df.dropna(how='all')
-				#ax = copy_df.plot(x=acc[0], y=acc[1])			# 折れ線グラフ
-				ax = copy_df.plot.scatter(x=acc[0], y=acc[1])		# 散布図
-				ax.set_title(filename)
-				ax.set_xlim([-5.5, 1.0])
-				ax.set_ylim([-2.5, 2.0])
-				plt.show()
+    @staticmethod
+    def plot(df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
+        global pred
+        df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
+        df = hmm_learn.aveData(df)  # 加速度データを平均化
+        delta = int(delta/hmm_learn.AVERAGE)    # 平均値をとる要素数で区間を割る
+        if sys.argv[1] != '2':  # 隠れマルコフモデルorクラスタリングの時系列データを表示
+            predict = pd.DataFrame(pred, columns=['pred'])
+            df = pd.concat([df[list(args)], predict], axis=1)
+            ## 加速度・角速度の時系列変化をプロット
+            for i in range(int(len(df)/delta)):
+                copy_df = df.loc[delta*i:delta*(i+1), :]
+                copy_df.dropna(how='all')
+                ax1 = copy_df[list(args)].plot()
+                #if i == 3:
+                #   break
+                #ax = copy_df[['pred']].plot.bar(ax=ax1, width=1.0)
+                ax = copy_df[['pred']].plot(ax=ax1)
+                ax.set_title(filename)
+                ax.set_ylim([-5.0, 2.5])
+                plt.show()
+                #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
+        else:   # 加速度データを2次元プロット
+            for i in range(int(len(df)/delta)):
+                copy_df = df.iloc[delta*i:delta*(i+1), :]
+                copy_df.dropna(how='all')
+                #ax = copy_df.plot(x=acc[0], y=acc[1])  # 折れ線グラフ
+                ax = copy_df.plot.scatter(x=acc[0], y=acc[1])   # 散布図
+                ax.set_title(filename)
+                ax.set_xlim([-5.5, 1.0])
+                ax.set_ylim([-2.5, 2.0])
+                plt.show()
 
 def main():
-	global filename
-	global PATH
-	global pred
-	global acc
-	global PLOT_SEG
+    global filename
+    global PATH
+    global pred
+    global acc
+    global PLOT_SEG
 
-	if sys.argv[1] == '0':		# 隠れマルコフモデル
-		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
-		hmm_learn.hmmLearn()
-		pred = hmm_learn.pred
-	elif sys.argv[1] == '1':		# クラスタリング
-		#np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
-		cluster_learn.clusterLearn()
-		pred = cluster_learn.pred
-	elif sys.argv[1] == '2':		# 加速度を２次元プロット
-		pass
-	else:
-		print("Error is here.")
+    if sys.argv[1] == '0':		# 隠れマルコフモデル
+        #np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
+        hmm_learn.hmmLearn()
+        pred = hmm_learn.pred
+    elif sys.argv[1] == '1':		# クラスタリング
+        #np.set_printoptions(threshold=np.inf)		# 配列の要素を全て表示(状態系列)
+        cluster_learn.clusterLearn()
+        pred = cluster_learn.pred
+    elif sys.argv[1] == '2':		# 加速度を２次元プロット
+        pass
+    else:
+        print("Error is here.")
 
-	dataframe = DataframeMaker(filename)
-	DataframePlotter.plot(dataframe.df, PLOT_SEG, tuple(acc))
+    dataframe = DataframeMaker(filename)
+    DataframePlotter.plot(dataframe.df, PLOT_SEG, tuple(acc))
 
 if __name__ == '__main__':
-	main()
+        main()
