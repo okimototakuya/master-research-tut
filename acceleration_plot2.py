@@ -62,13 +62,11 @@ class DataframeMaker():
 class DataframePlotter():
 	@staticmethod
 	def plot(df, delta, args):		# delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
+		global pred
+		df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
+		df = hmm_learn.aveData(df)			# 加速度データを平均化
+		delta = int(delta/hmm_learn.AVERAGE)		# 平均値をとる要素数で区間を割る
 		if sys.argv[1] != '2':
-			global pred
-			df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
-
-			df = hmm_learn.aveData(df)			# 加速度データを平均化
-			delta = int(delta/hmm_learn.AVERAGE)		# 平均値をとる要素数で区間を割る
-
 			predict = pd.DataFrame(pred, columns=['pred'])
 			df = pd.concat([df[list(args)], predict], axis=1)
 			## 加速度・角速度の時系列変化をプロット
@@ -85,11 +83,6 @@ class DataframePlotter():
 				plt.show()
 				#plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
 		else:
-			df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()		# 2次元プロットする範囲を指定
-
-			df = hmm_learn.aveData(df)			# 加速度データを平均化
-			delta = int(delta/hmm_learn.AVERAGE)		# 平均値をとる要素数で区間を割る
-
 			for i in range(int(len(df)/delta)):
 				copy_df = df.iloc[delta*i:delta*(i+1), :]
 				copy_df.dropna(how='all')
