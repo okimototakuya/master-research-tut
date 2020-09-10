@@ -1,12 +1,11 @@
+import os
+import sys
 import pandas as pd
-import matplotlib
 #matplotlib.use('Agg')		# pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
-import os
+import numpy as np
 import hmm_learn
 import cluster_learn
-import numpy as np
-import sys
 
 ## この位置でグローバル変数扱いになる.
 ## 予測値を格納する変数
@@ -66,7 +65,7 @@ class DataframePlotter():
 		df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
 		df = hmm_learn.aveData(df)			# 加速度データを平均化
 		delta = int(delta/hmm_learn.AVERAGE)		# 平均値をとる要素数で区間を割る
-		if sys.argv[1] != '2':
+		if sys.argv[1] != '2':		# 隠れマルコフモデルorクラスタリングの時系列データを表示
 			predict = pd.DataFrame(pred, columns=['pred'])
 			df = pd.concat([df[list(args)], predict], axis=1)
 			## 加速度・角速度の時系列変化をプロット
@@ -82,7 +81,7 @@ class DataframePlotter():
 				ax.set_ylim([-5.0, 2.5])
 				plt.show()
 				#plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
-		else:
+		else:		# 加速度データを2次元プロット
 			for i in range(int(len(df)/delta)):
 				copy_df = df.iloc[delta*i:delta*(i+1), :]
 				copy_df.dropna(how='all')
