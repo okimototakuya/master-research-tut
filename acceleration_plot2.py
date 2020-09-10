@@ -28,7 +28,8 @@ acc = [
 ## 画像ファイルの保存先
 #PATH = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
 PATH = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge"
-#PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
+#PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/
+#研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
 #PATH = "/Users/okimototakuya/Desktop/tmp"
 ## 一つのグラフのプロット数
 PLOT_SEG = 10000
@@ -43,22 +44,24 @@ class DataframeMaker():
     def __init__(self, filename):
     # 列名を明示的に指定することにより, 欠損値をNaNで補完.
         col_names = [
-                'line', 'time',
-                'Acceleration_x', 'Acceleration_y', 'Acceleration_z',
-                'AngularRate_x', 'AngularRate_y', 'AngularRate_z',
-                'Temperture', 'Pressure', 'MagnetCount', 'MagnetSwitch',
-                ]
-        self.df = pd.read_csv(filename,
-                names=col_names,
-                skiprows=3,
-                parse_dates=['time'],
-                index_col='time',
-                converters={'line':int, 'time':str,
-                    'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
-                    'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,
-                    'Temperture':float, 'Pressure':float, 'MagnetCount':int, 'MagnetSwitch':int,
-                    }
-                )
+            'line', 'time',
+            'Acceleration_x', 'Acceleration_y', 'Acceleration_z',
+            'AngularRate_x', 'AngularRate_y', 'AngularRate_z',
+            'Temperture', 'Pressure', 'MagnetCount', 'MagnetSwitch',
+            ]
+        self.df = pd.read_csv(
+            filename,
+            names=col_names,
+            skiprows=3,
+            parse_dates=['time'],
+            index_col='time',
+            converters={
+                'line':int, 'time':str,
+                'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
+                'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,
+                'Temperture':float, 'Pressure':float, 'MagnetCount':int, 'MagnetSwitch':int,
+                }
+            )
 
 class DataframePlotter():
     @staticmethod
@@ -118,4 +121,4 @@ def main():
     DataframePlotter.plot(dataframe.df, PLOT_SEG, tuple(acc))
 
 if __name__ == '__main__':
-        main()
+    main()
