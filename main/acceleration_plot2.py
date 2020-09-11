@@ -75,25 +75,19 @@ class DataframePlotter():
             copy_df = df.loc[delta*i:delta*(i+1), :]
             copy_df.dropna(how='all')
             ax1 = copy_df[list(args)].plot()
-            #if i == 3:
-            #   break
-            #ax = copy_df[['pred']].plot.bar(ax=ax1, width=1.0)
             ax = copy_df[['pred']].plot(ax=ax1)
             ax.set_title(filename)
             ax.set_ylim([-5.0, 2.5])
             plt.show()
             #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
     @staticmethod
-    def acc1_acc2_plot(df, delta, args):
-        for i in range(int(len(df)/delta)):
-            copy_df = df.iloc[delta*i:delta*(i+1), :]
-            copy_df.dropna(how='all')
-            #ax = copy_df.plot(x=acc[0], y=acc[1])  # 折れ線グラフ
-            ax = copy_df.plot.scatter(x=acc[0], y=acc[1])   # 散布図
-            ax.set_title(filename)
-            ax.set_xlim([-5.5, 1.0])
-            ax.set_ylim([-2.5, 2.0])
-            plt.show()
+    def acc1_acc2_plot(df):
+        '加速度の2次元データをプロットする'
+        ax = df.plot.scatter(x=acc[0], y=acc[1])   # 散布図
+        ax.set_title(filename)
+        ax.set_xlim([-5.5, 1.0])
+        ax.set_ylim([-2.5, 2.0])
+        plt.show()
     @staticmethod
     def plot(df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
         'DataFrame型変数をプロットする'
@@ -104,7 +98,7 @@ class DataframePlotter():
         if sys.argv[1] != '2':  # 隠れマルコフモデルorクラスタリングの時系列データを表示
             DataframePlotter.time_pred_plot(df, delta, args)
         else:   # 加速度データを2次元プロット
-            DataframePlotter.acc1_acc2_plot(df, delta, args)
+            DataframePlotter.acc1_acc2_plot(df)
 
 def main():
     '確率モデルを適用し、学習結果を時系列表示する'
