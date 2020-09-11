@@ -67,6 +67,34 @@ class DataframeMaker():
 class DataframePlotter():
     'DataFrameMakerクラスから生成したDataFrame型変数をプロットする'
     @staticmethod
+    def time_pred_plot(df, delta, args):
+        predict = pd.DataFrame(pred, columns=['pred'])
+        df = pd.concat([df[list(args)], predict], axis=1)
+        ## 加速度・角速度の時系列変化をプロット
+        for i in range(int(len(df)/delta)):
+            copy_df = df.loc[delta*i:delta*(i+1), :]
+            copy_df.dropna(how='all')
+            ax1 = copy_df[list(args)].plot()
+            #if i == 3:
+            #   break
+            #ax = copy_df[['pred']].plot.bar(ax=ax1, width=1.0)
+            ax = copy_df[['pred']].plot(ax=ax1)
+            ax.set_title(filename)
+            ax.set_ylim([-5.0, 2.5])
+            plt.show()
+            #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
+    @staticmethod
+    def acc1_acc2_plot(df, delta, args):
+        for i in range(int(len(df)/delta)):
+            copy_df = df.iloc[delta*i:delta*(i+1), :]
+            copy_df.dropna(how='all')
+            #ax = copy_df.plot(x=acc[0], y=acc[1])  # 折れ線グラフ
+            ax = copy_df.plot.scatter(x=acc[0], y=acc[1])   # 散布図
+            ax.set_title(filename)
+            ax.set_xlim([-5.5, 1.0])
+            ax.set_ylim([-2.5, 2.0])
+            plt.show()
+    @staticmethod
     def plot(df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
         'DataFrame型変数をプロットする'
         global pred
@@ -74,31 +102,9 @@ class DataframePlotter():
         df = hmm_learn.aveData(df)  # 加速度データを平均化
         delta = int(delta/hmm_learn.AVERAGE)    # 平均値をとる要素数で区間を割る
         if sys.argv[1] != '2':  # 隠れマルコフモデルorクラスタリングの時系列データを表示
-            predict = pd.DataFrame(pred, columns=['pred'])
-            df = pd.concat([df[list(args)], predict], axis=1)
-            ## 加速度・角速度の時系列変化をプロット
-            for i in range(int(len(df)/delta)):
-                copy_df = df.loc[delta*i:delta*(i+1), :]
-                copy_df.dropna(how='all')
-                ax1 = copy_df[list(args)].plot()
-                #if i == 3:
-                #   break
-                #ax = copy_df[['pred']].plot.bar(ax=ax1, width=1.0)
-                ax = copy_df[['pred']].plot(ax=ax1)
-                ax.set_title(filename)
-                ax.set_ylim([-5.0, 2.5])
-                plt.show()
-                #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
+            DataframePlotter.time_pred_plot(df, delta, args)
         else:   # 加速度データを2次元プロット
-            for i in range(int(len(df)/delta)):
-                copy_df = df.iloc[delta*i:delta*(i+1), :]
-                copy_df.dropna(how='all')
-                #ax = copy_df.plot(x=acc[0], y=acc[1])  # 折れ線グラフ
-                ax = copy_df.plot.scatter(x=acc[0], y=acc[1])   # 散布図
-                ax.set_title(filename)
-                ax.set_xlim([-5.5, 1.0])
-                ax.set_ylim([-2.5, 2.0])
-                plt.show()
+            DataframePlotter.acc1_acc2_plot(df, delta, args)
 
 def main():
     '確率モデルを適用し、学習結果を時系列表示する'
