@@ -12,10 +12,10 @@ import cluster_learn
 pred = None
 ## ID16
 # ファイル名
-filename = "dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
+filename = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
 ## ID19
 # ファイル名
-#filename = "dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
+#filename = "../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
 ## 加速度のリスト
 acc = [
     'Acceleration_x',
@@ -43,7 +43,10 @@ HMM_RANGE_END = 70000
 class DataframeMaker():
     'excelファイルを読み込み、DataFrame型変数を生成する'
     def __init__(self, filename):
-    # 列名を明示的に指定することにより, 欠損値をNaNで補完.
+        global acc
+        global HMM_RANGE_START
+        global HMM_RANGE_END
+        # 列名を明示的に指定することにより, 欠損値をNaNで補完.
         col_names = [
             'line', 'time',
             'Acceleration_x', 'Acceleration_y', 'Acceleration_z',
@@ -56,12 +59,15 @@ class DataframeMaker():
             skiprows=3,
             parse_dates=['time'],
             index_col='time',
+            #usecols=lambda x: x in acc+[index_col],
+            usecols=lambda x: x in acc+['time'],
+            #userows=lambda x: x in [i for i in range(HMM_RANGE_START, HMM_RANGE_END)],
             converters={
                 'line':int, 'time':str,
                 'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
                 'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,
                 'Temperture':float, 'Pressure':float, 'MagnetCount':int, 'MagnetSwitch':int,
-                }
+                },
             )
 
 class DataframePlotter():
@@ -109,6 +115,8 @@ def main():
     global acc
     global PLOT_SEG
 
+    dataframe = DataframeMaker(filename)
+
     if sys.argv[1] == '0':    # 隠れマルコフモデル
         #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
         hmm_learn.hmmLearn()
@@ -122,7 +130,6 @@ def main():
     else:
         print("Error is here.")
 
-    dataframe = DataframeMaker(filename)
     DataframePlotter.plot(dataframe.df, PLOT_SEG, tuple(acc))
 
 if __name__ == '__main__':
