@@ -1,6 +1,8 @@
 import os
 import sys
+import subprocess
 import pandas as pd
+import dask.dataframe as dd
 #matplotlib.use('Agg')  # pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
 import numpy as np
@@ -53,22 +55,26 @@ class DataframeMaker():
             'AngularRate_x', 'AngularRate_y', 'AngularRate_z',
             'Temperture', 'Pressure', 'MagnetCount', 'MagnetSwitch',
             ]
-        self.df = pd.read_csv(
+        self.df = dd.read_csv(
             filename,
             names=col_names,
-            skiprows=3,
             parse_dates=['time'],
-            index_col='time',
-            #usecols=lambda x: x in acc+[index_col],
-            usecols=lambda x: x in acc+['time'],
-            #userows=lambda x: x in [i for i in range(HMM_RANGE_START, HMM_RANGE_END)],
+            #index_col='time',
+            skiprows=3,
+            #skiprows=lambda x: x not in [i for i in range(HMM_RANGE_START+3, HMM_RANGE_END+3)],
+            #skiprows=lambda x: x not in [i for i in [2,3,4,5]],
+            #skiprows=[1,2,3,4,5],
+            #skiprows=[3],
             converters={
                 'line':int, 'time':str,
                 'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
                 'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,
                 'Temperture':float, 'Pressure':float, 'MagnetCount':int, 'MagnetSwitch':int,
                 },
-            )
+            #usecols=lambda x: x in acc+[index_col],
+            usecols=lambda x: x in acc+['time'],
+            #userows=lambda x: x in [i for i in range(HMM_RANGE_START, HMM_RANGE_END)],
+            ).compute()
 
 class DataframePlotter():
     'DataFrameMakerクラスから生成したDataFrame型変数をプロットする'
@@ -115,8 +121,12 @@ def main():
     global acc
     global PLOT_SEG
 
+    # 加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成
+    subprocess.run(['sed', '-e', '1,3d', filename])
+    subprocess.run(['sed', '-n', '{start},{end}p'.format(start=HMM_RANGE_START,end=HMM_RANGE_END), filename])
     dataframe = DataframeMaker(filename)
 
+    # メインプログラム実行時の引数によって、描画するグラフを決定する
     if sys.argv[1] == '0':    # 隠れマルコフモデル
         #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
         hmm_learn.hmmLearn()
