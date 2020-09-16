@@ -1,6 +1,6 @@
 import os
 import sys
-import subprocess
+import subprocess as sp
 import pandas as pd
 import dask.dataframe as dd
 #matplotlib.use('Agg')  # pyplotで生成した画像を保存するためのインポート
@@ -37,10 +37,10 @@ PATH = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16
 PLOT_SEG = 10000
 #PLOT_SEG = 131663
 ## 隠れマルコフモデルを適用させる範囲
-HMM_RANGE_START = 60000
-HMM_RANGE_END = 70000
-#HMM_RANGE_START = 0
-#HMM_RANGE_END = 131663
+#HMM_RANGE_START = 60000
+#HMM_RANGE_END = 70000
+HMM_RANGE_START = 1
+HMM_RANGE_END = 5
 
 class DataframeMaker():
     'excelファイルを読み込み、DataFrame型変数を生成する'
@@ -60,7 +60,7 @@ class DataframeMaker():
             names=col_names,
             parse_dates=['time'],
             #index_col='time',
-            skiprows=3,
+            #skiprows=3,
             #skiprows=lambda x: x not in [i for i in range(HMM_RANGE_START+3, HMM_RANGE_END+3)],
             #skiprows=lambda x: x not in [i for i in [2,3,4,5]],
             #skiprows=[1,2,3,4,5],
@@ -122,10 +122,15 @@ def main():
     global PLOT_SEG
 
     # 加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成
-    subprocess.run(['sed', '-e', '1,3d', filename])
-    subprocess.run(['sed', '-n', '{start},{end}p'.format(start=HMM_RANGE_START,end=HMM_RANGE_END), filename])
-    subprocess.run(['awk', '-F', '","', '{print}'])
-    dataframe = DataframeMaker(filename)
+    cmd1 = "sed -e 1,3d {filename}".format(filename=filename)
+    cmd2 = "sed -n {start},{end}p".format(start=HMM_RANGE_START,end=HMM_RANGE_END)
+    res1 = sp.Popen(cmd1.split(" "), stdout=sp.PIPE)
+    buf = "../dataset/buf.csv"
+    with open(buf, 'w') as f:
+        sp.Popen(cmd2.split(" "), stdin=res1.stdout, stdout=f)
+    #sp.run(['awk', '-F', '","', '{print}'])
+    #dataframe = DataframeMaker(filename)
+    dataframe = DataframeMaker(buf)
 
     # メインプログラム実行時の引数によって、描画するグラフを決定する
     if sys.argv[1] == '0':    # 隠れマルコフモデル
