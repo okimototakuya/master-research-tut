@@ -21,19 +21,20 @@ def hmmLearn():
     'DataFrame型変数を引数にして、HMMによる学習を行う'
     global pred
     # 加速度データのDataFrame型変数を作成.
-    dataframe = ap.DataframeMaker(ap.filename)
+    #dataframe = ap.DataframeMaker(ap.filename)
     # 確率モデル(隠れマルコフモデルの作成.
     model = hmm.GaussianHMM(n_components=3, covariance_type="full")
     # DataFrame型変数から学習に用いる加速度データを抽出.
-    X = (dataframe.df).loc[:, ap.acc[0]]
-    X = pd.DataFrame(X)
+    #X = (dataframe.df).loc[:, ap.acc[0]]
+    X = ((ap.dataframe).df).loc[:, ap.acc[0]]
+    #X = pd.DataFrame(X)
     if len(ap.acc) > 1:
         for ele in ap.acc[1:]:
             X_ = (dataframe.df).loc[:, ele]
             X = X.join(X_)
     else:
         pass
-    X = X.iloc[ap.HMM_RANGE_START:ap.HMM_RANGE_END, :]
+    #X = X.iloc[ap.HMM_RANGE_START:ap.HMM_RANGE_END, :]
     # 加速度の平均値を格納するためのDataFrame型変数
     X_ave = aveData(X)
     #model.fit(X)
