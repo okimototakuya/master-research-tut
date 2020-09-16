@@ -39,6 +39,8 @@ PLOT_SEG = 10000
 ## 隠れマルコフモデルを適用させる範囲
 HMM_RANGE_START = 60000
 HMM_RANGE_END = 69999
+## 加工したcsvファイルをDataFrame型で格納する変数
+dataframe = None
 
 
 class DataframeMaker():
@@ -79,7 +81,7 @@ class DataframeMaker():
         global HMM_RANGE_START
         global HMM_RANGE_END
         cmd1 = "sed -e 1,3d {filename}".format(filename=filename)
-        cmd2 = "sed -n {start},{end}p".format(start=HMM_RANGE_START,end=HMM_RANGE_END)
+        cmd2 = "sed -n {start},{end}p".format(start=HMM_RANGE_START, end=HMM_RANGE_END)
         res1 = sp.Popen(cmd1.split(" "), stdout=sp.PIPE)
         with open(buf, 'w') as f:
             sp.Popen(cmd2.split(" "), stdin=res1.stdout, stdout=f)
@@ -134,6 +136,7 @@ def main():
     global pred
     global acc
     global PLOT_SEG
+    global dataframe
 
     # 加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成
     buf = "../dataset/buf.csv"
