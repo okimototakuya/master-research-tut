@@ -37,12 +37,12 @@ PATH = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16
 PLOT_SEG = 10000
 #PLOT_SEG = 131663
 ## 隠れマルコフモデルを適用させる範囲
-#HMM_RANGE_START = 60000
-#HMM_RANGE_END = 70000
-HMM_RANGE_START = 1
-HMM_RANGE_END = 5
+HMM_RANGE_START = 60000
+HMM_RANGE_END = 69999
+
 
 class DataframeMaker():
+
     'excelファイルを読み込み、DataFrame型変数を生成する'
     def __init__(self, filename):
         global acc
@@ -61,10 +61,8 @@ class DataframeMaker():
             parse_dates=['time'],
             #index_col='time',
             #skiprows=3,
-            #skiprows=lambda x: x not in [i for i in range(HMM_RANGE_START+3, HMM_RANGE_END+3)],
-            #skiprows=lambda x: x not in [i for i in [2,3,4,5]],
-            #skiprows=[1,2,3,4,5],
             #skiprows=[3],
+            #skiprows=lambda x: x not in [i for i in range(HMM_RANGE_START+3, HMM_RANGE_END+3)],
             converters={
                 'line':int, 'time':str,
                 'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
@@ -73,10 +71,23 @@ class DataframeMaker():
                 },
             #usecols=lambda x: x in acc+[index_col],
             usecols=lambda x: x in acc+['time'],
-            #userows=lambda x: x in [i for i in range(HMM_RANGE_START, HMM_RANGE_END)],
             ).compute()
 
+    @staticmethod
+    def cut_csv(buf):
+        global filename
+        global HMM_RANGE_START
+        global HMM_RANGE_END
+        cmd1 = "sed -e 1,3d {filename}".format(filename=filename)
+        cmd2 = "sed -n {start},{end}p".format(start=HMM_RANGE_START,end=HMM_RANGE_END)
+        res1 = sp.Popen(cmd1.split(" "), stdout=sp.PIPE)
+        with open(buf, 'w') as f:
+            sp.Popen(cmd2.split(" "), stdin=res1.stdout, stdout=f)
+        #sp.run(['awk', '-F', '","', '{print}'])
+
+
 class DataframePlotter():
+
     'DataFrameMakerクラスから生成したDataFrame型変数をプロットする'
     @staticmethod
     def time_pred_plot(df, delta, args):
@@ -92,6 +103,7 @@ class DataframePlotter():
             ax.set_ylim([-5.0, 2.5])
             plt.show()
             #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
+
     @staticmethod
     def acc1_acc2_plot(df):
         '加速度の2次元データをプロットする'
@@ -100,6 +112,7 @@ class DataframePlotter():
         ax.set_xlim([-5.5, 1.0])
         ax.set_ylim([-2.5, 2.0])
         plt.show()
+
     @staticmethod
     def plot(df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
         'DataFrame型変数をプロットする'
@@ -112,6 +125,7 @@ class DataframePlotter():
         else:   # 加速度データを2次元プロット
             DataframePlotter.acc1_acc2_plot(df)
 
+
 def main():
     '確率モデルを適用し、学習結果を時系列表示する'
     'もしくは、加速度データを2次元プロットする'
@@ -122,13 +136,8 @@ def main():
     global PLOT_SEG
 
     # 加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成
-    cmd1 = "sed -e 1,3d {filename}".format(filename=filename)
-    cmd2 = "sed -n {start},{end}p".format(start=HMM_RANGE_START,end=HMM_RANGE_END)
-    res1 = sp.Popen(cmd1.split(" "), stdout=sp.PIPE)
     buf = "../dataset/buf.csv"
-    with open(buf, 'w') as f:
-        sp.Popen(cmd2.split(" "), stdin=res1.stdout, stdout=f)
-    #sp.run(['awk', '-F', '","', '{print}'])
+    DataframeMaker.cut_csv(buf)
     #dataframe = DataframeMaker(filename)
     dataframe = DataframeMaker(buf)
 
