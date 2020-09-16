@@ -124,6 +124,7 @@ def main():
     # 加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成
     subprocess.run(['sed', '-e', '1,3d', filename])
     subprocess.run(['sed', '-n', '{start},{end}p'.format(start=HMM_RANGE_START,end=HMM_RANGE_END), filename])
+    subprocess.run(['awk', '-F', '","', '{print}'])
     dataframe = DataframeMaker(filename)
 
     # メインプログラム実行時の引数によって、描画するグラフを決定する
