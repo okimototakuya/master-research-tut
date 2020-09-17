@@ -9,47 +9,70 @@ import numpy as np
 import hmm_learn
 import cluster_learn
 
-## この位置でグローバル変数扱いになる.
-## 予測値を格納する変数
-pred = None
-## ID16
-# ファイル名
-filename = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"
-## ID19
-# ファイル名
-#filename = "../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"
-## 加速度のリスト
-acc = [
-    'Acceleration_x',
-    'Acceleration_y',
-    'Acceleration_z',
-    #'AngularRate_x',
-    #'AngularRate_y',
-    #'AngularRate_z',
-    ]
-## 画像ファイルの保存先
-#PATH = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
-PATH = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge"
-#PATH = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/
-#研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
-#PATH = "/Users/okimototakuya/Desktop/tmp"
-## 一つのグラフのプロット数
-PLOT_SEG = 10000
-#PLOT_SEG = 131663
-## 隠れマルコフモデルを適用させる範囲
-HMM_RANGE_START = 60000
-HMM_RANGE_END = 69999
-## 加工したcsvファイルをDataFrame型で格納する変数
-dataframe = None
+
+class Global():
+    'acceleration_plot2モジュールのグローバル変数を属性に持つクラス'
+    def __init__(self):
+        pass
+
+    'ゲッターメソッド'
+    def get_pred(self):
+        return self.hidden_pred
+    def get_filename(self):
+        return self.hidden_filename
+    def get_acc(self):
+        return self.hidden_acc
+    def get_path(self):
+        return self.hidden_path
+    def get_plotseg(self):
+        return self.hidden_plotseg
+    def get_hmmstart(self):
+        return self.hidden_hmmstart
+    def get_hmmend(self):
+        return self.hidden_hmmend
+    def get_dataframe(self):
+        return self.hidden_dataframe
+
+    'セッターメソッド'
+    # 確率モデルによる予測値
+    def set_pred(self, input_pred):
+        self.hidden_pred = input_pred
+    # 加速度データファイル(csv)のパス
+    def set_filename(self, input_filename):
+        self.hidden_filename = input_filename
+    # 加速度の方向名のリスト
+    def set_acc(self, input_acc):
+        self.hidden_acc = input_acc
+    # 時系列/加速度2次元プロット画像ファイルの保存先
+    def set_path(self, input_path):
+        self.hidden_path = input_path
+    # 1つのグラフにおけるプロット数
+    def set_plotseg(self, input_plotseg):
+        self.hidden_plotseg = input_plotseg
+    # 加速度データファイルで、隠れマルコフモデルを適用させる範囲:始まり
+    def set_hmmstart(self, input_hmmstart):
+        self.hidden_hmmstart = input_hmmstart
+    # ":終わり
+    def set_hmmend(self, input_hmmend):
+        self.hidden_hmmend = input_hmmend
+    # 加工した加速度データファイルを格納するDataFrame型変数
+    def set_dataframe(self, input_dataframe):
+        self.hidden_dataframe = input_dataframe
+
+    'プロパティ'
+    pred = property(get_pred, set_pred)
+    filename = property(get_filename, set_filename)
+    acc = property(get_acc, set_acc)
+    path = property(get_path, set_path)
+    plotseg = property(get_plotseg, set_plotseg)
+    hmmstart = property(get_hmmstart, set_hmmstart)
+    hmmend = property(get_hmmend, set_hmmend)
+    dataframe = property(get_dataframe, set_dataframe)
 
 
 class DataframeMaker():
-
     'excelファイルを読み込み、DataFrame型変数を生成する'
-    def __init__(self, filename):
-        global acc
-        global HMM_RANGE_START
-        global HMM_RANGE_END
+    def __init__(self, filename, acc, hmmstart, hmmend):
         # 列名を明示的に指定することにより, 欠損値をNaNで補完.
         col_names = [
             'line', 'time',
@@ -64,7 +87,7 @@ class DataframeMaker():
             #index_col='time',
             #skiprows=3,
             #skiprows=[3],
-            #skiprows=lambda x: x not in [i for i in range(HMM_RANGE_START+3, HMM_RANGE_END+3)],
+            #skiprows=lambda x: x not in [i for i in range(hmmstart+3, hmmend+3)],
             converters={
                 'line':int, 'time':str,
                 'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
@@ -76,12 +99,9 @@ class DataframeMaker():
             ).compute()
 
     @staticmethod
-    def cut_csv(buf):
-        global filename
-        global HMM_RANGE_START
-        global HMM_RANGE_END
+    def cut_csv(buf, filename, hmmstart, hmmend):
         cmd1 = "sed -e 1,3d {filename}".format(filename=filename)
-        cmd2 = "sed -n {start},{end}p".format(start=HMM_RANGE_START, end=HMM_RANGE_END)
+        cmd2 = "sed -n {start},{end}p".format(start=hmmstart, end=hmmend)
         res1 = sp.Popen(cmd1.split(" "), stdout=sp.PIPE)
         with open(buf, 'w') as f:
             sp.Popen(cmd2.split(" "), stdin=res1.stdout, stdout=f)
@@ -91,6 +111,9 @@ class DataframeMaker():
 class DataframePlotter():
 
     'DataFrameMakerクラスから生成したDataFrame型変数をプロットする'
+    def __init__(self):
+        pass
+
     @staticmethod
     def time_pred_plot(df, delta, args):
         predict = pd.DataFrame(pred, columns=['pred'])
@@ -131,20 +154,36 @@ class DataframePlotter():
 def main():
     '確率モデルを適用し、学習結果を時系列表示する'
     'もしくは、加速度データを2次元プロットする'
-    global filename
-    global PATH
-    global pred
-    global acc
-    global PLOT_SEG
-    global dataframe
 
-    # 加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成
-    buf = "../dataset/buf.csv"
-    DataframeMaker.cut_csv(buf)
-    #dataframe = DataframeMaker(filename)
-    dataframe = DataframeMaker(buf)
+    'グローバル変数のセット'
+    global_parameter = Global()
+    global_parameter.pred = None
+    global_parameter.filename = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"   # ID16
+    #global_parameter.filename = "../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
+    global_parameter.acc = [
+        'Acceleration_x',
+        'Acceleration_y',
+        'Acceleration_z',
+        #'AngularRate_x',
+        #'AngularRate_y',
+        #'AngularRate_z',
+        ]
+    #global_parameter.path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
+    global_parameter.path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge"
+    #global_parameter.path = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
+    #global_parameter.path = "/Users/okimototakuya/Desktop/tmp"
+    global_parameter.plotseg = 10000
+    #global_parameter.plotseg = 131663
+    global_parameter.hmmstart = 60000
+    global_parameter.hmmend = 69999
+    global_parameter.dataframe = None
 
-    # メインプログラム実行時の引数によって、描画するグラフを決定する
+    '加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成'
+    buf = "../dataset/buf.csv"  # 加工したcsvファイルの保存先
+    DataframeMaker.cut_csv(buf, global_parameter.filename, global_parameter.hmmstart, global_parameter.hmmend)
+    dataframe = DataframeMaker(buf, global_parameter.acc, global_parameter.hmmstart, global_parameter.hmmend)
+
+    'メインプログラム実行時の引数によって、描画するグラフを決定'
     if sys.argv[1] == '0':    # 隠れマルコフモデル
         #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
         hmm_learn.hmmLearn()
@@ -158,6 +197,7 @@ def main():
     else:
         print("Error is here.")
 
+    'グラフを描画'
     DataframePlotter.plot(dataframe.df, PLOT_SEG, tuple(acc))
 
 if __name__ == '__main__':
