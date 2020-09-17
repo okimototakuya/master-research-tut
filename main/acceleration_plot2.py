@@ -12,8 +12,15 @@ import cluster_learn
 
 class Global():
     'acceleration_plot2モジュールのグローバル変数を属性に持つクラス'
-    def __init__(self):
-        pass
+    def __init__(self, **kwargs):
+        self.hidden_pred = kwargs["input_pred"]
+        self.hidden_filename = kwargs["input_filename"]
+        self.hidden_acc = kwargs["input_acc"]
+        self.hidden_path = kwargs["input_path"]
+        self.hidden_plotseg = kwargs["input_plotseg"]
+        self.hidden_hmmstart = kwargs["input_hmmstart"]
+        self.hidden_hmmend = kwargs["input_hmmend"]
+        self.hidden_dataframe = kwargs["input_dataframe"]
 
     'ゲッターメソッド'
     def get_pred(self):
@@ -156,27 +163,28 @@ def main():
     'もしくは、加速度データを2次元プロットする'
 
     'グローバル変数のセット'
-    global_parameter = Global()
-    global_parameter.pred = None
-    global_parameter.filename = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"   # ID16
-    #global_parameter.filename = "../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
-    global_parameter.acc = [
-        'Acceleration_x',
-        'Acceleration_y',
-        'Acceleration_z',
-        #'AngularRate_x',
-        #'AngularRate_y',
-        #'AngularRate_z',
-        ]
-    #global_parameter.path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
-    global_parameter.path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge"
-    #global_parameter.path = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
-    #global_parameter.path = "/Users/okimototakuya/Desktop/tmp"
-    global_parameter.plotseg = 10000
-    #global_parameter.plotseg = 131663
-    global_parameter.hmmstart = 60000
-    global_parameter.hmmend = 69999
-    global_parameter.dataframe = None
+    global_parameter = Global(
+        input_pred=None,
+        input_filename="../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv",  # ID16
+        #input_filename="../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv",  # ID19
+        input_acc=[
+            'Acceleration_x',
+            'Acceleration_y',
+            'Acceleration_z',
+            #'AngularRate_x',
+            #'AngularRate_y',
+            #'AngularRate_z',
+            ],
+        #input_path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
+        input_path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge",
+        #input_path="/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
+        #input_path="/Users/okimototakuya/Desktop/tmp",
+        input_plotseg=10000,
+        #input_plotseg=131663,
+        input_hmmstart=60000,
+        input_hmmend=69999,
+        input_dataframe=None,
+        )
 
     '加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成'
     buf = "../dataset/buf.csv"  # 加工したcsvファイルの保存先

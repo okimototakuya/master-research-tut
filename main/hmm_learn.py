@@ -5,7 +5,7 @@ from hmmlearn import hmm
 import acceleration_plot2 as ap
 
 # 予測値を格納する変数
-pred = None
+#pred = None
 # 平均値をとる要素数
 AVERAGE = 10
 
