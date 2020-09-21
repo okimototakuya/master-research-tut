@@ -26,6 +26,7 @@ def hmmLearn(df):
     model = hmm.GaussianHMM(n_components=3, covariance_type="full")
     # DataFrame型変数から学習に用いる加速度データを抽出.
     #X = (dataframe.df).loc[:, ap.Global().acc[0]]
+    print(type(df))
     X = df.loc[:, (ap.Global().acc[0])[0]]
     #X = pd.DataFrame(X)
     if len(ap.Global().acc[0]) > 1:

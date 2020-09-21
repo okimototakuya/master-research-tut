@@ -151,6 +151,8 @@ class DataframePlotter():
     def __init__(self):
         pass
 
+    'メソッドはクラスの継承で書くべき！！'
+    '親クラス；plot、子クラス；time_pred_plot、acc1_acc2_plot'
     @staticmethod
     def time_pred_plot(df, delta, args):
         predict = pd.DataFrame(pred, columns=['pred'])
