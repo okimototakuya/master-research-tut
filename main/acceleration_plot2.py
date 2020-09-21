@@ -117,7 +117,8 @@ class DataframeMaker():
             'AngularRate_x', 'AngularRate_y', 'AngularRate_z',
             'Temperture', 'Pressure', 'MagnetCount', 'MagnetSwitch',
             ]
-        self.df = dd.read_csv(
+        self.df = pd.read_csv(
+        #self.df = dd.read_csv(
             filename,
             names=col_names,
             parse_dates=['time'],
@@ -133,7 +134,8 @@ class DataframeMaker():
                 },
             #usecols=lambda x: x in acc+[index_col],
             usecols=lambda x: x in acc+['time'],
-            ).compute()
+            )
+           #).compute()
 
     @staticmethod
     def cut_csv(buf, filename, hmmstart, hmmend):
@@ -221,6 +223,7 @@ def main():
     '加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成'
     buf = "../dataset/buf.csv"  # 加工したcsvファイルの保存先
     DataframeMaker.cut_csv(buf, Global().filename[0], Global().hmmstart[0], Global().hmmend[0])
+    #dataframe = DataframeMaker(buf, Global().acc[0], Global().hmmstart[0], Global().hmmend[0])
     dataframe = DataframeMaker(buf, Global().acc[0], Global().hmmstart[0], Global().hmmend[0])
 
     'メインプログラム実行時の引数によって、描画するグラフを決定'
