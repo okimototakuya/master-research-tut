@@ -15,8 +15,8 @@ import cluster_learn
 ##################################################################
 class Global():
     'acceleration_plot2モジュールのグローバル変数を属性に持つクラス'
-    ' 確率モデルによる予測値'
-    pred=None,
+    #' 確率モデルによる予測値'
+    #pred=None,
     ' 加速度データファイル(csv)のパス'
     filename="../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv",  # ID16
     #filename="../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv",  # ID19
@@ -42,7 +42,7 @@ class Global():
     ' ":終わり'
     hmmend=69999,
     ' 加工した加速度データファイルを格納するDataFrame型変数'
-    dataframe=None,
+    #dataframe=None,
 
     'Globalオブジェクト作成時に使用'
     #def __init__(self, **kwargs):
@@ -165,48 +165,54 @@ class DataframeMaker():
 ##########データフレーム型変数をプロットするクラス################
 ##################################################################
 class DataframePlotter():
-
     'DataFrameMakerクラスから生成したDataFrame型変数をプロットする'
-    def __init__(self):
-        pass
-
     'メソッドはクラスの継承で書くべき！！'
     '親クラス；plot、子クラス；time_pred_plot、acc1_acc2_plot'
-    @staticmethod
-    def time_pred_plot(df, delta, args):
-        predict = pd.DataFrame(pred, columns=['pred'])
-        df = pd.concat([df[list(args)], predict], axis=1)
-        ## 加速度・角速度の時系列変化をプロット
-        for i in range(int(len(df)/delta)):
-            copy_df = df.loc[delta*i:delta*(i+1), :]
-            copy_df.dropna(how='all')
-            ax1 = copy_df[list(args)].plot()
-            ax = copy_df[['pred']].plot(ax=ax1)
-            ax.set_title(filename)
-            ax.set_ylim([-5.0, 2.5])
-            plt.show()
-            #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
-
-    @staticmethod
-    def acc1_acc2_plot(df):
-        '加速度の2次元データをプロットする'
-        ax = df.plot.scatter(x=acc[0], y=acc[1])   # 散布図
-        ax.set_title(filename)
-        ax.set_xlim([-5.5, 1.0])
-        ax.set_ylim([-2.5, 2.0])
-        plt.show()
+    'ToDoリストの書き方：リーダブルコード 5.2 自分の考えを記録する'
+    def __init__(self, df, delta):
+        self.df = hmm_learn.aveData(df)  # 加速度データを平均化
+        self.delta = int(delta/hmm_learn.AVERAGE)    # 平均値をとる要素数で区間を割る
 
     @staticmethod
     def plot(df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
         'DataFrame型変数をプロットする'
-        global pred
-        df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
-        df = hmm_learn.aveData(df)  # 加速度データを平均化
-        delta = int(delta/hmm_learn.AVERAGE)    # 平均値をとる要素数で区間を割る
-        if sys.argv[1] != '2':  # 隠れマルコフモデルorクラスタリングの時系列データを表示
-            DataframePlotter.time_pred_plot(df, delta, args)
-        else:   # 加速度データを2次元プロット
-            DataframePlotter.acc1_acc2_plot(df)
+        #global pred
+        #df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
+        #df = hmm_learn.aveData(df)  # 加速度データを平均化
+        #delta = int(delta/hmm_learn.AVERAGE)    # 平均値をとる要素数で区間を割る
+        #if sys.argv[1] != '2':  # 隠れマルコフモデルorクラスタリングの時系列データを表示
+        #    DataframePlotter.time_pred_plot(df, delta, args)
+        #else:   # 加速度データを2次元プロット
+        #    DataframePlotter.acc1_acc2_plot(df)
+        pass
+
+
+class TimePredDataframePlotter(DataframePlotter):
+
+    def plot(args):
+        '加速度・角速度の時系列変化をプロット'
+        predict = pd.DataFrame(Global().pred, columns=['pred'])
+        self.df = pd.concat([(self.df)[list(args)], predict], axis=1)
+        for i in range(int(len(self.df)/(self.delta))):
+            copy_df = (self.df).loc[(self.delta)*i:(self.delta)*(i+1), :]
+            copy_df.dropna(how='all')
+            ax1 = copy_df[list(args)].plot()
+            ax = copy_df[['pred']].plot(ax=ax1)
+            ax.set_title(Global().filename)
+            ax.set_ylim([-5.0, 2.5])
+            plt.show()
+            #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
+
+
+class Acc1Acc2DataframePlotter(DataframePlotter):
+
+    def plot():
+        '加速度の2次元データをプロットする'
+        ax = (self.df).plot.scatter(x=acc[0], y=acc[1])   # 散布図
+        ax.set_title(Global().filename)
+        ax.set_xlim([-5.5, 1.0])
+        ax.set_ylim([-2.5, 2.0])
+        plt.show()
 
 
 ##################################################################
@@ -246,19 +252,22 @@ def main():
     #dataframe = DataframeMaker(buf, Global().acc[0], Global().hmmstart[0], Global().hmmend[0])
     dataframe = DataframeMaker(buf, Global().acc[0], Global().hmmstart[0], Global().hmmend[0])
 
-    'メインプログラム実行時の引数によって、描画するグラフを決定'
+    'メインプログラム実行時の引数によって、描画するグラフを決定&プロット'
     try:
         if sys.argv[1] in ['0', '1', '2']:
             if sys.argv[1] == '0':    # 隠れマルコフモデル
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 hmm_learn.hmmLearn(dataframe.df)
                 #pred = hmm_learn.pred
+                TimePredDataframePlotter().plot(tuple(Global().acc[0]))
             elif sys.argv[1] == '1':    # クラスタリング
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 cluster_learn.clusterLearn(dataframe.df)
                 #pred = cluster_learn.pred
+                TimePredDataframePlotter().plot(tuple(Global().acc[0]))
             elif sys.argv[1] == '2':    # 加速度を２次元プロット
-                pass
+                #pass
+                Acc1Acc2DataframePlotter().plot()
         else:
             raise WrongArgumentException(sys.argv[1])
     except IndexError as err:
@@ -268,9 +277,8 @@ def main():
     #    print("予期せぬエラーです.")
     #    sys.exit()
 
-    'グラフを描画'
-    #DataframePlotter.plot(dataframe.df, PLOT_SEG, tuple(acc))
-    DataframePlotter.plot(dataframe.df, Global().plotseg[0], tuple(Global().acc[0]))
+    #'グラフを描画'
+    #DataframePlotter.plot(dataframe.df, Global().plotseg[0], tuple(Global().acc[0]))
 
 if __name__ == '__main__':
     main()

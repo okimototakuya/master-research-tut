@@ -7,7 +7,12 @@ import acceleration_plot2 as ap
 # 予測値を格納する変数
 #pred = None
 # 平均値をとる要素数
-AVERAGE = 10
+#AVERAGE = 10
+
+class Global():
+    '平均値をとる要素数'
+    AVERAGE = 10
+
 
 def aveData(X):
     '加速度の平均値をとり、DataFrame型変数にして返す'
@@ -28,7 +33,7 @@ def hmmLearn(df):
     #X = (dataframe.df).loc[:, ap.Global().acc[0]]
     print(type(df))
     X = df.loc[:, (ap.Global().acc[0])[0]]
-    #X = pd.DataFrame(X)
+    X = pd.DataFrame(X)
     if len(ap.Global().acc[0]) > 1:
         for ele in (ap.Global().acc[0])[1:]:
             X_ = df.loc[:, ele]
@@ -48,9 +53,13 @@ def hmmLearn(df):
     #print("遷移確率\n", model.transmat_)
     #print("対数尤度\n", model.score(X))
     #ap.Global().pred = model.predict(X)
-    ap.Global().pred[0]= model.predict(X_ave)
+    (ap.Global().pred)[0]= model.predict(X_ave)
     print("状態系列の復号\n", ap.Global().pred[0])
 
+
+##################################################################
+##########メイン関数##############################################
+##################################################################
 def main():
     'HMMによる学習を行う'
     hmmLearn()
