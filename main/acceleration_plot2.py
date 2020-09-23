@@ -10,6 +10,9 @@ import hmm_learn
 import cluster_learn
 
 
+##################################################################
+##########グローバル変数クラス####################################
+##################################################################
 class Global():
     'acceleration_plot2モジュールのグローバル変数を属性に持つクラス'
     ' 確率モデルによる予測値'
@@ -107,6 +110,17 @@ class Global():
     #dataframe = property(get_dataframe, set_dataframe)
 
 
+##################################################################
+##########例外クラス##############################################
+##################################################################
+class WrongArgumentException(Exception):
+    'pythonスクリプトに与えられた引数が適切でない時に返す例外'
+    pass
+
+
+##################################################################
+##########データフレーム型変数を作るクラス########################
+##################################################################
 class DataframeMaker():
     'excelファイルを読み込み、DataFrame型変数を生成する'
     def __init__(self, filename, acc, hmmstart, hmmend):
@@ -147,6 +161,9 @@ class DataframeMaker():
         #sp.run(['awk', '-F', '","', '{print}'])
 
 
+##################################################################
+##########データフレーム型変数をプロットするクラス################
+##################################################################
 class DataframePlotter():
 
     'DataFrameMakerクラスから生成したDataFrame型変数をプロットする'
@@ -192,6 +209,9 @@ class DataframePlotter():
             DataframePlotter.acc1_acc2_plot(df)
 
 
+##################################################################
+##########メイン関数##############################################
+##################################################################
 def main():
     '確率モデルを適用し、学習結果を時系列表示する'
     'もしくは、加速度データを2次元プロットする'
@@ -227,18 +247,26 @@ def main():
     dataframe = DataframeMaker(buf, Global().acc[0], Global().hmmstart[0], Global().hmmend[0])
 
     'メインプログラム実行時の引数によって、描画するグラフを決定'
-    if sys.argv[1] == '0':    # 隠れマルコフモデル
-        #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
-        hmm_learn.hmmLearn(dataframe.df)
-        #pred = hmm_learn.pred
-    elif sys.argv[1] == '1':    # クラスタリング
-        #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
-        cluster_learn.clusterLearn(dataframe.df)
-        #pred = cluster_learn.pred
-    elif sys.argv[1] == '2':    # 加速度を２次元プロット
-        pass
-    else:
-        print("Error is here.")
+    try:
+        if sys.argv[1] in ['0', '1', '2']:
+            if sys.argv[1] == '0':    # 隠れマルコフモデル
+                #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
+                hmm_learn.hmmLearn(dataframe.df)
+                #pred = hmm_learn.pred
+            elif sys.argv[1] == '1':    # クラスタリング
+                #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
+                cluster_learn.clusterLearn(dataframe.df)
+                #pred = cluster_learn.pred
+            elif sys.argv[1] == '2':    # 加速度を２次元プロット
+                pass
+        else:
+            raise WrongArgumentException(sys.argv[1])
+    except IndexError as err:
+        print("Pythonスクリプトに引数が与えられていません.(sys.argv[1]:0~2)")
+        sys.exit()
+    #except Exception as other:
+    #    print("予期せぬエラーです.")
+    #    sys.exit()
 
     'グラフを描画'
     #DataframePlotter.plot(dataframe.df, PLOT_SEG, tuple(acc))
