@@ -211,7 +211,7 @@ class Acc1Acc2DataframePlotter(DataframePlotter):
 
     def plot(self):
         '加速度の2次元データをプロットする'
-        ax = (self.df).plot.scatter(x=acc[0], y=acc[1])   # 散布図
+        ax = (self.df).plot.scatter(x=config.acc[0], y=config.acc[1])   # 散布図
         ax.set_title(config.filename)
         ax.set_xlim([-5.5, 1.0])
         ax.set_ylim([-2.5, 2.0])
@@ -270,7 +270,8 @@ def main():
                 TimePredDataframePlotter(config.dataframe, config.plotseg).plot(tuple(config.acc))
             elif sys.argv[1] == '2':    # 加速度を２次元プロット
                 #pass
-                Acc1Acc2DataframePlotter().plot()
+                config.dataframe = hmm_learn.aveData(dataframe.df)
+                Acc1Acc2DataframePlotter(config.dataframe, config.plotseg).plot()
         else:
             raise WrongArgumentException(sys.argv[1])
     except IndexError as err:
