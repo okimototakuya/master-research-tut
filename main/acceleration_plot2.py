@@ -13,101 +13,101 @@ import cluster_learn
 ##################################################################
 ##########グローバル変数クラス####################################
 ##################################################################
-class Global():
-    'acceleration_plot2モジュールのグローバル変数を属性に持つクラス'
-    #' 確率モデルによる予測値'
-    #pred=None,
-    ' 加速度データファイル(csv)のパス'
-    filename="../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv",  # ID16
-    #filename="../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv",  # ID19
-    ' 加速度の方向名のリスト'
-    acc=[
-        'Acceleration_x',
-        'Acceleration_y',
-        'Acceleration_z',
-        #'AngularRate_x',
-        #'AngularRate_y',
-        #'AngularRate_z',
-        ],
-    ' 時系列/加速度2次元プロット画像ファイルの保存先'
-    #path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
-    path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge",
-    #path="/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
-    #path="/Users/okimototakuya/Desktop/tmp",
-    ' 1つのグラフにおけるプロット数'
-    plotseg=10000,
-    #plotseg=131663,
-    ' 加速度データファイルで、隠れマルコフモデルを適用させる範囲:始まり'
-    hmmstart=60000,
-    ' ":終わり'
-    hmmend=69999,
-    ' 加工した加速度データファイルを格納するDataFrame型変数'
-    #dataframe=None,
-
-    'Globalオブジェクト作成時に使用'
-    #def __init__(self, **kwargs):
-    #    self.hidden_pred = kwargs["input_pred"]
-    #    self.hidden_filename = kwargs["input_filename"]
-    #    self.hidden_acc = kwargs["input_acc"]
-    #    self.hidden_path = kwargs["input_path"]
-    #    self.hidden_plotseg = kwargs["input_plotseg"]
-    #    self.hidden_hmmstart = kwargs["input_hmmstart"]
-    #    self.hidden_hmmend = kwargs["input_hmmend"]
-    #    self.hidden_dataframe = kwargs["input_dataframe"]
-
-    #'ゲッターメソッド'
-    #def get_pred(self):
-    #    return self.hidden_pred
-    #def get_filename(self):
-    #    return self.hidden_filename
-    #def get_acc(self):
-    #    return self.hidden_acc
-    #def get_path(self):
-    #    return self.hidden_path
-    #def get_plotseg(self):
-    #    return self.hidden_plotseg
-    #def get_hmmstart(self):
-    #    return self.hidden_hmmstart
-    #def get_hmmend(self):
-    #    return self.hidden_hmmend
-    #def get_dataframe(self):
-    #    return self.hidden_dataframe
-
-    #'セッターメソッド'
-    ## 確率モデルによる予測値
-    #def set_pred(self, input_pred):
-    #    self.hidden_pred = input_pred
-    ## 加速度データファイル(csv)のパス
-    #def set_filename(self, input_filename):
-    #    self.hidden_filename = input_filename
-    ## 加速度の方向名のリスト
-    #def set_acc(self, input_acc):
-    #    self.hidden_acc = input_acc
-    ## 時系列/加速度2次元プロット画像ファイルの保存先
-    #def set_path(self, input_path):
-    #    self.hidden_path = input_path
-    ## 1つのグラフにおけるプロット数
-    #def set_plotseg(self, input_plotseg):
-    #    self.hidden_plotseg = input_plotseg
-    ## 加速度データファイルで、隠れマルコフモデルを適用させる範囲:始まり
-    #def set_hmmstart(self, input_hmmstart):
-    #    self.hidden_hmmstart = input_hmmstart
-    ## ":終わり
-    #def set_hmmend(self, input_hmmend):
-    #    self.hidden_hmmend = input_hmmend
-    ## 加工した加速度データファイルを格納するDataFrame型変数
-    #def set_dataframe(self, input_dataframe):
-    #    self.hidden_dataframe = input_dataframe
-
-    #'プロパティ'
-    #pred = property(get_pred, set_pred)
-    #filename = property(get_filename, set_filename)
-    #acc = property(get_acc, set_acc)
-    #path = property(get_path, set_path)
-    #plotseg = property(get_plotseg, set_plotseg)
-    #hmmstart = property(get_hmmstart, set_hmmstart)
-    #hmmend = property(get_hmmend, set_hmmend)
-    #dataframe = property(get_dataframe, set_dataframe)
+#class Global():
+#    'acceleration_plot2モジュールのグローバル変数を属性に持つクラス'
+#    #' 確率モデルによる予測値'
+#    #pred=None,
+#    ' 加速度データファイル(csv)のパス'
+#    filename="../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv",  # ID16
+#    #filename="../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv",  # ID19
+#    ' 加速度の方向名のリスト'
+#    acc=[
+#        'Acceleration_x',
+#        'Acceleration_y',
+#        'Acceleration_z',
+#        #'AngularRate_x',
+#        #'AngularRate_y',
+#        #'AngularRate_z',
+#        ],
+#    ' 時系列/加速度2次元プロット画像ファイルの保存先'
+#    #path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
+#    path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge",
+#    #path="/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
+#    #path="/Users/okimototakuya/Desktop/tmp",
+#    ' 1つのグラフにおけるプロット数'
+#    plotseg=10000,
+#    #plotseg=131663,
+#    ' 加速度データファイルで、隠れマルコフモデルを適用させる範囲:始まり'
+#    hmmstart=60000,
+#    ' ":終わり'
+#    hmmend=69999,
+#    ' 加工した加速度データファイルを格納するDataFrame型変数'
+#    #dataframe=None,
+#
+#    'Globalオブジェクト作成時に使用'
+#    #def __init__(self, **kwargs):
+#    #    self.hidden_pred = kwargs["input_pred"]
+#    #    self.hidden_filename = kwargs["input_filename"]
+#    #    self.hidden_acc = kwargs["input_acc"]
+#    #    self.hidden_path = kwargs["input_path"]
+#    #    self.hidden_plotseg = kwargs["input_plotseg"]
+#    #    self.hidden_hmmstart = kwargs["input_hmmstart"]
+#    #    self.hidden_hmmend = kwargs["input_hmmend"]
+#    #    self.hidden_dataframe = kwargs["input_dataframe"]
+#
+#    #'ゲッターメソッド'
+#    #def get_pred(self):
+#    #    return self.hidden_pred
+#    #def get_filename(self):
+#    #    return self.hidden_filename
+#    #def get_acc(self):
+#    #    return self.hidden_acc
+#    #def get_path(self):
+#    #    return self.hidden_path
+#    #def get_plotseg(self):
+#    #    return self.hidden_plotseg
+#    #def get_hmmstart(self):
+#    #    return self.hidden_hmmstart
+#    #def get_hmmend(self):
+#    #    return self.hidden_hmmend
+#    #def get_dataframe(self):
+#    #    return self.hidden_dataframe
+#
+#    #'セッターメソッド'
+#    ## 確率モデルによる予測値
+#    #def set_pred(self, input_pred):
+#    #    self.hidden_pred = input_pred
+#    ## 加速度データファイル(csv)のパス
+#    #def set_filename(self, input_filename):
+#    #    self.hidden_filename = input_filename
+#    ## 加速度の方向名のリスト
+#    #def set_acc(self, input_acc):
+#    #    self.hidden_acc = input_acc
+#    ## 時系列/加速度2次元プロット画像ファイルの保存先
+#    #def set_path(self, input_path):
+#    #    self.hidden_path = input_path
+#    ## 1つのグラフにおけるプロット数
+#    #def set_plotseg(self, input_plotseg):
+#    #    self.hidden_plotseg = input_plotseg
+#    ## 加速度データファイルで、隠れマルコフモデルを適用させる範囲:始まり
+#    #def set_hmmstart(self, input_hmmstart):
+#    #    self.hidden_hmmstart = input_hmmstart
+#    ## ":終わり
+#    #def set_hmmend(self, input_hmmend):
+#    #    self.hidden_hmmend = input_hmmend
+#    ## 加工した加速度データファイルを格納するDataFrame型変数
+#    #def set_dataframe(self, input_dataframe):
+#    #    self.hidden_dataframe = input_dataframe
+#
+#    #'プロパティ'
+#    #pred = property(get_pred, set_pred)
+#    #filename = property(get_filename, set_filename)
+#    #acc = property(get_acc, set_acc)
+#    #path = property(get_path, set_path)
+#    #plotseg = property(get_plotseg, set_plotseg)
+#    #hmmstart = property(get_hmmstart, set_hmmstart)
+#    #hmmend = property(get_hmmend, set_hmmend)
+#    #dataframe = property(get_dataframe, set_dataframe)
 
 
 ##################################################################
