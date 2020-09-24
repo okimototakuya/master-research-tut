@@ -46,6 +46,7 @@ def hmmLearn(df):
     #print("対数尤度\n", model.score(X))
     #config.pred = model.predict(X)
     config.pred = model.predict(X_ave)
+    config.dataframe = X_ave
     print("状態系列の復号\n", config.pred)
 
 

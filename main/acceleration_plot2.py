@@ -171,8 +171,10 @@ class DataframePlotter():
     '親クラス；plot、子クラス；time_pred_plot、acc1_acc2_plot'
     'ToDoリストの書き方：リーダブルコード 5.2 自分の考えを記録する'
     def __init__(self, df, delta):
-        self.df = hmm_learn.aveData(df)  # 加速度データを平均化
-        self.delta = int(delta/hmm_learn.AVERAGE)    # 平均値をとる要素数で区間を割る
+        #self.df = hmm_learn.aveData(df)  # 加速度データを平均化
+        self.df = df  # 加速度データを平均化
+        #self.delta = int(delta/hmm_learn.AVERAGE)    # 平均値をとる要素数で区間を割る
+        self.delta = int(delta/config.AVERAGE)    # 平均値をとる要素数で区間を割る
 
     @staticmethod
     def plot(df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
@@ -190,7 +192,7 @@ class DataframePlotter():
 
 class TimePredDataframePlotter(DataframePlotter):
 
-    def plot(args):
+    def plot(self, args):
         '加速度・角速度の時系列変化をプロット'
         predict = pd.DataFrame(config.pred, columns=['pred'])
         self.df = pd.concat([(self.df)[list(args)], predict], axis=1)
@@ -207,7 +209,7 @@ class TimePredDataframePlotter(DataframePlotter):
 
 class Acc1Acc2DataframePlotter(DataframePlotter):
 
-    def plot():
+    def plot(self):
         '加速度の2次元データをプロットする'
         ax = (self.df).plot.scatter(x=acc[0], y=acc[1])   # 散布図
         ax.set_title(config.filename)
@@ -260,12 +262,12 @@ def main():
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 hmm_learn.hmmLearn(dataframe.df)
                 #pred = hmm_learn.pred
-                TimePredDataframePlotter().plot(tuple(config.acc))
+                TimePredDataframePlotter(config.dataframe, config.plotseg).plot(tuple(config.acc))
             elif sys.argv[1] == '1':    # クラスタリング
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 cluster_learn.clusterLearn(dataframe.df)
                 #pred = cluster_learn.pred
-                TimePredDataframePlotter().plot(tuple(config.acc))
+                TimePredDataframePlotter(config.dataframe, config.plotseg).plot(tuple(config.acc))
             elif sys.argv[1] == '2':    # 加速度を２次元プロット
                 #pass
                 Acc1Acc2DataframePlotter().plot()

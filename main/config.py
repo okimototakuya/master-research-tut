@@ -1,4 +1,6 @@
 'プロジェクトのグローバル変数を定義するクラス'
+from pprint import pprint
+from collections import OrderedDict
 
 
 ' 確率モデルによる予測値'
@@ -43,14 +45,17 @@ AVERAGE = 10
 
 
 def main():
-    print(pred)
-    print(filename)
-    print(acc)
-    print(path)
-    print(plotseg)
-    print(hmmstart)
-    print(hmmend)
-    print(dataframe)
+    print("pred:", pred)
+    print("filename:", filename)
+    print("acc:", acc)
+    print("path:", path)
+    print("plotseg:", plotseg)
+    print("hmmstart:", hmmstart)
+    print("hmmend:", hmmend)
+    print("dataframe:", dataframe)
+
+    #pprint(globals())
+    #pprint(OrderedDict(globals()))
 
 if __name__ =='__main__':
     main()
