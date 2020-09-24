@@ -6,6 +6,7 @@ import dask.dataframe as dd
 #matplotlib.use('Agg')  # pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
 import numpy as np
+import config
 import hmm_learn
 import cluster_learn
 
@@ -191,14 +192,14 @@ class TimePredDataframePlotter(DataframePlotter):
 
     def plot(args):
         '加速度・角速度の時系列変化をプロット'
-        predict = pd.DataFrame(Global().pred, columns=['pred'])
+        predict = pd.DataFrame(config.pred, columns=['pred'])
         self.df = pd.concat([(self.df)[list(args)], predict], axis=1)
         for i in range(int(len(self.df)/(self.delta))):
             copy_df = (self.df).loc[(self.delta)*i:(self.delta)*(i+1), :]
             copy_df.dropna(how='all')
             ax1 = copy_df[list(args)].plot()
             ax = copy_df[['pred']].plot(ax=ax1)
-            ax.set_title(Global().filename)
+            ax.set_title(config.filename)
             ax.set_ylim([-5.0, 2.5])
             plt.show()
             #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
@@ -209,7 +210,7 @@ class Acc1Acc2DataframePlotter(DataframePlotter):
     def plot():
         '加速度の2次元データをプロットする'
         ax = (self.df).plot.scatter(x=acc[0], y=acc[1])   # 散布図
-        ax.set_title(Global().filename)
+        ax.set_title(config.filename)
         ax.set_xlim([-5.5, 1.0])
         ax.set_ylim([-2.5, 2.0])
         plt.show()
@@ -248,9 +249,9 @@ def main():
 
     '加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成'
     buf = "../dataset/buf.csv"  # 加工したcsvファイルの保存先
-    DataframeMaker.cut_csv(buf, Global().filename[0], Global().hmmstart[0], Global().hmmend[0])
-    #dataframe = DataframeMaker(buf, Global().acc[0], Global().hmmstart[0], Global().hmmend[0])
-    dataframe = DataframeMaker(buf, Global().acc[0], Global().hmmstart[0], Global().hmmend[0])
+    DataframeMaker.cut_csv(buf, config.filename, config.hmmstart, config.hmmend)
+    #dataframe = DataframeMaker(buf, config.acc, config.hmmstart, config.hmmend)
+    dataframe = DataframeMaker(buf, config.acc, config.hmmstart, config.hmmend)
 
     'メインプログラム実行時の引数によって、描画するグラフを決定&プロット'
     try:
@@ -259,12 +260,12 @@ def main():
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 hmm_learn.hmmLearn(dataframe.df)
                 #pred = hmm_learn.pred
-                TimePredDataframePlotter().plot(tuple(Global().acc[0]))
+                TimePredDataframePlotter().plot(tuple(config.acc))
             elif sys.argv[1] == '1':    # クラスタリング
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 cluster_learn.clusterLearn(dataframe.df)
                 #pred = cluster_learn.pred
-                TimePredDataframePlotter().plot(tuple(Global().acc[0]))
+                TimePredDataframePlotter().plot(tuple(config.acc))
             elif sys.argv[1] == '2':    # 加速度を２次元プロット
                 #pass
                 Acc1Acc2DataframePlotter().plot()
@@ -278,7 +279,7 @@ def main():
     #    sys.exit()
 
     #'グラフを描画'
-    #DataframePlotter.plot(dataframe.df, Global().plotseg[0], tuple(Global().acc[0]))
+    #DataframePlotter.plot(dataframe.df, config.plotseg, tuple(config.acc))
 
 if __name__ == '__main__':
     main()
