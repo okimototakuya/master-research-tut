@@ -1,6 +1,7 @@
 'プロジェクトのグローバル変数を定義するクラス'
 from pprint import pprint
 from collections import OrderedDict
+import pandas as pd
 
 
 ' 確率モデルによる予測値'
@@ -42,6 +43,15 @@ dataframe=None
 
 '平均値をとる要素数'
 AVERAGE = 10
+
+
+def aveData(X):
+    '加速度の平均値をとり、DataFrame型変数にして返す'
+    # 加速度の平均値を格納するためのDataFrame型変数
+    X_ave = pd.DataFrame(index=[], columns=acc)
+    for i in range(int(len(X)/AVERAGE)):
+        X_ave = X_ave.append(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean(), ignore_index=True)
+    return X_ave
 
 
 def main():

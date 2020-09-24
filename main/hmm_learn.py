@@ -6,14 +6,6 @@ import config
 import acceleration_plot2 as ap
 
 
-def aveData(X):
-    '加速度の平均値をとり、DataFrame型変数にして返す'
-    # 加速度の平均値を格納するためのDataFrame型変数
-    X_ave = pd.DataFrame(index=[], columns=config.acc)
-    for i in range(int(len(X)/config.AVERAGE)):
-        X_ave = X_ave.append(X.iloc[i*config.AVERAGE:i*config.AVERAGE+config.AVERAGE, :].mean(), ignore_index=True)
-    return X_ave
-
 def hmmLearn(df):
     'DataFrame型変数を引数にして、HMMによる学習を行う'
     #global pred
@@ -34,7 +26,7 @@ def hmmLearn(df):
         pass
     #X = X.iloc[config.HMM_RANGE_START:config.HMM_RANGE_END, :]
     # 加速度の平均値を格納するためのDataFrame型変数
-    X_ave = aveData(X)
+    X_ave = config.aveData(X)
     #model.fit(X)
     model.fit(X_ave)
 
