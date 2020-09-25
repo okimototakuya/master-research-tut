@@ -45,13 +45,15 @@ dataframe=None
 AVERAGE = 10
 
 
-def aveData(X):
+##HACK:反例ありそう→データフレームの大きさと平均値幅のすり合わせ、例外処理
+def aveData(input_dataframe):
     '加速度の平均値をとり、DataFrame型変数にして返す'
     # 加速度の平均値を格納するためのDataFrame型変数
-    X_ave = pd.DataFrame(index=[], columns=acc)
-    for i in range(int(len(X)/AVERAGE)):
-        X_ave = X_ave.append(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean(), ignore_index=True)
-    return X_ave
+    #ave_dataframe = pd.DataFrame(index=[], columns=acc)
+    ave_dataframe = pd.DataFrame(index=[], columns=list(input_dataframe.columns))
+    for i in range(int(len(input_dataframe)/AVERAGE)):
+        ave_dataframe = ave_dataframe.append(input_dataframe.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean(), ignore_index=True)
+    return ave_dataframe
 
 
 def main():
