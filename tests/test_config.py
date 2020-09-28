@@ -54,7 +54,7 @@ def make_arange_dataframe(**kwargs):
     '行数と列数を引数にとり、データフレーム型オブジェクト(要素は全て１)を返す'
     df = pd.DataFrame(
             np.reshape(
-                      np.arange(30),
+                      np.arange(kwargs['row']*kwargs['columns']),
                       (kwargs['row'], kwargs['columns'])
                       ),
             )
@@ -66,7 +66,7 @@ def make_random_dataframe(**kwargs):
     '行数と列数を引数にとり、データフレーム型オブジェクト(要素は全て１)を返す'
     df = pd.DataFrame(
             np.reshape(
-                      np.random.rand(30),
+                      np.random.rand(kwargs['row']*kwargs['columns']),
                       (kwargs['row'], kwargs['columns'])
                       ),
             )
@@ -85,37 +85,37 @@ class TestConfig(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @document_it
-    def test_allone_aveData(self):
-        'configモジュールの関数(aveData)をテストする関数'
-        '引数のデータフレーム型オブジェクトの要素は全て1'
-        input_rows = 10
-        input_columns = 3
-        #関数aveDataを使用し、データフレーム型オブジェクトを返値
-        df1 = config.aveData(make_allone_dataframe(row=input_rows, columns=input_columns))
-        #上記df1と結果が等しくなるように、データフレーム型オブジェクトを作成
-        df2 = pd.DataFrame(
-                np.reshape(np.ones(1*input_columns),
-                           (1, input_columns)
-                          ),
-                )
-        #アサーション
-        assert_frame_equal(df1, df2)
+    #@document_it
+    #def test_allone_aveData(self):
+    #    'configモジュールの関数(aveData)をテストする関数'
+    #    '引数のデータフレーム型オブジェクトの要素は全て1'
+    #    input_rows = 10
+    #    input_columns = 3
+    #    #関数aveDataを使用し、データフレーム型オブジェクトを返値
+    #    df1 = config.aveData(make_allone_dataframe(row=input_rows, columns=input_columns))
+    #    #上記df1と結果が等しくなるように、データフレーム型オブジェクトを作成
+    #    df2 = pd.DataFrame(
+    #            np.reshape(np.ones(1*input_columns),
+    #                       (1, input_columns)
+    #                      ),
+    #            )
+    #    #アサーション
+    #    assert_frame_equal(df1, df2)
 
-    @document_it
-    def test_arange_aveData(self):
-        'configモジュールの関数(aveData)をテストする関数'
-        '引数のデータフレーム型オブジェクトの要素はnp.arangeで作成'
-        input_rows = 10
-        input_columns = 3
-        #関数aveDataを使用し、データフレーム型オブジェクトを返値
-        df1 = config.aveData(make_arange_dataframe(row=input_rows, columns=input_columns))
-        #上記df1と結果が等しくなるように、データフレーム型オブジェクトを作成
-        arr = np.reshape(np.arange(input_rows*input_columns), (input_rows, input_columns))
-        df_tmp = (pd.DataFrame(arr)).mean(axis=0)
-        df2 = pd.DataFrame(df_tmp, columns=[0]).T
-        #アサーション
-        assert_frame_equal(df1, df2)
+    #@document_it
+    #def test_arange_aveData(self):
+    #    'configモジュールの関数(aveData)をテストする関数'
+    #    '引数のデータフレーム型オブジェクトの要素はnp.arangeで作成'
+    #    input_rows = 10
+    #    input_columns = 3
+    #    #関数aveDataを使用し、データフレーム型オブジェクトを返値
+    #    df1 = config.aveData(make_arange_dataframe(row=input_rows, columns=input_columns))
+    #    #上記df1と結果が等しくなるように、データフレーム型オブジェクトを作成
+    #    arr = np.reshape(np.arange(input_rows*input_columns), (input_rows, input_columns))
+    #    df_tmp = (pd.DataFrame(arr)).mean(axis=0)
+    #    df2 = pd.DataFrame(df_tmp, columns=[0]).T
+    #    #アサーション
+    #    assert_frame_equal(df1, df2)
 
 
     @document_it
@@ -131,6 +131,8 @@ class TestConfig(unittest.TestCase):
         #上記df1と結果が等しくなるように、データフレーム型オブジェクトを作成
         df_tmp = df_rand.mean(axis=0)
         df2 = pd.DataFrame(df_tmp, columns=[0]).T
+        print('df1:\n', df1)
+        print('df2:\n', df2)
         #アサーション
         assert_frame_equal(df1, df2)
 
