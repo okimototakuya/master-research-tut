@@ -3,7 +3,8 @@ import sys
 import subprocess as sp
 import pandas as pd
 import dask.dataframe as dd
-#matplotlib.use('Agg')  # pyplotで生成した画像を保存するためのインポート
+import matplotlib
+matplotlib.use('Agg')  # pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
 import numpy as np
 import config
@@ -202,20 +203,26 @@ class TimePredDataframePlotter(DataframePlotter):
             ax1 = copy_df[list(args)].plot()
             ax = copy_df[['pred']].plot(ax=ax1)
             ax.set_title(config.filename)
-            ax.set_ylim([-5.0, 2.5])
+            #ax.set_ylim([-5.0, 2.5])
             plt.show()
             #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
+            ## テスト用グラフの保存先
+            plt.savefig(os.path.join('../tests/test_plot/', "demo"+str(i)+".png"))
 
 
 class Acc1Acc2DataframePlotter(DataframePlotter):
 
     def plot(self):
         '加速度の2次元データをプロットする'
-        ax = (self.df).plot.scatter(x=config.acc[0], y=config.acc[1])   # 散布図
+        #ax = (self.df).plot.scatter(x=config.acc[0], y=config.acc[1])   # 散布図
+        #ax = (self.df).plot.scatter(x=config.dataframe['Acceleration_x'], y=config.dataframe['Acceleration_y'])   # 散布図
+        ax = (self.df).plot.scatter(x='Acceleration_x', y='Acceleration_y')   # 散布図
         ax.set_title(config.filename)
-        ax.set_xlim([-5.5, 1.0])
-        ax.set_ylim([-2.5, 2.0])
-        plt.show()
+        #ax.set_xlim([-5.5, 1.0])
+        #ax.set_ylim([-2.5, 2.0])
+        #plt.show()
+        ## テスト用グラフの保存先
+        plt.savefig(os.path.join('../tests/test_plot/', "demo"+".png"))
 
 
 ##################################################################
@@ -271,7 +278,7 @@ def main():
             elif sys.argv[1] == '2':    # 加速度を２次元プロット
                 #pass
                 config.dataframe = config.aveData(dataframe.df)
-                Acc1Acc2DataframePlotter(config.dataframe, config.plotseg).plot()
+                Acc2Acc2DataframePlotter(config.dataframe, config.plotseg).plot()
         else:
             raise WrongArgumentException(sys.argv[1])
     except IndexError as err:
