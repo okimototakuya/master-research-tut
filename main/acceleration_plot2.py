@@ -172,22 +172,12 @@ class DataframePlotter():
     '親クラス；plot、子クラス；time_pred_plot、acc1_acc2_plot'
     'ToDoリストの書き方：リーダブルコード 5.2 自分の考えを記録する'
     def __init__(self, df, delta):
-        #self.df = config.aveData(df)  # 加速度データを平均化
         self.df = df  # 加速度データを平均化
-        #self.delta = int(delta/hmm_learn.AVERAGE)    # 平均値をとる要素数で区間を割る
         self.delta = int(delta/config.AVERAGE)    # 平均値をとる要素数で区間を割る
 
     @staticmethod
     def plot(df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
         'DataFrame型変数をプロットする'
-        #global pred
-        #df = df.iloc[HMM_RANGE_START:HMM_RANGE_END, :].reset_index()
-        #df = config.aveData(df)  # 加速度データを平均化
-        #delta = int(delta/hmm_learn.AVERAGE)    # 平均値をとる要素数で区間を割る
-        #if sys.argv[1] != '2':  # 隠れマルコフモデルorクラスタリングの時系列データを表示
-        #    DataframePlotter.time_pred_plot(df, delta, args)
-        #else:   # 加速度データを2次元プロット
-        #    DataframePlotter.acc1_acc2_plot(df)
         pass
 
 
