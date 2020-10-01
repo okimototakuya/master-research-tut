@@ -10,16 +10,16 @@ def hmmLearn(df):
     'DataFrame型変数を引数にして、HMMによる学習を行う'
     #global pred
     # 加速度データのDataFrame型変数を作成.
-    #dataframe = ap.DataframeMaker(config.filename)
+    #data_sampled_by_func = ap.DataframeMaker(config.data_read_by_api)
     # 確率モデル(隠れマルコフモデルの作成.
     model = hmm.GaussianHMM(n_components=3, covariance_type="full")
     # DataFrame型変数から学習に用いる加速度データを抽出.
-    #X = (dataframe.df).loc[:, config.acc]
+    #X = (data_sampled_by_func.df).loc[:, config.direct_acc]
     print(type(df))
-    X = df.loc[:, (config.acc)[0]]
+    X = df.loc[:, (config.direct_acc)[0]]
     X = pd.DataFrame(X)
-    if len(config.acc) > 1:
-        for ele in (config.acc)[1:]:
+    if len(config.direct_acc) > 1:
+        for ele in (config.direct_acc)[1:]:
             X_ = df.loc[:, ele]
             X = X.join(X_)
     else:
@@ -36,10 +36,10 @@ def hmmLearn(df):
     #print("共分散値\n", model.covars_)
     #print("遷移確率\n", model.transmat_)
     #print("対数尤度\n", model.score(X))
-    #config.pred = model.predict(X)
-    config.pred = model.predict(X_ave)
-    config.dataframe = X_ave
-    print("状態系列の復号\n", config.pred)
+    #config.pred_by_prob_model = model.predict(X)
+    config.pred_by_prob_model = model.predict(X_ave)
+    config.data_sampled_by_func = X_ave
+    print("状態系列の復号\n", config.pred_by_prob_model)
 
 
 ##################################################################

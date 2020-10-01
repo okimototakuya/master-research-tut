@@ -4,7 +4,7 @@ import subprocess as sp
 import pandas as pd
 import dask.dataframe as dd
 import matplotlib
-matplotlib.use('Agg')  # pyplotで生成した画像を保存するためのインポート
+#matplotlib.use('Agg')  # pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
 import numpy as np
 import config
@@ -18,12 +18,12 @@ import cluster_learn
 #class Global():
 #    'acceleration_plot2モジュールのグローバル変数を属性に持つクラス'
 #    #' 確率モデルによる予測値'
-#    #pred=None,
+#    #pred_by_prob_model=None,
 #    ' 加速度データファイル(csv)のパス'
-#    filename="../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv",  # ID16
-#    #filename="../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv",  # ID19
+#    data_read_by_api="../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv",  # ID16
+#    #data_read_by_api="../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv",  # ID19
 #    ' 加速度の方向名のリスト'
-#    acc=[
+#    direct_acc=[
 #        'Acceleration_x',
 #        'Acceleration_y',
 #        'Acceleration_z',
@@ -32,84 +32,84 @@ import cluster_learn
 #        #'AngularRate_z',
 #        ],
 #    ' 時系列/加速度2次元プロット画像ファイルの保存先'
-#    #path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
-#    path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge",
-#    #path="/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
-#    #path="/Users/okimototakuya/Desktop/tmp",
+#    #save_graph_to_path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
+#    save_graph_to_path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge",
+#    #save_graph_to_path="/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
+#    #save_graph_to_path="/Users/okimototakuya/Desktop/tmp",
 #    ' 1つのグラフにおけるプロット数'
-#    plotseg=10000,
-#    #plotseg=131663,
+#    plot_amount_in_graph=10000,
+#    #plot_amount_in_graph=131663,
 #    ' 加速度データファイルで、隠れマルコフモデルを適用させる範囲:始まり'
-#    hmmstart=60000,
+#    data_sampled_first=60000,
 #    ' ":終わり'
-#    hmmend=69999,
+#    data_sampled_last=69999,
 #    ' 加工した加速度データファイルを格納するDataFrame型変数'
-#    #dataframe=None,
+#    #data_sampled_by_func=None,
 #
 #    'Globalオブジェクト作成時に使用'
 #    #def __init__(self, **kwargs):
-#    #    self.hidden_pred = kwargs["input_pred"]
-#    #    self.hidden_filename = kwargs["input_filename"]
-#    #    self.hidden_acc = kwargs["input_acc"]
-#    #    self.hidden_path = kwargs["input_path"]
-#    #    self.hidden_plotseg = kwargs["input_plotseg"]
-#    #    self.hidden_hmmstart = kwargs["input_hmmstart"]
-#    #    self.hidden_hmmend = kwargs["input_hmmend"]
-#    #    self.hidden_dataframe = kwargs["input_dataframe"]
+#    #    self.hidden_pred_by_prob_model = kwargs["input_pred_by_prob_model"]
+#    #    self.hidden_data_read_by_api = kwargs["input_data_read_by_api"]
+#    #    self.hidden_direct_acc = kwargs["input_direct_acc"]
+#    #    self.hidden_save_graph_to_path = kwargs["input_save_graph_to_path"]
+#    #    self.hidden_plot_amount_in_graph = kwargs["input_plot_amount_in_graph"]
+#    #    self.hidden_data_sampled_first = kwargs["input_data_sampled_first"]
+#    #    self.hidden_data_sampled_last = kwargs["input_data_sampled_last"]
+#    #    self.hidden_data_sampled_by_func = kwargs["input_data_sampled_by_func"]
 #
 #    #'ゲッターメソッド'
-#    #def get_pred(self):
-#    #    return self.hidden_pred
-#    #def get_filename(self):
-#    #    return self.hidden_filename
-#    #def get_acc(self):
-#    #    return self.hidden_acc
-#    #def get_path(self):
-#    #    return self.hidden_path
-#    #def get_plotseg(self):
-#    #    return self.hidden_plotseg
-#    #def get_hmmstart(self):
-#    #    return self.hidden_hmmstart
-#    #def get_hmmend(self):
-#    #    return self.hidden_hmmend
-#    #def get_dataframe(self):
-#    #    return self.hidden_dataframe
+#    #def get_pred_by_prob_model(self):
+#    #    return self.hidden_pred_by_prob_model
+#    #def get_data_read_by_api(self):
+#    #    return self.hidden_data_read_by_api
+#    #def get_direct_acc(self):
+#    #    return self.hidden_direct_acc
+#    #def get_save_graph_to_path(self):
+#    #    return self.hidden_save_graph_to_path
+#    #def get_plot_amount_in_graph(self):
+#    #    return self.hidden_plot_amount_in_graph
+#    #def get_data_sampled_first(self):
+#    #    return self.hidden_data_sampled_first
+#    #def get_data_sampled_last(self):
+#    #    return self.hidden_data_sampled_last
+#    #def get_data_sampled_by_func(self):
+#    #    return self.hidden_data_sampled_by_func
 #
 #    #'セッターメソッド'
 #    ## 確率モデルによる予測値
-#    #def set_pred(self, input_pred):
-#    #    self.hidden_pred = input_pred
+#    #def set_pred_by_prob_model(self, input_pred_by_prob_model):
+#    #    self.hidden_pred_by_prob_model = input_pred_by_prob_model
 #    ## 加速度データファイル(csv)のパス
-#    #def set_filename(self, input_filename):
-#    #    self.hidden_filename = input_filename
+#    #def set_data_read_by_api(self, input_data_read_by_api):
+#    #    self.hidden_data_read_by_api = input_data_read_by_api
 #    ## 加速度の方向名のリスト
-#    #def set_acc(self, input_acc):
-#    #    self.hidden_acc = input_acc
+#    #def set_direct_acc(self, input_direct_acc):
+#    #    self.hidden_direct_acc = input_direct_acc
 #    ## 時系列/加速度2次元プロット画像ファイルの保存先
-#    #def set_path(self, input_path):
-#    #    self.hidden_path = input_path
+#    #def set_save_graph_to_path(self, input_save_graph_to_path):
+#    #    self.hidden_save_graph_to_path = input_save_graph_to_path
 #    ## 1つのグラフにおけるプロット数
-#    #def set_plotseg(self, input_plotseg):
-#    #    self.hidden_plotseg = input_plotseg
+#    #def set_plot_amount_in_graph(self, input_plot_amount_in_graph):
+#    #    self.hidden_plot_amount_in_graph = input_plot_amount_in_graph
 #    ## 加速度データファイルで、隠れマルコフモデルを適用させる範囲:始まり
-#    #def set_hmmstart(self, input_hmmstart):
-#    #    self.hidden_hmmstart = input_hmmstart
+#    #def set_data_sampled_first(self, input_data_sampled_first):
+#    #    self.hidden_data_sampled_first = input_data_sampled_first
 #    ## ":終わり
-#    #def set_hmmend(self, input_hmmend):
-#    #    self.hidden_hmmend = input_hmmend
+#    #def set_data_sampled_last(self, input_data_sampled_last):
+#    #    self.hidden_data_sampled_last = input_data_sampled_last
 #    ## 加工した加速度データファイルを格納するDataFrame型変数
-#    #def set_dataframe(self, input_dataframe):
-#    #    self.hidden_dataframe = input_dataframe
+#    #def set_data_sampled_by_func(self, input_data_sampled_by_func):
+#    #    self.hidden_data_sampled_by_func = input_data_sampled_by_func
 #
 #    #'プロパティ'
-#    #pred = property(get_pred, set_pred)
-#    #filename = property(get_filename, set_filename)
-#    #acc = property(get_acc, set_acc)
-#    #path = property(get_path, set_path)
-#    #plotseg = property(get_plotseg, set_plotseg)
-#    #hmmstart = property(get_hmmstart, set_hmmstart)
-#    #hmmend = property(get_hmmend, set_hmmend)
-#    #dataframe = property(get_dataframe, set_dataframe)
+#    #pred_by_prob_model = property(get_pred_by_prob_model, set_pred_by_prob_model)
+#    #data_read_by_api = property(get_data_read_by_api, set_data_read_by_api)
+#    #direct_acc = property(get_direct_acc, set_direct_acc)
+#    #save_graph_to_path = property(get_save_graph_to_path, set_save_graph_to_path)
+#    #plot_amount_in_graph = property(get_plot_amount_in_graph, set_plot_amount_in_graph)
+#    #data_sampled_first = property(get_data_sampled_first, set_data_sampled_first)
+#    #data_sampled_last = property(get_data_sampled_last, set_data_sampled_last)
+#    #data_sampled_by_func = property(get_data_sampled_by_func, set_data_sampled_by_func)
 
 
 ##################################################################
@@ -124,8 +124,8 @@ class WrongArgumentException(Exception):
 ##########データフレーム型変数を作るクラス########################
 ##################################################################
 class DataframeMaker():
-    'excelファイルを読み込み、DataFrame型変数を生成する'
-    def __init__(self, filename, acc, hmmstart, hmmend):
+    '加速度データファイルを読み込み、DataFrame型変数を生成する'
+    def __init__(self, data_read_by_api, direct_acc, data_sampled_first, data_sampled_last):
         # 列名を明示的に指定することにより, 欠損値をNaNで補完.
         col_names = [
             'line', 'time',
@@ -135,28 +135,31 @@ class DataframeMaker():
             ]
         self.df = pd.read_csv(
         #self.df = dd.read_csv(
-            filename,
+            data_read_by_api,
             names=col_names,
             parse_dates=['time'],
             #index_col='time',
             #skiprows=3,
             #skiprows=[3],
-            #skiprows=lambda x: x not in [i for i in range(hmmstart+3, hmmend+3)],
+            #skiprows=lambda x: x not in [i for i in range(data_sampled_first+3, data_sampled_last+3)],
             converters={
                 'line':int, 'time':str,
                 'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
                 'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,
                 'Temperture':float, 'Pressure':float, 'MagnetCount':int, 'MagnetSwitch':int,
                 },
-            #usecols=lambda x: x in acc+[index_col],
-            usecols=lambda x: x in acc+['time'],
+            #usecols=lambda x: x in direct_acc+[index_col],
+            usecols=lambda x: x in direct_acc+['time'],
             )
            #).compute()
 
     @staticmethod
-    def cut_csv(buf, filename, hmmstart, hmmend):
-        cmd1 = "sed -e 1,3d {filename}".format(filename=filename)
-        cmd2 = "sed -n {start},{end}p".format(start=hmmstart, end=hmmend)
+    def sample_data(buf, data_read_by_api, data_sampled_first, data_sampled_last):
+        '加速度データファイルの必要部分(data_sampled_firstからdata_sampled_last)を抽出する'
+        # 加速度データファイルの不要部分(上3行)を削除.
+        cmd1 = "sed -e 1,3d {data_read_by_api}".format(data_read_by_api=data_read_by_api)
+        # 加速度データファイルの必要部分(data_sampled_firstからdata_sampled_last)を抽出.
+        cmd2 = "sed -n {start},{end}p".format(start=data_sampled_first, end=data_sampled_last)
         res1 = sp.Popen(cmd1.split(" "), stdout=sp.PIPE)
         with open(buf, 'w') as f:
             sp.Popen(cmd2.split(" "), stdin=res1.stdout, stdout=f)
@@ -173,7 +176,7 @@ class DataframePlotter():
     'ToDoリストの書き方：リーダブルコード 5.2 自分の考えを記録する'
     def __init__(self, df, delta):
         self.df = df  # 加速度データを平均化
-        self.delta = int(delta/config.AVERAGE)    # 平均値をとる要素数で区間を割る
+        self.delta = int(delta/config.mean_range)    # 平均値をとる要素数で区間を割る
 
     @staticmethod
     def plot(df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
@@ -185,17 +188,17 @@ class TimePredDataframePlotter(DataframePlotter):
 
     def plot(self, args):
         '加速度・角速度の時系列変化をプロット'
-        predict = pd.DataFrame(config.pred, columns=['pred'])
+        predict = pd.DataFrame(config.pred_by_prob_model, columns=['pred'])
         self.df = pd.concat([(self.df)[list(args)], predict], axis=1)
         for i in range(int(len(self.df)/(self.delta))):
             copy_df = (self.df).loc[(self.delta)*i:(self.delta)*(i+1), :]
             copy_df.dropna(how='all')
             ax1 = copy_df[list(args)].plot()
             ax = copy_df[['pred']].plot(ax=ax1)
-            ax.set_title(config.filename)
+            ax.set_title(config.data_read_by_api)
             #ax.set_ylim([-5.0, 2.5])
             plt.show()
-            #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
+            #plt.savefig(os.save_graph_to_path.join(PATH, "demo"+str(i)+".png"))
             ## テスト用グラフの保存先
             plt.savefig(os.path.join('../tests/test_plot/', "demo"+str(i)+".png"))
 
@@ -204,13 +207,13 @@ class Acc1Acc2DataframePlotter(DataframePlotter):
 
     def plot(self):
         '加速度の2次元データをプロットする'
-        #ax = (self.df).plot.scatter(x=config.acc[0], y=config.acc[1])   # 散布図
-        #ax = (self.df).plot.scatter(x=config.dataframe['Acceleration_x'], y=config.dataframe['Acceleration_y'])   # 散布図
+        #ax = (self.df).plot.scatter(x=config.direct_acc[0], y=config.direct_acc[1])   # 散布図
+        #ax = (self.df).plot.scatter(x=config.data_sampled_by_func['Acceleration_x'], y=config.data_sampled_by_func['Acceleration_y'])   # 散布図
         ax = (self.df).plot.scatter(x='Acceleration_x', y='Acceleration_y')   # 散布図
-        ax.set_title(config.filename)
-        #ax.set_xlim([-5.5, 1.0])
-        #ax.set_ylim([-2.5, 2.0])
-        #plt.show()
+        ax.set_title(config.data_read_by_api)
+        ax.set_xlim([-1.5, 0.5])
+        ax.set_ylim([-2.0, 0.5])
+        plt.show()
         ## テスト用グラフの保存先
         plt.savefig(os.path.join('../tests/test_plot/', "demo"+".png"))
 
@@ -224,10 +227,10 @@ def main():
 
     'グローバル変数のセット'
     #global_parameter = Global(
-    #    input_pred=None,
-    #    input_filename="../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv",  # ID16
-    #    #input_filename="../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv",  # ID19
-    #    input_acc=[
+    #    input_pred_by_prob_model=None,
+    #    input_data_read_by_api="../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv",  # ID16
+    #    #input_data_read_by_api="../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv",  # ID19
+    #    input_direct_acc=[
     #        'Acceleration_x',
     #        'Acceleration_y',
     #        'Acceleration_z',
@@ -235,40 +238,40 @@ def main():
     #        #'AngularRate_y',
     #        #'AngularRate_z',
     #        ],
-    #    #input_path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
-    #    input_path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge",
-    #    #input_path="/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
-    #    #input_path="/Users/okimototakuya/Desktop/tmp",
-    #    input_plotseg=10000,
-    #    #input_plotseg=131663,
-    #    input_hmmstart=60000,
-    #    input_hmmend=69999,
-    #    input_dataframe=None,
+    #    #input_save_graph_to_path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
+    #    input_save_graph_to_path="/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge",
+    #    #input_save_graph_to_path="/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100",
+    #    #input_save_graph_to_path="/Users/okimototakuya/Desktop/tmp",
+    #    input_plot_amount_in_graph=10000,
+    #    #input_plot_amount_in_graph=131663,
+    #    input_data_sampled_first=60000,
+    #    input_data_sampled_last=69999,
+    #    input_data_sampled_by_func=None,
     #    )
 
     '加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成'
     buf = "../dataset/buf.csv"  # 加工したcsvファイルの保存先
-    DataframeMaker.cut_csv(buf, config.filename, config.hmmstart, config.hmmend)
-    #dataframe = DataframeMaker(buf, config.acc, config.hmmstart, config.hmmend)
-    dataframe = DataframeMaker(buf, config.acc, config.hmmstart, config.hmmend)
+    DataframeMaker.sample_data(buf, config.data_read_by_api, config.data_sampled_first, config.data_sampled_last)
+    #data_sampled_by_func = DataframeMaker(buf, config.direct_acc, config.data_sampled_first, config.data_sampled_last)
+    data_sampled_by_func = DataframeMaker(buf, config.direct_acc, config.data_sampled_first, config.data_sampled_last)
 
     'メインプログラム実行時の引数によって、描画するグラフを決定&プロット'
     try:
         if sys.argv[1] in ['0', '1', '2']:
             if sys.argv[1] == '0':    # 隠れマルコフモデル
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
-                hmm_learn.hmmLearn(dataframe.df)
+                hmm_learn.hmmLearn(data_sampled_by_func.df)
                 #pred = hmm_learn.pred
-                TimePredDataframePlotter(config.dataframe, config.plotseg).plot(tuple(config.acc))
+                TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph).plot(tuple(config.direct_acc))
             elif sys.argv[1] == '1':    # クラスタリング
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
-                cluster_learn.clusterLearn(dataframe.df)
+                cluster_learn.clusterLearn(data_sampled_by_func.df)
                 #pred = cluster_learn.pred
-                TimePredDataframePlotter(config.dataframe, config.plotseg).plot(tuple(config.acc))
+                TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph).plot(tuple(config.direct_acc))
             elif sys.argv[1] == '2':    # 加速度を２次元プロット
                 #pass
-                config.dataframe = config.aveData(dataframe.df)
-                Acc2Acc2DataframePlotter(config.dataframe, config.plotseg).plot()
+                config.data_sampled_by_func = config.aveData(data_sampled_by_func.df)
+                Acc1Acc2DataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph).plot()
         else:
             raise WrongArgumentException(sys.argv[1])
     except IndexError as err:
@@ -279,7 +282,7 @@ def main():
     #    sys.exit()
 
     #'グラフを描画'
-    #DataframePlotter.plot(dataframe.df, config.plotseg, tuple(config.acc))
+    #DataframePlotter.plot(data_sampled_by_func.df, config.plot_amount_in_graph, tuple(config.direct_acc))
 
 if __name__ == '__main__':
     main()
