@@ -1,41 +1,32 @@
 import numpy as np
 import pandas as pd
 from hmmlearn import hmm
+import config
 #import acceleration_plot as ap
 import acceleration_plot2 as ap
 
-# 予測値を格納する変数
-pred = None
-# 平均値をとる要素数
-AVERAGE = 10
 
-def aveData(X):
-    '加速度の平均値をとり、DataFrame型変数にして返す'
-    # 加速度の平均値を格納するためのDataFrame型変数
-    X_ave = pd.DataFrame(index=[], columns=ap.acc)
-    for i in range(int(len(X)/AVERAGE)):
-        X_ave = X_ave.append(X.iloc[i*AVERAGE:i*AVERAGE+AVERAGE, :].mean(), ignore_index=True)
-    return X_ave
-
-def hmmLearn():
+def hmmLearn(df):
     'DataFrame型変数を引数にして、HMMによる学習を行う'
-    global pred
+    #global pred
     # 加速度データのDataFrame型変数を作成.
-    dataframe = ap.DataframeMaker(ap.filename)
+    #data_sampled_by_func = ap.DataframeMaker(config.data_read_by_api)
     # 確率モデル(隠れマルコフモデルの作成.
     model = hmm.GaussianHMM(n_components=3, covariance_type="full")
     # DataFrame型変数から学習に用いる加速度データを抽出.
-    X = (dataframe.df).loc[:, ap.acc[0]]
+    #X = (data_sampled_by_func.df).loc[:, config.direct_acc]
+    print(type(df))
+    X = df.loc[:, (config.direct_acc)[0]]
     X = pd.DataFrame(X)
-    if len(ap.acc) > 1:
-        for ele in ap.acc[1:]:
-            X_ = (dataframe.df).loc[:, ele]
+    if len(config.direct_acc) > 1:
+        for ele in (config.direct_acc)[1:]:
+            X_ = df.loc[:, ele]
             X = X.join(X_)
     else:
         pass
-    X = X.iloc[ap.HMM_RANGE_START:ap.HMM_RANGE_END, :]
+    #X = X.iloc[config.HMM_RANGE_START:config.HMM_RANGE_END, :]
     # 加速度の平均値を格納するためのDataFrame型変数
-    X_ave = aveData(X)
+    X_ave = config.aveData(X)
     #model.fit(X)
     model.fit(X_ave)
 
@@ -45,10 +36,15 @@ def hmmLearn():
     #print("共分散値\n", model.covars_)
     #print("遷移確率\n", model.transmat_)
     #print("対数尤度\n", model.score(X))
-    #pred = model.predict(X)
-    pred = model.predict(X_ave)
-    print("状態系列の復号\n", pred)
+    #config.pred_by_prob_model = model.predict(X)
+    config.pred_by_prob_model = model.predict(X_ave)
+    config.data_sampled_by_func = X_ave
+    print("状態系列の復号\n", config.pred_by_prob_model)
 
+
+##################################################################
+##########メイン関数##############################################
+##################################################################
 def main():
     'HMMによる学習を行う'
     hmmLearn()
