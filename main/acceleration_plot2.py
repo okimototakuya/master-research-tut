@@ -6,6 +6,7 @@ import dask.dataframe as dd
 import matplotlib
 #matplotlib.use('Agg')  # pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import numpy as np
 import config
 import hmm_learn
@@ -214,8 +215,30 @@ class Acc1Acc2DataframePlotter(DataframePlotter):
         ax.set_xlim([-1.5, 0.5])
         ax.set_ylim([-2.0, 0.5])
         plt.show()
+        # FIXME:テスト用の設定は、テストコードに書くべき！
         ## テスト用グラフの保存先
-        plt.savefig(os.path.join('../tests/test_plot/', "demo"+".png"))
+        #plt.savefig(os.path.join('../tests/test_plot/', "demo"+".png"))
+
+
+class Acc1Acc2ColorDataframePlotter(DataframePlotter):
+
+    def plot(self, args):
+        '加速度の2次元データをプロットする'
+        # 1.予測値を結合
+        predict = pd.DataFrame(config.pred_by_prob_model, columns=['pred'])
+        self.df = pd.concat([(self.df)[list(args)], predict], axis=1)
+        # 2.散布図をプロット
+        #ax = (self.df).plot.scatter(x=config.direct_acc[0], y=config.direct_acc[1])   # 散布図
+        #ax = (self.df).plot.scatter(x=config.data_sampled_by_func['Acceleration_x'], y=config.data_sampled_by_func['Acceleration_y'])   # 散布図
+        ax = (self.df).plot.scatter(x='Acceleration_x', y='Acceleration_y', vmin=0, vmax=2, c=(self.df).pred, cmap=cm.rainbow)   # 散布図
+        ax.set_title(config.data_read_by_api)
+        ax.set_xlim([-1.5, 0.5])
+        ax.set_ylim([-2.0, 2.0])
+        #plt.colorbar(ax)
+        plt.show()
+        # FIXME:テスト用の設定は、テストコードに書くべき！
+        ## テスト用グラフの保存先
+        #plt.savefig(os.path.join('../tests/test_plot/', "demo"+".png"))
 
 
 ##################################################################
@@ -257,7 +280,7 @@ def main():
 
     'メインプログラム実行時の引数によって、描画するグラフを決定&プロット'
     try:
-        if sys.argv[1] in ['0', '1', '2']:
+        if sys.argv[1] in ['0', '1', '2', '3']:
             if sys.argv[1] == '0':    # 隠れマルコフモデル
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 hmm_learn.hmmLearn(data_sampled_by_func.df)
@@ -269,9 +292,14 @@ def main():
                 #pred = cluster_learn.pred
                 TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph).plot(tuple(config.direct_acc))
             elif sys.argv[1] == '2':    # 加速度を２次元プロット
-                #pass
                 config.data_sampled_by_func = config.aveData(data_sampled_by_func.df)
                 Acc1Acc2DataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph).plot()
+            elif sys.argv[1] == '3':    # 加速度を２次元プロット(予測値による色付き)
+                #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
+                hmm_learn.hmmLearn(data_sampled_by_func.df)
+                #pred = hmm_learn.pred
+                #FIXME:クラス名を変更する必要がある.
+                Acc1Acc2ColorDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph).plot(tuple(config.direct_acc))
         else:
             raise WrongArgumentException(sys.argv[1])
     except IndexError as err:
