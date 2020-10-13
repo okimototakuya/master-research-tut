@@ -20,23 +20,24 @@ class TestAcceleration_plot2(unittest.TestCase):
         pass
 
     def test_plot_TimePredDataframePlotter(self):
-        tpdfp = TimePredDataframePlotter(config.dataframe, 30)
-        print(config.dataframe)
-        tpdfp.plot(tuple(config.acc))
+        tpdfp = TimePredDataframePlotter(config.data_sampled_by_func, 30)
+        print(config.data_sampled_by_func)
+        tpdfp.plot(tuple(config.direct_acc))
         assert glob.glob('./test_plot/*.png') is not None
 
     def test_plot_Acc1Acc2DataframePlotter(self):
-        aadfp = Acc1Acc2DataframePlotter(config.dataframe, 30)
+        aadfp = Acc1Acc2DataframePlotter(config.data_sampled_by_func, 30)
         #print(aadfp.df)
         aadfp.plot()
         assert glob.glob('./test_plot/*.png') is not None
 
 
 if __name__ == '__main__':
-    '本番プログラム：configモジュールのdataframe変数にプロットするDataFrame型変数を格納する.'
-    config.dataframe = pd.DataFrame(
-                      np.reshape(np.arange(30), (10,3)),
+    '本番プログラムデモ：configモジュールのdataframe変数にプロットするDataFrame型変数を格納する.'
+    config.data_sampled_by_func = pd.DataFrame(
+                      #np.reshape(np.arange(30), (10,3)),
+                      (np.arange(30)).reshape(10,3),
                       columns = ['Acceleration_x', 'Acceleration_y', 'Acceleration_z'],
                      )
-    config.pred = np.ones(10)
+    config.pred_by_prob_model = np.ones(10)
     unittest.main()

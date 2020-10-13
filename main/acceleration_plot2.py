@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess as sp
 import pandas as pd
-import dask.dataframe as dd
+#import dask.dataframe as dd
 import matplotlib
 #matplotlib.use('Agg')  # pyplotで生成した画像を保存するためのインポート
 import matplotlib.pyplot as plt

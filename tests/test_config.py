@@ -123,7 +123,7 @@ class TestConfig(unittest.TestCase):
     def test_random_aveData(self):
         'configモジュールの関数(aveData)をテストする関数'
         '引数のデータフレーム型オブジェクトの要素はnp.random.randで作成'
-        'FIXME:config.AVERAGE=input_rowsでなければ、テストが通らない.→少なくともテストコードに問題あり.'
+        'FIXME:config.mean_range=input_rowsでなければ、テストが通らない.→少なくともテストコードに問題あり.'
         'FIXME:aveData関数でなくテストコードで平均を計算している部分で、列をDataFrame.meanで一括計算しているのに問題あり.'
         input_rows = 10
         input_columns = 3
