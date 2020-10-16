@@ -175,14 +175,74 @@ class DataframePlotter():
     'メソッドはクラスの継承で書くべき！！'
     '親クラス；plot、子クラス；time_pred_plot、acc1_acc2_plot'
     'ToDoリストの書き方：リーダブルコード 5.2 自分の考えを記録する'
-    def __init__(self, df, delta):
+    def __init__(self, df, delta, input_state):
         self.df = df  # 加速度データを平均化
         self.delta = int(delta/config.mean_range)    # 平均値をとる要素数で区間を割る
+        #self.__state = input_state
+        self.state = input_state
+        #self.generate_graph = None
+
+        #if input_state == 'p':
+        #    #self.generate_graph = plt.show
+        #    self.generate_graph = lambda x:
+        #elif input_state == 's':
+        #    #self.generate_graph = plt.savefig
+        #else:
+        #    raise ValueError(input_state)
+
+        self.__save_graph_to_path = None
+
+    @property
+    def save_graph_to_path(self):
+        return self.__save_graph_to_path
+
+    @save_graph_to_path.setter
+    def save_graph_to_path(self, input_save_graph_to_path):
+        self.__save_graph_to_path = input_save_graph_to_path
+
+    def generate_graph(self, input_save_graph_to_path):
+        'HACK'
+        '185~191行のコードを抽象化した関数'
+        '1.plt.show():引数を受け取れない→self.generate_graphでplt.savefigと同じ扱いをするのは不可能'
+        '2.plt.savefig():TimePredDataframePlotterクラスに関しては、グラフの保存場所を更新する必要がある→抽象化する必要あり'
+        #if input_state == 'p':
+        #if self.state == 'p':
+        if self.state == 'p' and input_save_graph_to_path == None:
+            print('pに入ってます.')
+            return plt.show()
+        #elif input_state == 's':
+        #elif self.state == 's':
+        elif self.state == 's' and input_save_graph_to_path != None:
+            print('sに入ってます.')
+            return plt.savefig(self.save_graph_to_path)
+        else:
+            print('入ってないです.')
 
     @staticmethod
     def plot(df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
         'DataFrame型変数をプロットする'
         pass
+
+    'ゲッター/セッターメソッドでなく、インスタンス生成時に状態を渡す.'
+    'インスタンス変数生成とは別に、インスタンス変数に値を代入する手間が省ける.'
+    #@property
+    #def state(self):
+    #    'インスタンス変数self.__stateによって、plot/savefigを場合分け. (ゲッター)'
+    #    return self.__state
+
+    #@state.setter
+    #def state(self, input_state):
+    #    ' " .(セッター)'
+    #    if input_state == 'p':
+    #        self.generate_graph = plt.show
+    #    elif input_state == 's':
+    #        self.generate_graph = plt.savefig(os.path.join('../tests/test_plot/', "demo"+".png"))
+
+    '明示的に関数定義を書く必要ある？'
+    'ない(参考：multiplexer2.py→セッターメソッドはインスタンス生成と同等のイメージ)'
+    'インスタンス変数生成時、self.~って形で宣言(？)する必要あり.'
+    #def generate_graph(self):
+    #    pass
 
 
 class TimePredDataframePlotter(DataframePlotter):
@@ -198,10 +258,12 @@ class TimePredDataframePlotter(DataframePlotter):
             ax = copy_df[['pred']].plot(ax=ax1)
             ax.set_title(config.data_read_by_api)
             #ax.set_ylim([-5.0, 2.5])
-            plt.show()
-            #plt.savefig(os.save_graph_to_path.join(PATH, "demo"+str(i)+".png"))
+            #plt.show()
+            #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
             ## テスト用グラフの保存先
-            plt.savefig(os.path.join('../tests/test_plot/', "demo"+str(i)+".png"))
+            #plt.savefig(os.path.join('../tests/test_plot/', "demo"+str(i)+".png"))
+            #self.generate_graph(self.save_graph_to_path)
+            self.generate_graph(self.save_graph_to_path)
 
 
 class Acc1Acc2DataframePlotter(DataframePlotter):
@@ -214,10 +276,11 @@ class Acc1Acc2DataframePlotter(DataframePlotter):
         ax.set_title(config.data_read_by_api)
         ax.set_xlim([-1.5, 0.5])
         ax.set_ylim([-2.0, 0.5])
-        plt.show()
+        #plt.show()
         # FIXME:テスト用の設定は、テストコードに書くべき！
         ## テスト用グラフの保存先
         #plt.savefig(os.path.join('../tests/test_plot/', "demo"+".png"))
+        self.generate_graph(self.save_graph_to_path)
 
 
 class Acc1Acc2ColorDataframePlotter(DataframePlotter):
@@ -235,10 +298,11 @@ class Acc1Acc2ColorDataframePlotter(DataframePlotter):
         ax.set_xlim([-1.5, 0.5])
         ax.set_ylim([-2.0, 2.0])
         #plt.colorbar(ax)
-        plt.show()
+        #plt.show()
         # FIXME:テスト用の設定は、テストコードに書くべき！
         ## テスト用グラフの保存先
         #plt.savefig(os.path.join('../tests/test_plot/', "demo"+".png"))
+        self.generate_graph(self.save_graph_to_path)
 
 
 ##################################################################
@@ -279,6 +343,7 @@ def main():
     data_sampled_by_func = DataframeMaker(buf, config.direct_acc, config.data_sampled_first, config.data_sampled_last)
 
     'メインプログラム実行時の引数によって、描画するグラフを決定&プロット'
+    'HACK:インジェクション攻撃に注意(参考:実践Python3 Interpreterパターン)'
     try:
         if sys.argv[1] in ['0', '1', '2', '3']:
             if sys.argv[1] == '0':    # 隠れマルコフモデル

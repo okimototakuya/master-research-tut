@@ -1,4 +1,5 @@
 import sys
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -20,24 +21,36 @@ class TestAcceleration_plot2(unittest.TestCase):
         pass
 
     def test_plot_TimePredDataframePlotter(self):
-        tpdfp = TimePredDataframePlotter(config.data_sampled_by_func, 30)
-        print(config.data_sampled_by_func)
-        tpdfp.plot(tuple(config.direct_acc))
-        assert glob.glob('./test_plot/*.png') is not None
+        'TimePredDataframePlotterクラスのplot関数をテスト.'
+        '指定ディレクトリ下にpngファイルが生成されたかどうかでアサート.'
+        '正しくプロットされているかどうかはナイーブに確認.'
+        tpdfp = TimePredDataframePlotter(config.data_sampled_by_func, 30, 'p')
+        #print(config.data_sampled_by_func)
+        #tpdfp.state = 'p'
+        tpdfp.save_graph_to_path = './test_plot1/'  # 互いに独立したテストにするため
+        tpdfp.plot(tuple(config.direct_acc))    # 複数のグラフを生成
+        #assert glob.glob('./test_plot/*.png') is not None
+        self.assertTrue(glob.glob('./test_plot1/*.png'))
 
     def test_plot_Acc1Acc2DataframePlotter(self):
-        aadfp = Acc1Acc2DataframePlotter(config.data_sampled_by_func, 30)
+        '上記テストメソッドと同じ.'
+        aadfp = Acc1Acc2DataframePlotter(config.data_sampled_by_func, 30, 'p')
         #print(aadfp.df)
-        aadfp.plot()
-        assert glob.glob('./test_plot/*.png') is not None
+        aadfp.save_graph_to_path = os.path.join('./test_plot2/', 'demo.png')  # 互いに独立したテストにするため
+        aadfp.plot()    # １つのグラフを生成
+        #assert glob.glob('./test_plot/*.png') is not None
+        self.assertTrue(glob.glob('./test_plot2/*.png'))
 
 
 if __name__ == '__main__':
-    '本番プログラムデモ：configモジュールのdataframe変数にプロットするDataFrame型変数を格納する.'
+    '本番プログラム：configモジュールのdataframe変数にプロットするDataFrame型変数を格納する.'
+    'デモ：小規模のDataFrame型変数を生成し、正しくプロットできているかテストする.'
+    # デモDataFrame型変数の生成
     config.data_sampled_by_func = pd.DataFrame(
                       #np.reshape(np.arange(30), (10,3)),
                       (np.arange(30)).reshape(10,3),
                       columns = ['Acceleration_x', 'Acceleration_y', 'Acceleration_z'],
                      )
+    # デモ予測値の生成
     config.pred_by_prob_model = np.ones(10)
     unittest.main()
