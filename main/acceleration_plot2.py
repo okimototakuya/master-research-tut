@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import subprocess as sp
 import pandas as pd
 #import dask.dataframe as dd
@@ -154,17 +155,35 @@ class DataframeMaker():
             )
            #).compute()
 
-    @staticmethod
-    def sample_data(buf, data_read_by_api, data_sampled_first, data_sampled_last):
+    @classmethod
+    def sample_data(cls, buf, data_read_by_api, data_sampled_first, data_sampled_last):
         '加速度データファイルの必要部分(data_sampled_firstからdata_sampled_last)を抽出する'
+        '抽出した加速度データファイルはbufディレクトリ下に保存する'
         # 加速度データファイルの不要部分(上3行)を削除.
         cmd1 = "sed -e 1,3d {data_read_by_api}".format(data_read_by_api=data_read_by_api)
         # 加速度データファイルの必要部分(data_sampled_firstからdata_sampled_last)を抽出.
         cmd2 = "sed -n {start},{end}p".format(start=data_sampled_first, end=data_sampled_last)
         res1 = sp.Popen(cmd1.split(" "), stdout=sp.PIPE)
         with open(buf, 'w') as f:
-            sp.Popen(cmd2.split(" "), stdin=res1.stdout, stdout=f)
+            res2 = sp.Popen(cmd2.split(" "), stdin=res1.stdout, stdout=f)
         #sp.run(['awk', '-F', '","', '{print}'])
+        while True:
+            ret2 = res2.poll()
+            if ret2 is None:
+                print('waiting for finish')
+                time.sleep(1)
+            else:
+                break
+        while True:
+            ret1 = res1.poll()
+            if ret1 is None:
+                print('waiting for finish')
+                time.sleep(1)
+            else:
+                break
+        res1.stdout.close()
+        #res2.stdout.close()
+        f.closed
 
 
 ##################################################################

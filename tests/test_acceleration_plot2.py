@@ -6,6 +6,7 @@ import pandas as pd
 import glob
 import unittest
 sys.path.append('../main')
+from acceleration_plot2 import DataframeMaker
 from acceleration_plot2 import DataframePlotter
 from acceleration_plot2 import TimePredDataframePlotter
 from acceleration_plot2 import Acc1Acc2DataframePlotter
@@ -20,11 +21,11 @@ class TestAcceleration_plot2(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_plot_TimePredDataframePlotter(self):
+    def _test_plot_TimePredDataframePlotter(self):
         'TimePredDataframePlotterクラスのplot関数をテスト.'
         '指定ディレクトリ下にpngファイルが生成されたかどうかでアサート.'
         '正しくプロットされているかどうかはナイーブに確認.'
-        tpdfp = TimePredDataframePlotter(config.data_sampled_by_func, 30, 'p')
+        tpdfp = TimePredDataframePlotter(config.data_sampled_by_func, 30, 's')
         #print(config.data_sampled_by_func)
         #tpdfp.state = 'p'
         tpdfp.save_graph_to_path = './test_plot1/'  # 互いに独立したテストにするため
@@ -32,14 +33,18 @@ class TestAcceleration_plot2(unittest.TestCase):
         #assert glob.glob('./test_plot/*.png') is not None
         self.assertTrue(glob.glob('./test_plot1/*.png'))
 
-    def test_plot_Acc1Acc2DataframePlotter(self):
+    def _test_plot_Acc1Acc2DataframePlotter(self):
         '上記テストメソッドと同じ.'
-        aadfp = Acc1Acc2DataframePlotter(config.data_sampled_by_func, 30, 'p')
+        aadfp = Acc1Acc2DataframePlotter(config.data_sampled_by_func, 30, 's')
         #print(aadfp.df)
         aadfp.save_graph_to_path = os.path.join('./test_plot2/', 'demo.png')  # 互いに独立したテストにするため
         aadfp.plot()    # １つのグラフを生成
         #assert glob.glob('./test_plot/*.png') is not None
         self.assertTrue(glob.glob('./test_plot2/*.png'))
+
+    def test_sample_data(self):
+        DataframeMaker.sample_data('./test_sample/demo', config.data_read_by_api, 1, 5)
+        self.assertTrue('glob.glob(./test_sample/demo)')
 
 
 if __name__ == '__main__':
