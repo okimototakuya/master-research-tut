@@ -218,8 +218,7 @@ class DataframePlotter():
         else:
             print('入ってないです.')
 
-    @staticmethod
-    def plot(df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
+    def plot(self, df, delta, args):  # delta:グラフの定義域,*args:グラフを描く列のタプル(＊タプルで受け取る)
         'DataFrame型変数をプロットする'
         pass
 
@@ -350,21 +349,21 @@ def main():
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 hmm_learn.hmmLearn(data_sampled_by_func.df)
                 #pred = hmm_learn.pred
-                TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph).plot(tuple(config.direct_acc))
+                TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, 'p').plot(tuple(config.direct_acc))
             elif sys.argv[1] == '1':    # クラスタリング
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 cluster_learn.clusterLearn(data_sampled_by_func.df)
                 #pred = cluster_learn.pred
-                TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph).plot(tuple(config.direct_acc))
+                TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, 'p').plot(tuple(config.direct_acc))
             elif sys.argv[1] == '2':    # 加速度を２次元プロット
                 config.data_sampled_by_func = config.aveData(data_sampled_by_func.df)
-                Acc1Acc2DataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph).plot()
+                Acc1Acc2DataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, 'p').plot()
             elif sys.argv[1] == '3':    # 加速度を２次元プロット(予測値による色付き)
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 hmm_learn.hmmLearn(data_sampled_by_func.df)
                 #pred = hmm_learn.pred
                 #FIXME:クラス名を変更する必要がある.
-                Acc1Acc2ColorDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph).plot(tuple(config.direct_acc))
+                Acc1Acc2ColorDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, 'p').plot(tuple(config.direct_acc))
         else:
             raise WrongArgumentException(sys.argv[1])
     except IndexError as err:
