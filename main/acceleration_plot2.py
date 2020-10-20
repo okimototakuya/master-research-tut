@@ -125,15 +125,16 @@ class DataframePlotter():
         '1.plt.show():引数を受け取れない→self.generate_graphでplt.savefigと同じ扱いをするのは不可能'
         '2.plt.savefig():TimePredDataframePlotterクラスに関しては、グラフの保存場所を更新する必要がある→抽象化する必要あり'
         #if input_state == 'p':
-        #if self.state == 'p':
-        if self.state == 'p' and input_save_graph_to_path == None:
+        if self.state == 'p':
+        #if self.state == 'p' and input_save_graph_to_path == None:
             print('pに入ってます.')
             return plt.show()
         #elif input_state == 's':
-        #elif self.state == 's':
-        elif self.state == 's' and input_save_graph_to_path != None:
+        elif self.state == 's':
+            #elif self.state == 's' and input_save_graph_to_path != None:   # テストコードから：条件入らない→else:「入ってないです.」
             print('sに入ってます.')
-            return plt.savefig(self.save_graph_to_path)
+            #return plt.savefig(self.save_graph_to_path)
+            return plt.savefig(input_save_graph_to_path)
         else:
             print('入ってないです.')
 
@@ -165,14 +166,14 @@ class DataframePlotter():
 
 class TimePredDataframePlotter(DataframePlotter):
 
-    def plot(self, args):
+    def plot(self):
         '加速度・角速度の時系列変化をプロット'
         predict = pd.DataFrame(config.pred_by_prob_model, columns=['pred'])
-        self.df = pd.concat([(self.df)[list(args)], predict], axis=1)
+        self.df = pd.concat([(self.df)[config.direct_acc], predict], axis=1)
         for i in range(int(len(self.df)/(self.delta))):
             copy_df = (self.df).loc[(self.delta)*i:(self.delta)*(i+1), :]
             copy_df.dropna(how='all')
-            ax1 = copy_df[list(args)].plot()
+            ax1 = copy_df[config.direct_acc].plot()
             ax = copy_df[['pred']].plot(ax=ax1)
             ax.set_title(config.data_read_by_api)
             #ax.set_ylim([-5.0, 2.5])
@@ -190,7 +191,8 @@ class Acc1Acc2DataframePlotter(DataframePlotter):
         '加速度の2次元データをプロットする'
         #ax = (self.df).plot.scatter(x=config.direct_acc[0], y=config.direct_acc[1])   # 散布図
         #ax = (self.df).plot.scatter(x=config.data_sampled_by_func['Acceleration_x'], y=config.data_sampled_by_func['Acceleration_y'])   # 散布図
-        ax = (self.df).plot.scatter(x='Acceleration_x', y='Acceleration_y')   # 散布図
+        #ax = (self.df).plot.scatter(x='Acceleration_x', y='Acceleration_y')   # 散布図
+        ax = (self.df).plot.scatter(x=config.direct_acc[0], y=config.direct_acc[1])   # 散布図
         ax.set_title(config.data_read_by_api)
         ax.set_xlim([-1.5, 0.5])
         ax.set_ylim([-2.0, 0.5])
@@ -244,7 +246,7 @@ def main():
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 hmm_learn.hmmLearn(data_sampled_by_func.df)
                 #pred = hmm_learn.pred
-                TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, 'p').plot(tuple(config.direct_acc))
+                TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, 'p').plot()
             elif sys.argv[1] == '1':    # クラスタリング
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 cluster_learn.clusterLearn(data_sampled_by_func.df)

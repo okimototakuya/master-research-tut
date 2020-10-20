@@ -56,7 +56,8 @@ def aveData(input_dataframe):
     try:
         ave_dataframe = pd.DataFrame(index=[], columns=list(input_dataframe.columns))
         for i in range(int(len(input_dataframe)/mean_range)):
-            ave_dataframe = ave_dataframe.append(input_dataframe.iloc[i*mean_range:i*mean_range+mean_range, :].mean(), ignore_index=True)
+            #ave_dataframe = ave_dataframe.append(input_dataframe.iloc[i*mean_range:i*mean_range+mean_range, :].mean(), ignore_index=True)
+            ave_dataframe = ave_dataframe.append(input_dataframe.iloc[i*mean_range:i*mean_range+mean_range, :].describe().loc['mean'], ignore_index=True)
     except ZeroDivisionError as err:
         print('平均値をとる要素数(mean_range)が０です.')
         sys.exit()
