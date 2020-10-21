@@ -1,6 +1,8 @@
 import os
 import glob
 import unittest
+import matplotlib.pyplot as plt
+import pandas as pd
 
 
 class TestApi(unittest.TestCase):
@@ -11,9 +13,18 @@ class TestApi(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_globassert(self):
+    def _test_globassert(self):
+        'glob.glob()の返り値をテスト→True/False'
         #assert glob.glob('./test_plot/*.png') is not None
         self.assertTrue(glob.glob('./test_plot/*.png'))
+
+    def test_pltsavefig(self):
+        'plt.savefig()がサポートされているかテスト→されている'
+        df = pd.DataFrame([[1,2,3],[4,5,6]], columns=['a','b','c'])
+        ax = df.plot()
+        plt.savefig('./test_plot_api/demo_savefig.png')
+        self.assertTrue(glob.glob('./test_plot_api'))
+
 
 def main():
     if glob.glob('./test_plot/*'):

@@ -26,10 +26,10 @@ direct_acc = [
     ]
 
 ' 時系列/加速度2次元プロット画像ファイルの保存先'
-#save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
-save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge"
-#save_graph_to_path = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
-#save_graph_to_path = "/Users/okimototakuya/Desktop/tmp"
+#save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
+save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge/"
+#save_graph_to_path = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
+#save_graph_to_path = "/Users/okimototakuya/Desktop/tmp/"
 
 ' 1つのグラフにおけるプロット数'
 plot_amount_in_graph = 10000
