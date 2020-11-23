@@ -32,15 +32,15 @@ save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンフ�
 #save_graph_to_path = "/Users/okimototakuya/Desktop/tmp/"
 
 ' 1つのグラフにおけるプロット数'
-plot_amount_in_graph = 10000
-#plot_amount_in_graph = 131663
+#plot_amount_in_graph = 10000
+plot_amount_in_graph = 131663
 
 #' 加速度データファイルで、隠れマルコフモデルを適用させる範囲:始まり'
 '加速度データファイル(csv)を抽出する範囲(first-last:リーダブルコードの包含関係をsedの挙動から確認済)'
-data_sampled_first = 60000
+data_sampled_first = 1
 
 ' ":終わり'
-data_sampled_last = 69999
+data_sampled_last = 131663
 
 ' 加工した加速度データファイルを格納するDataFrame型変数'
 data_sampled_by_func = None

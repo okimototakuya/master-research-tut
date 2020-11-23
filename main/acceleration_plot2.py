@@ -97,6 +97,7 @@ class DataframePlotter():
     def __init__(self, df, delta, input_state):
         self.df = df  # 加速度データを平均化
         self.delta = int(delta/config.mean_range)    # 平均値をとる要素数で区間を割る
+        #self.delta = delta
         #self.__state = input_state
         self.state = input_state
         #self.generate_graph = None
@@ -156,14 +157,17 @@ class TimePredDataframePlotter(DataframePlotter):
 
     def plot(self):
         '加速度・角速度の時系列変化をプロット'
-        predict = pd.DataFrame(config.pred_by_prob_model, columns=['pred'])
-        self.df = pd.concat([(self.df)[config.direct_acc], predict], axis=1)
+        if sys.argv[1] != '0':    # 本モジュールに引数0を渡して実行した場合のみ、予測値なし時系列グラフをプロットする
+            predict = pd.DataFrame(config.pred_by_prob_model, columns=['pred'])
+            self.df = pd.concat([(self.df)[config.direct_acc], predict], axis=1)
         for i in range(int(len(self.df)/(self.delta))):
             copy_df = (self.df).loc[(self.delta)*i:(self.delta)*(i+1), :]
             copy_df.dropna(how='all')
             ax1 = copy_df[config.direct_acc].plot()
-            ax = copy_df[['pred']].plot(ax=ax1)
-            ax.set_title(config.data_read_by_api)
+            if sys.argv[1] != '0':    # 本モジュールに引数0を渡して実行した場合のみ、予測値なし時系列グラフをプロットする
+                ax = copy_df[['pred']].plot(ax=ax1)
+                ax.set_title(config.data_read_by_api)
+            ax1.set_title(config.data_read_by_api)
             #ax.set_ylim([-5.0, 2.5])
             #plt.show()
             #plt.savefig(os.path.join(PATH, "demo"+str(i)+".png"))
@@ -230,8 +234,15 @@ def main():
     'HACK:インジェクション攻撃に注意(参考:実践Python3 Interpreterパターン)'
     state_plot = 'p'    # 'p':plt.show()/'s':plt.savefig(config.save_graph_to_path)
     try:
-        if sys.argv[1] in ['0', '1', '2', '3']:
-            if sys.argv[1] == '0':    # 時系列プロット：隠れマルコフモデル
+        if sys.argv[1] in ['0', '1', '2', '3', '4']:
+            if sys.argv[1] == '0':    # 時系列プロット：予測値なし
+                #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
+                data_sampled_by_func.df = config.aveData(data_sampled_by_func.df)
+                tpdfp = TimePredDataframePlotter(data_sampled_by_func.df, config.plot_amount_in_graph, state_plot)
+                if state_plot == 's':
+                    tpdfp.save_graph_to_path = config.save_graph_to_path
+                tpdfp.plot()
+            elif sys.argv[1] == '1':    # 時系列プロット：隠れマルコフモデル
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 hmm_learn.hmmLearn(data_sampled_by_func.df)
                 #pred = hmm_learn.pred
@@ -239,18 +250,18 @@ def main():
                 if state_plot == 's':
                     tpdfp.save_graph_to_path = config.save_graph_to_path
                 tpdfp.plot()
-            elif sys.argv[1] == '1':    # 時系列プロット：クラスタリング
+            elif sys.argv[1] == '2':    # 時系列プロット：クラスタリング
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 cluster_learn.clusterLearn(data_sampled_by_func.df)
                 #pred = cluster_learn.pred
                 TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, 'p').plot(tuple(config.direct_acc))
-            elif sys.argv[1] == '2':    # 加速度を２次元プロット
+            elif sys.argv[1] == '3':    # 加速度を２次元プロット
                 config.data_sampled_by_func = config.aveData(data_sampled_by_func.df)
                 aadfp = Acc1Acc2DataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, state_plot)
                 if state_plot == 's':
                     aadfp.save_graph_to_path = config.save_graph_to_path
                 aadfp.plot()
-            elif sys.argv[1] == '3':    # 加速度を２次元プロット(予測値による色付き)
+            elif sys.argv[1] == '4':    # 加速度を２次元プロット(予測値による色付き)
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 hmm_learn.hmmLearn(data_sampled_by_func.df)
                 #pred = hmm_learn.pred
