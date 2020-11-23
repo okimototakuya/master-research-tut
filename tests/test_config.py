@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import pandas as pd
-from pandas.util.testing import assert_frame_equal
+#from pandas.util.testing import assert_frame_equal     # pandas.util.testing:FutureWarning → pandas.testing
 import unittest
 from pprint import pprint
 sys.path.append('../')
@@ -100,7 +100,8 @@ class TestConfig(unittest.TestCase):
     #                      ),
     #            )
     #    #アサーション
-    #    assert_frame_equal(df1, df2)
+    #    #assert_frame_equal(df1, df2)
+    #    pd.testing.assert_frame_equal(df1, df2)
 
     #@document_it
     #def test_arange_aveData(self):
@@ -115,7 +116,8 @@ class TestConfig(unittest.TestCase):
     #    df_tmp = (pd.DataFrame(arr)).mean(axis=0)
     #    df2 = pd.DataFrame(df_tmp, columns=[0]).T
     #    #アサーション
-    #    assert_frame_equal(df1, df2)
+    #    #assert_frame_equal(df1, df2)
+    #    pd.testing.assert_frame_equal(df1, df2)
 
 
     @document_it
@@ -123,7 +125,7 @@ class TestConfig(unittest.TestCase):
     def test_random_aveData(self):
         'configモジュールの関数(aveData)をテストする関数'
         '引数のデータフレーム型オブジェクトの要素はnp.random.randで作成'
-        'FIXME:config.AVERAGE=input_rowsでなければ、テストが通らない.→少なくともテストコードに問題あり.'
+        'FIXME:config.mean_range=input_rowsでなければ、テストが通らない.→少なくともテストコードに問題あり.'
         'FIXME:aveData関数でなくテストコードで平均を計算している部分で、列をDataFrame.meanで一括計算しているのに問題あり.'
         input_rows = 10
         input_columns = 3
@@ -136,7 +138,8 @@ class TestConfig(unittest.TestCase):
         print('df1:\n', df1)
         print('df2:\n', df2)
         #アサーション
-        assert_frame_equal(df1, df2)
+        #assert_frame_equal(df1, df2)
+        pd.testing.assert_frame_equal(df1, df2)
 
 
 if __name__ == '__main__':

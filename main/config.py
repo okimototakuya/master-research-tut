@@ -26,10 +26,10 @@ direct_acc = [
     ]
 
 ' 時系列/加速度2次元プロット画像ファイルの保存先'
-#save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
-save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge"
-#save_graph_to_path = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100"
-#save_graph_to_path = "/Users/okimototakuya/Desktop/tmp"
+#save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
+save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge/"
+#save_graph_to_path = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
+#save_graph_to_path = "/Users/okimototakuya/Desktop/tmp/"
 
 ' 1つのグラフにおけるプロット数'
 plot_amount_in_graph = 10000
@@ -56,7 +56,8 @@ def aveData(input_dataframe):
     try:
         ave_dataframe = pd.DataFrame(index=[], columns=list(input_dataframe.columns))
         for i in range(int(len(input_dataframe)/mean_range)):
-            ave_dataframe = ave_dataframe.append(input_dataframe.iloc[i*mean_range:i*mean_range+mean_range, :].mean(), ignore_index=True)
+            #ave_dataframe = ave_dataframe.append(input_dataframe.iloc[i*mean_range:i*mean_range+mean_range, :].mean(), ignore_index=True)
+            ave_dataframe = ave_dataframe.append(input_dataframe.iloc[i*mean_range:i*mean_range+mean_range, :].describe().loc['mean'], ignore_index=True)
     except ZeroDivisionError as err:
         print('平均値をとる要素数(mean_range)が０です.')
         sys.exit()
