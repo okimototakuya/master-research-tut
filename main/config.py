@@ -37,16 +37,16 @@ plot_amount_in_graph = 131663
 
 #' 加速度データファイルで、隠れマルコフモデルを適用させる範囲:始まり'
 '加速度データファイル(csv)を抽出する範囲(first-last:リーダブルコードの包含関係をsedの挙動から確認済)'
-data_sampled_first = 1
+data_sampled_first = 70000
 
 ' ":終わり'
-data_sampled_last = 131663
+data_sampled_last = 80000
 
 ' 加工した加速度データファイルを格納するDataFrame型変数'
 data_sampled_by_func = None
 
 '平均値をとる要素数'
-mean_range = 10
+mean_range = 1
 
 
 ##HACK:反例ありそう→データフレームの大きさと平均値幅のすり合わせ、例外処理

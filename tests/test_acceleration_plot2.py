@@ -44,10 +44,14 @@ class TestAcceleration_plot2(unittest.TestCase):
         #assert glob.glob('./test_plot/*.png') is not None
         self.assertTrue(glob.glob('./test_plot2/*.png'))
 
-    def test_sample_data(self):
+    def test_sample_data_save(self):
         # 開始オフセットに０を指定するとバグる:指定ディレクトリにファイル自体は生成されるが、中身は空っぽ
-        DataframeMaker.sample_data('./test_sample/demo', config.data_read_by_api, 0, 6) 
+        DataframeMaker.sample_data('./test_sample/demo', config.data_read_by_api, 1, 6)
         self.assertTrue('glob.glob(./test_sample/demo)')
+
+    def test_sample_data_range(self):
+        with self.assertRaises(IndexError):
+            DataframeMaker.sample_data('./test_sample/demo', config.data_read_by_api, 0, 6)
 
     def _test_connect_dataframe(cls):
         predict = pd.DataFrame(config.pred_by_prob_model, columns=['pred'])

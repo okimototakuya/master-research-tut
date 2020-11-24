@@ -59,31 +59,41 @@ class DataframeMaker():
     def sample_data(cls, buf, data_read_by_api, data_sampled_first, data_sampled_last):
         '加速度データファイルの必要部分(data_sampled_firstからdata_sampled_last)を抽出する'
         '抽出した加速度データファイルはbufディレクトリ下に保存する'
-        # 加速度データファイルの不要部分(上3行)を削除.
-        cmd1 = "sed -e 1,3d {data_read_by_api}".format(data_read_by_api=data_read_by_api)
-        # 加速度データファイルの必要部分(data_sampled_firstからdata_sampled_last)を抽出.
-        cmd2 = "sed -n {start},{end}p".format(start=data_sampled_first, end=data_sampled_last)
-        res1 = sp.Popen(cmd1.split(" "), stdout=sp.PIPE)
-        with open(buf, 'w') as f:
-            res2 = sp.Popen(cmd2.split(" "), stdin=res1.stdout, stdout=f)
-        #sp.run(['awk', '-F', '","', '{print}'])
-        while True:
-            ret2 = res2.poll()
-            if ret2 is None:
-                print('waiting for finish')
-                time.sleep(1)
-            else:
-                break
-        while True:
-            ret1 = res1.poll()
-            if ret1 is None:
-                print('waiting for finish')
-                time.sleep(1)
-            else:
-                break
-        res1.stdout.close()
-        #res2.stdout.close()
-        f.closed
+        #'subprocessモジュールによりシェルを呼び出し、テキストデータファイルのサイズを抽出する'
+        #'↑範囲外のオフセット(config.data_sampled_first, config.data_sampled_last)を指定した場合、例外を投げる'
+        #cmd_pre1 = "wc -l {data_read_by_api}".format(data_read_by_api=data_read_by_api)
+        #cmd_pre2 = "awk '{print $1}'"
+        #res_pre1 = sp.Popen(cmd_pre1.split(" "), stdout=sp.PIPE)
+        #last_data = sp.Popen(cmd_pre2.split(" "), stdin=res_pre1.stdout)
+        #if (1 <= data_sampled_first < data_sampled_last <= last_data):
+        if (1 <= data_sampled_first < data_sampled_last <= 131663):
+            # 加速度データファイルの不要部分(上3行)を削除.
+            cmd1 = "sed -e 1,3d {data_read_by_api}".format(data_read_by_api=data_read_by_api)
+            # 加速度データファイルの必要部分(data_sampled_firstからdata_sampled_last)を抽出.
+            cmd2 = "sed -n {start},{end}p".format(start=data_sampled_first, end=data_sampled_last)
+            res1 = sp.Popen(cmd1.split(" "), stdout=sp.PIPE)
+            with open(buf, 'w') as f:
+                res2 = sp.Popen(cmd2.split(" "), stdin=res1.stdout, stdout=f)
+            #sp.run(['awk', '-F', '","', '{print}'])
+            while True:
+                ret2 = res2.poll()
+                if ret2 is None:
+                    print('waiting for finish')
+                    time.sleep(1)
+                else:
+                    break
+            while True:
+                ret1 = res1.poll()
+                if ret1 is None:
+                    print('waiting for finish')
+                    time.sleep(1)
+                else:
+                    break
+            res1.stdout.close()
+            #res2.stdout.close()
+            f.closed
+        else:
+            raise IndexError(data_sampled_first, data_sampled_last)
 
 
 ##################################################################
@@ -237,7 +247,7 @@ def main():
         if sys.argv[1] in ['0', '1', '2', '3', '4']:
             if sys.argv[1] == '0':    # 時系列プロット：予測値なし
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
-                data_sampled_by_func.df = config.aveData(data_sampled_by_func.df)
+                #data_sampled_by_func.df = config.aveData(data_sampled_by_func.df)
                 tpdfp = TimePredDataframePlotter(data_sampled_by_func.df, config.plot_amount_in_graph, state_plot)
                 if state_plot == 's':
                     tpdfp.save_graph_to_path = config.save_graph_to_path
