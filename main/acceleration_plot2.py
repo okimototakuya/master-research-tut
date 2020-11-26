@@ -27,31 +27,35 @@ class WrongArgumentException(Exception):
 ##################################################################
 class DataframeMaker():
     '加速度データファイルを読み込み、DataFrame型変数を生成する'
-    def __init__(self, data_read_by_api, direct_acc, data_sampled_first, data_sampled_last):
+    def __init__(self, data_read_by_api, features_selected_manually, data_sampled_first, data_sampled_last):
         # 列名を明示的に指定することにより, 欠損値をNaNで補完.
-        col_names = [
-            'line', 'time',
-            'Acceleration_x', 'Acceleration_y', 'Acceleration_z',
-            'AngularRate_x', 'AngularRate_y', 'AngularRate_z',
-            'Temperture', 'Pressure', 'MagnetCount', 'MagnetSwitch',
-            ]
+        #col_names = [
+        #    'Unnamed: 0', 'line', 'time',
+        #    'Acceleration_x', 'Acceleration_y', 'Acceleration_z',
+        #    'AngularRate_x', 'AngularRate_y', 'AngularRate_z',
+        #    'Temperture', 'Pressure', 'MagnetCount', 'MagnetSwitch',
+        #    'onCrossroad', 'crossroadID',
+        #    ]
         self.df = pd.read_csv(
         #self.df = dd.read_csv(
             data_read_by_api,
-            names=col_names,
-            parse_dates=['time'],
+            #names=col_names,
+            header=0,
             #index_col='time',
             #skiprows=3,
             #skiprows=[3],
             #skiprows=lambda x: x not in [i for i in range(data_sampled_first+3, data_sampled_last+3)],
             converters={
-                'line':int, 'time':str,
-                'Acceleration_x':float, 'Acceleration_y':float, 'Acceleration_z':float,
-                'AngularRate_x':float, 'AngularRate_y':float, 'AngularRate_z':float,
-                'Temperture':float, 'Pressure':float, 'MagnetCount':int, 'MagnetSwitch':int,
+                'Unnamed: 0':int, 'line':int, 'time':str,
+                'Acceleration(X)[g]':float, 'Acceleration(Y)[g]':float, 'Acceleration(Z)[g]':float,
+                'AngularRate(X)[dps]':float, 'AngularRate(Y)[dps]':float, 'AngularRate(Z)[dps]':float,
+                'Temperature[degree]':float, 'Pressure[hPa]':float, 'MagnetCount':int, 'MagnetSwitch':int,
+                'onCrossroad':int, 'crossroadID':int,
                 },
-            #usecols=lambda x: x in direct_acc+[index_col],
-            usecols=lambda x: x in direct_acc+['time'],
+            parse_dates=['time'],
+            #usecols=lambda x: x in features_selected_manually+[index_col],
+            #usecols=lambda x: x in features_selected_manually+['time'],
+            #usecols=features_selected_manually+['time'],
             )
            #).compute()
 
@@ -169,11 +173,11 @@ class TimePredDataframePlotter(DataframePlotter):
         '加速度・角速度の時系列変化をプロット'
         if sys.argv[1] != '0':    # 本モジュールに引数0を渡して実行した場合のみ、予測値なし時系列グラフをプロットする
             predict = pd.DataFrame(config.pred_by_prob_model, columns=['pred'])
-            self.df = pd.concat([(self.df)[config.direct_acc], predict], axis=1)
+            self.df = pd.concat([(self.df)[config.features_selected_manually], predict], axis=1)
         for i in range(int(len(self.df)/(self.delta))):
             copy_df = (self.df).loc[(self.delta)*i:(self.delta)*(i+1), :]
             copy_df.dropna(how='all')
-            ax1 = copy_df[config.direct_acc].plot()
+            ax1 = copy_df[config.features_selected_manually].plot()
             if sys.argv[1] != '0':    # 本モジュールに引数0を渡して実行した場合のみ、予測値なし時系列グラフをプロットする
                 ax = copy_df[['pred']].plot(ax=ax1)
                 ax.set_title(config.data_read_by_api)
@@ -191,10 +195,10 @@ class Acc1Acc2DataframePlotter(DataframePlotter):
 
     def plot(self):
         '加速度の2次元データをプロットする'
-        #ax = (self.df).plot.scatter(x=config.direct_acc[0], y=config.direct_acc[1])   # 散布図
+        #ax = (self.df).plot.scatter(x=config.features_selected_manually[0], y=config.features_selected_manually[1])   # 散布図
         #ax = (self.df).plot.scatter(x=config.data_sampled_by_func['Acceleration_x'], y=config.data_sampled_by_func['Acceleration_y'])   # 散布図
         #ax = (self.df).plot.scatter(x='Acceleration_x', y='Acceleration_y')   # 散布図
-        ax = (self.df).plot.scatter(x=config.direct_acc[0], y=config.direct_acc[1])   # 散布図
+        ax = (self.df).plot.scatter(x=config.features_selected_manually[0], y=config.features_selected_manually[1])   # 散布図
         ax.set_title(config.data_read_by_api)
         ax.set_xlim([-1.5, 0.5])
         ax.set_ylim([-2.0, 0.5])
@@ -209,13 +213,17 @@ class Acc1Acc2ColorDataframePlotter(DataframePlotter):
 
     def plot(self, args):
         '加速度の2次元データをプロットする'
+        if sys.argv[1] == '4':
         # 1.予測値を結合
-        predict = pd.DataFrame(config.pred_by_prob_model, columns=['pred'])
-        self.df = pd.concat([(self.df)[list(args)], predict], axis=1)
+            predict = pd.DataFrame(config.pred_by_prob_model, columns=['pred'])
+            self.df = pd.concat([(self.df)[list(args)], predict], axis=1)
         # 2.散布図をプロット
-        #ax = (self.df).plot.scatter(x=config.direct_acc[0], y=config.direct_acc[1])   # 散布図
+        #ax = (self.df).plot.scatter(x=config.features_selected_manually[0], y=config.features_selected_manually[1])   # 散布図
         #ax = (self.df).plot.scatter(x=config.data_sampled_by_func['Acceleration_x'], y=config.data_sampled_by_func['Acceleration_y'])   # 散布図
-        ax = (self.df).plot.scatter(x='Acceleration_x', y='Acceleration_y', vmin=0, vmax=2, c=(self.df).pred, cmap=cm.rainbow)   # 散布図
+        if sys.argv[1] == '4':
+            ax = (self.df).plot.scatter(x='Acceleration_x', y='Acceleration_y', vmin=0, vmax=2, c=(self.df).pred, cmap=cm.rainbow)   # 散布図
+        elif sys.argv[1] == '5':
+            ax = (self.df).plot.scatter(x='Acceleration_x', y='Acceleration_y', vmin=0, vmax=2, c=(self.df).onCrossroad, cmap=cm.rainbow)   # 散布図
         ax.set_title(config.data_read_by_api)
         ax.set_xlim([-1.5, 0.5])
         ax.set_ylim([-2.0, 2.0])
@@ -237,17 +245,17 @@ def main():
     '加速度データのDataFrame型変数を属性とする、DataframeMaker型オブジェクトを作成'
     buf = "../dataset/buf.csv"  # 加工したcsvファイルの保存先
     DataframeMaker.sample_data(buf, config.data_read_by_api, config.data_sampled_first, config.data_sampled_last)
-    #data_sampled_by_func = DataframeMaker(buf, config.direct_acc, config.data_sampled_first, config.data_sampled_last)
-    data_sampled_by_func = DataframeMaker(buf, config.direct_acc, config.data_sampled_first, config.data_sampled_last)
+    #data_sampled_by_func = DataframeMaker(buf, config.features_selected_manually, config.data_sampled_first, config.data_sampled_last)
+    data_sampled_by_func = DataframeMaker(buf, config.features_selected_manually, config.data_sampled_first, config.data_sampled_last)
 
     'メインプログラム実行時の引数によって、描画するグラフを決定&プロット'
     'HACK:インジェクション攻撃に注意(参考:実践Python3 Interpreterパターン)'
     state_plot = 'p'    # 'p':plt.show()/'s':plt.savefig(config.save_graph_to_path)
     try:
-        if sys.argv[1] in ['0', '1', '2', '3', '4']:
+        if sys.argv[1] in ['0', '1', '2', '3', '4', '5']:
             if sys.argv[1] == '0':    # 時系列プロット：予測値なし
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
-                #data_sampled_by_func.df = config.aveData(data_sampled_by_func.df)
+                data_sampled_by_func.df = config.aveData(data_sampled_by_func.df)
                 tpdfp = TimePredDataframePlotter(data_sampled_by_func.df, config.plot_amount_in_graph, state_plot)
                 if state_plot == 's':
                     tpdfp.save_graph_to_path = config.save_graph_to_path
@@ -264,19 +272,25 @@ def main():
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 cluster_learn.clusterLearn(data_sampled_by_func.df)
                 #pred = cluster_learn.pred
-                TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, 'p').plot(tuple(config.direct_acc))
-            elif sys.argv[1] == '3':    # 加速度を２次元プロット
+                TimePredDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, 'p').plot(tuple(config.features_selected_manually))
+            elif sys.argv[1] == '3':    # 加速度を２次元プロット：予測値なし
                 config.data_sampled_by_func = config.aveData(data_sampled_by_func.df)
                 aadfp = Acc1Acc2DataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, state_plot)
                 if state_plot == 's':
                     aadfp.save_graph_to_path = config.save_graph_to_path
                 aadfp.plot()
-            elif sys.argv[1] == '4':    # 加速度を２次元プロット(予測値による色付き)
+            elif sys.argv[1] == '4':    # 加速度を２次元プロット(隠れマルコフモデルを用いた予測値による色付き)
                 #np.set_printoptions(threshold=np.inf)    # 配列の要素を全て表示(状態系列)
                 hmm_learn.hmmLearn(data_sampled_by_func.df)
                 #pred = hmm_learn.pred
                 #FIXME:クラス名を変更する必要がある.
-                Acc1Acc2ColorDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, 'p').plot(tuple(config.direct_acc))
+                Acc1Acc2ColorDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, 'p').plot(tuple(config.features_selected_manually))
+            elif sys.argv[1] == '5':
+                config.data_sampled_by_func = config.aveData(data_sampled_by_func.df)
+                aadfp = Acc1Acc2ColorDataframePlotter(config.data_sampled_by_func, config.plot_amount_in_graph, state_plot)
+                if state_plot == 's':
+                    aadfp.save_graph_to_path = config.save_graph_to_path
+                aadfp.plot(tuple(config.features_selected_manually))
         else:
             raise WrongArgumentException(sys.argv[1])
     except IndexError as err:
@@ -287,7 +301,7 @@ def main():
     #    sys.exit()
 
     #'グラフを描画'
-    #DataframePlotter.plot(data_sampled_by_func.df, config.plot_amount_in_graph, tuple(config.direct_acc))
+    #DataframePlotter.plot(data_sampled_by_func.df, config.plot_amount_in_graph, tuple(config.features_selected_manually))
 
 if __name__ == '__main__':
     main()

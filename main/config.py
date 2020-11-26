@@ -12,17 +12,19 @@ import pandas as pd
 pred_by_prob_model = None
 
 ' 加速度データファイル(csv)のパス'
-data_read_by_api = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
+#data_read_by_api = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
 #data_read_by_api = "../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
+data_read_by_api = "../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
+#data_read_by_api = "../dataset/labeledEditedLOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19(交差点ラベル付)
 
 ' 加速度の方向名のリスト'
-direct_acc = [
-    'Acceleration_x',
-    'Acceleration_y',
-    'Acceleration_z',
-    #'AngularRate_x',
-    #'AngularRate_y',
-    #'AngularRate_z',
+features_selected_manually = [
+    'Acceleration(X)[g]',
+    'Acceleration(Y)[g]',
+    'Acceleration(Z)[g]',
+    #'AngularRate(X)[dps]',
+    #'AngularRate(Y)[dps]',
+    #'AngularRate(Z)[dps]',
     ]
 
 ' 時系列/加速度2次元プロット画像ファイルの保存先'
@@ -70,7 +72,7 @@ def aveData(input_dataframe):
 def main():
     print("pred_by_prob_model:", pred_by_prob_model)
     print("data_read_by_api:", data_read_by_api)
-    print("direct_acc:", direct_acc)
+    print("features_selected_manually:", features_selected_manually)
     print("save_graph_to_path:", save_graph_to_path)
     print("plot_amount_in_graph:", plot_amount_in_graph)
     print("data_sampled_first:", data_sampled_first)

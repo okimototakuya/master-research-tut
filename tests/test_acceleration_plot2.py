@@ -21,6 +21,9 @@ class TestAcceleration_plot2(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_init_DataframeMaker(self):
+        DataframeMaker()
+
     def _test_plot_TimePredDataframePlotter(self):
         'TimePredDataframePlotterクラスのplot関数をテスト.'
         '指定ディレクトリ下にpngファイルが生成されたかどうかでアサート.'
