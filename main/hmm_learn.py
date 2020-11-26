@@ -14,12 +14,12 @@ def hmmLearn(df):
     # 確率モデル(隠れマルコフモデルの作成.
     model = hmm.GaussianHMM(n_components=3, covariance_type="full")
     # DataFrame型変数から学習に用いる加速度データを抽出.
-    #X = (data_sampled_by_func.df).loc[:, config.direct_acc]
+    #X = (data_sampled_by_func.df).loc[:, config.features_selected_manually]
     print(type(df))
-    X = df.loc[:, (config.direct_acc)[0]]
+    X = df.loc[:, (config.features_selected_manually)[0]]
     X = pd.DataFrame(X)
-    if len(config.direct_acc) > 1:
-        for ele in (config.direct_acc)[1:]:
+    if len(config.features_selected_manually) > 1:
+        for ele in (config.features_selected_manually)[1:]:
             X_ = df.loc[:, ele]
             X = X.join(X_)
     else:

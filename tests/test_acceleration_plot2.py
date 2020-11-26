@@ -21,7 +21,10 @@ class TestAcceleration_plot2(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_plot_TimePredDataframePlotter(self):
+    def test_init_DataframeMaker(self):
+        DataframeMaker()
+
+    def _test_plot_TimePredDataframePlotter(self):
         'TimePredDataframePlotterクラスのplot関数をテスト.'
         '指定ディレクトリ下にpngファイルが生成されたかどうかでアサート.'
         '正しくプロットされているかどうかはナイーブに確認.'
@@ -34,7 +37,7 @@ class TestAcceleration_plot2(unittest.TestCase):
         #assert glob.glob('./test_plot/*.png') is not None
         self.assertTrue(glob.glob('./test_plot1/*.png'))
 
-    def test_plot_Acc1Acc2DataframePlotter(self):
+    def _test_plot_Acc1Acc2DataframePlotter(self):
         '上記テストメソッドと同じ.'
         aadfp = Acc1Acc2DataframePlotter(config.data_sampled_by_func, 30, 's')
         #aadfp = Acc1Acc2DataframePlotter(config.data_sampled_by_func, 30, 'p')
@@ -44,9 +47,14 @@ class TestAcceleration_plot2(unittest.TestCase):
         #assert glob.glob('./test_plot/*.png') is not None
         self.assertTrue(glob.glob('./test_plot2/*.png'))
 
-    def _test_sample_data(self):
-        DataframeMaker.sample_data('./test_sample/demo', config.data_read_by_api, 1, 5)
+    def test_sample_data_save(self):
+        # 開始オフセットに０を指定するとバグる:指定ディレクトリにファイル自体は生成されるが、中身は空っぽ
+        DataframeMaker.sample_data('./test_sample/demo', config.data_read_by_api, 1, 6)
         self.assertTrue('glob.glob(./test_sample/demo)')
+
+    def test_sample_data_range(self):
+        with self.assertRaises(IndexError):
+            DataframeMaker.sample_data('./test_sample/demo', config.data_read_by_api, 0, 6)
 
     def _test_connect_dataframe(cls):
         predict = pd.DataFrame(config.pred_by_prob_model, columns=['pred'])

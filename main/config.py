@@ -12,17 +12,30 @@ import pandas as pd
 pred_by_prob_model = None
 
 ' 加速度データファイル(csv)のパス'
-data_read_by_api = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
+#data_read_by_api = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
 #data_read_by_api = "../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
+data_read_by_api = "../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
+#data_read_by_api = "../dataset/labeledEditedLOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19(交差点ラベル付)
 
-' 加速度の方向名のリスト'
-direct_acc = [
-    'Acceleration_x',
-    'Acceleration_y',
-    'Acceleration_z',
-    #'AngularRate_x',
-    #'AngularRate_y',
-    #'AngularRate_z',
+'グラフ描画に用いる特徴量(時系列/加速度2次元)'
+features_selected_manually = [
+    'time'
+    'Acceleration(X)[g]',
+    'Acceleration(Y)[g]',
+    'Acceleration(Z)[g]',
+    #'AngularRate(X)[dps]',
+    #'AngularRate(Y)[dps]',
+    #'AngularRate(Z)[dps]',
+    ]
+
+'PCA分析にかける特徴量'
+features_analyzed_by_pca = [
+    'Acceleration(X)[g]',
+    'Acceleration(Y)[g]',
+    'Acceleration(Z)[g]',
+    #'AngularRate(X)[dps]',
+    #'AngularRate(Y)[dps]',
+    #'AngularRate(Z)[dps]',
     ]
 
 ' 時系列/加速度2次元プロット画像ファイルの保存先'
@@ -32,21 +45,21 @@ save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンフ�
 #save_graph_to_path = "/Users/okimototakuya/Desktop/tmp/"
 
 ' 1つのグラフにおけるプロット数'
-plot_amount_in_graph = 10000
-#plot_amount_in_graph = 131663
+#plot_amount_in_graph = 10000
+plot_amount_in_graph = 131663
 
 #' 加速度データファイルで、隠れマルコフモデルを適用させる範囲:始まり'
 '加速度データファイル(csv)を抽出する範囲(first-last:リーダブルコードの包含関係をsedの挙動から確認済)'
-data_sampled_first = 60000
+data_sampled_first = 70000
 
 ' ":終わり'
-data_sampled_last = 69999
+data_sampled_last = 80000
 
 ' 加工した加速度データファイルを格納するDataFrame型変数'
 data_sampled_by_func = None
 
 '平均値をとる要素数'
-mean_range = 10
+mean_range = 1
 
 
 ##HACK:反例ありそう→データフレームの大きさと平均値幅のすり合わせ、例外処理
@@ -70,7 +83,7 @@ def aveData(input_dataframe):
 def main():
     print("pred_by_prob_model:", pred_by_prob_model)
     print("data_read_by_api:", data_read_by_api)
-    print("direct_acc:", direct_acc)
+    print("features_selected_manually:", features_selected_manually)
     print("save_graph_to_path:", save_graph_to_path)
     print("plot_amount_in_graph:", plot_amount_in_graph)
     print("data_sampled_first:", data_sampled_first)
