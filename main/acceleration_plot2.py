@@ -235,6 +235,15 @@ class Acc1Acc2ColorDataframePlotter(DataframePlotter):
         self.generate_graph()
 
 
+class FeaturesPlotter():
+
+    def __init__(self):
+        pass
+
+    def plot_(self):
+        pass
+
+
 ##################################################################
 ##########メイン関数##############################################
 ##################################################################
