@@ -15,23 +15,24 @@ class TestAccelerationPlot3(unittest.TestCase):
     def test_real_columns_read_csv_by_pandas(self):
         df_test = ap.read_csv_('./test_dataset/demo.csv')
         df_real_columns = pd.DataFrame({
-            'Unnamed: 0':[0],
-            'line':[0],
-            'time':[0],
-            'Acceleration(X)[g]':[0],
-            'Acceleration(Y)[g]':[0],
-            'Acceleration(Z)[g]':[0],
-            'AngularRate(X)[dps]':[0],
-            'AngularRate(Y)[dps]':[0],
-            'AngularRate(Z)[dps]':[0],
-            'Temperature[degree]':[0],
-            'Pressure[hPa]':[0],
-            'MagnetCount':[0],
-            'MagnetSwitch':[0],
-            'onCrossroad':[0],
-            'crossroadID':[0],
+            'Unnamed: 0':[0,1,2,3,4,5,6,7,8,9],
+            'line':[0,1,2,3,4,5,6,7,8,9],
+            'time':[0,1,2,3,4,5,6,7,8,9],
+            'Acceleration(X)[g]':[0,1,2,3,4,5,6,7,8,9],
+            'Acceleration(Y)[g]':[0,1,2,3,4,5,6,7,8,9],
+            'Acceleration(Z)[g]':[0,1,2,3,4,5,6,7,8,9],
+            'AngularRate(X)[dps]':[0,1,2,3,4,5,6,7,8,9],
+            'AngularRate(Y)[dps]':[0,1,2,3,4,5,6,7,8,9],
+            'AngularRate(Z)[dps]':[0,1,2,3,4,5,6,7,8,9],
+            'Temperature[degree]':[0,1,2,3,4,5,6,7,8,9],
+            'Pressure[hPa]':[0,1,2,3,4,5,6,7,8,9],
+            'MagnetCount':[0,1,2,3,4,5,6,7,8,9],
+            'MagnetSwitch':[0,1,2,3,4,5,6,7,8,9],
+            'onCrossroad':[0,1,2,3,4,5,6,7,8,9],
+            'crossroadID':[0,1,2,3,4,5,6,7,8,9],
             })
         pd.testing.assert_frame_equal(df_test, df_real_columns)
+
 
 if __name__ == '__main__':
     unittest.main()
