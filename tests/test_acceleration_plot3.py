@@ -11,6 +11,9 @@ import acceleration_plot3 as ap
 
 
 AMOUNT_OF_ROW = 30  # テストcsvファイルの列数
+'csvファイルを読み取る際の、切り出し区間'
+TEST_DATA_SAMPLED_FIRST = 3    # 切り出し始め(line値TEST_DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
+TEST_DATA_SAMPLED_LAST = 7 # 切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
 
 
 class IterAddMicrosecond():
@@ -77,18 +80,29 @@ class TestAccelerationPlot3(unittest.TestCase):
     #    df_one_column = pd.DataFrame({'a':[0]})
     #    pd.testing.assert_frame_equal(df_test, df_one_column)
 
-    def test_read_csv_real_columns(self):
+    def _test_read_csv_real_columns(self):
         'テストcsvファイルをDataFrame型変数として読み込めたかテスト'
         '1. テストcsvファイルを書込'
         df_real_columns.to_csv('./test_dataset/demo.csv')
         '2. テストcsvファイルを読込'
         df_test = ap.read_csv_('./test_dataset/demo.csv')
-        subprocess.getoutput('head ./test_dataset/demo.csv')
-        print(df_real_columns)
+        #print(df_real_columns)
+        #print()
+        #print(df_test)
+        pd.testing.assert_frame_equal(df_test, df_real_columns)
+        os.remove('./test_dataset/demo.csv')   # 次回のテストのためにテストcsvファイルを削除
+
+    def test_read_csv_real_columns_sample_partly(self):
+        'テストcsvファイルの一部をDataFrame型変数として読み込めたかテスト'
+        '1. テストcsvファイルを書込'
+        df_real_columns.to_csv('./test_dataset/demo_sample.csv')
+        '2. テストcsvファイルの一部を読込'
+        df_test = ap.read_csv_('./test_dataset/demo_sample.csv')
+        print(df_real_columns[TEST_DATA_SAMPLED_FIRST:TEST_DATA_SAMPLED_LAST:1])
         print()
         print(df_test)
-        pd.testing.assert_frame_equal(df_test, df_real_columns)
-        os.remove('./test_dataset/demo.csv')   # 次回のテストのためにテストcsvファイルを消去
+        pd.testing.assert_frame_equal(df_test, df_real_columns[TEST_DATA_SAMPLED_FIRST:TEST_DATA_SAMPLED_LAST:1])
+        os.remove('./test_dataset/demo_sample.csv')   # 次回のテストのためにテストcsvファイルを削除
 
 
 if __name__ == '__main__':
