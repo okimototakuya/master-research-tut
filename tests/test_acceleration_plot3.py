@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 import pandas as pd
 sys.path.append('../main')
-import acceleration_plot3 as ap
+import acceleration_plot3 as ap3
 
 
 AMOUNT_OF_ROW = 30  # テストcsvファイルの列数
@@ -76,7 +76,7 @@ class TestAccelerationPlot3(unittest.TestCase):
 
     #def _test_read_csv_one_column(self):
     #    'テストcsvファイルをDataFrame型変数として読み込めたかテスト(特徴量数1)'
-    #    df_test = ap.read_csv_('./test_dataset/demo.csv')
+    #    df_test = ap3.read_csv_('./test_dataset/demo.csv')
     #    df_one_column = pd.DataFrame({'a':[0]})
     #    pd.testing.assert_frame_equal(df_test, df_one_column)
 
@@ -85,24 +85,33 @@ class TestAccelerationPlot3(unittest.TestCase):
         '1. テストcsvファイルを書込'
         df_real_columns.to_csv('./test_dataset/demo.csv')
         '2. テストcsvファイルを読込'
-        df_test = ap.read_csv_('./test_dataset/demo.csv')
+        df_test = ap3.read_csv_('./test_dataset/demo.csv')
         #print(df_real_columns)
         #print()
         #print(df_test)
         pd.testing.assert_frame_equal(df_test, df_real_columns)
         os.remove('./test_dataset/demo.csv')   # 次回のテストのためにテストcsvファイルを削除
 
-    def test_read_csv_real_columns_sample_partly(self):
+    def _test_read_csv_real_columns_sample_partly(self):
         'テストcsvファイルの一部をDataFrame型変数として読み込めたかテスト'
         '1. テストcsvファイルを書込'
         df_real_columns.to_csv('./test_dataset/demo_sample.csv')
         '2. テストcsvファイルの一部を読込'
-        df_test = ap.read_csv_('./test_dataset/demo_sample.csv')
+        df_test = ap3.read_csv_('./test_dataset/demo_sample.csv')
         print(df_real_columns[TEST_DATA_SAMPLED_FIRST:TEST_DATA_SAMPLED_LAST:1])
         print()
         print(df_test)
         pd.testing.assert_frame_equal(df_test, df_real_columns[TEST_DATA_SAMPLED_FIRST:TEST_DATA_SAMPLED_LAST:1])
         os.remove('./test_dataset/demo_sample.csv')   # 次回のテストのためにテストcsvファイルを削除
+
+    def test_average_data(self):
+        df_test = ap3.average_data(df_real_columns)
+        df_real_columns_average = (df_real_columns.describe()).loc['mean',:]
+        print(df_real_columns_average)
+        print()
+        print(df_test)
+        #pd.testing.assert_frame_equal(df_test, df_real_columns_average)
+        pd.testing.assert_series_equal(df_test, df_real_columns_average)
 
 
 if __name__ == '__main__':
