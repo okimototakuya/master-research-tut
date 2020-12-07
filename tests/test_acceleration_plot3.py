@@ -31,6 +31,8 @@ class IterAddMicrosecond():
             yield self.date_time.strftime('%M:%S.%f')
 
 
+# HACK:2020.12.7:テストDataFrame型変数df_real_columnsの要素について、密度関数の出力値を固定できないか
+# → 「平均値の計算」をテストする際、テスト値をベタ書きでソースコードに書いておけるので便利
 df_real_columns = pd.DataFrame(
     {    # テストDataFrame型変数
         'Unnamed: 0':range(AMOUNT_OF_ROW),
@@ -86,8 +88,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         df_real_columns.to_csv('./test_dataset/demo.csv')
         '2. テストcsvファイルを読込'
         df_test = ap3.read_csv_('./test_dataset/demo.csv')
-        #print(df_real_columns)
-        #print()
+        #print(df_real_columns, '\n')
         #print(df_test)
         pd.testing.assert_frame_equal(df_test, df_real_columns)
         os.remove('./test_dataset/demo.csv')   # 次回のテストのためにテストcsvファイルを削除
@@ -98,20 +99,30 @@ class TestAccelerationPlot3(unittest.TestCase):
         df_real_columns.to_csv('./test_dataset/demo_sample.csv')
         '2. テストcsvファイルの一部を読込'
         df_test = ap3.read_csv_('./test_dataset/demo_sample.csv')
-        print(df_real_columns[TEST_DATA_SAMPLED_FIRST:TEST_DATA_SAMPLED_LAST:1])
-        print()
+        print(df_real_columns[TEST_DATA_SAMPLED_FIRST:TEST_DATA_SAMPLED_LAST:1], '\n')
         print(df_test)
         pd.testing.assert_frame_equal(df_test, df_real_columns[TEST_DATA_SAMPLED_FIRST:TEST_DATA_SAMPLED_LAST:1])
         os.remove('./test_dataset/demo_sample.csv')   # 次回のテストのためにテストcsvファイルを削除
 
-    def test_average_data(self):
+    #def _test_average_data_in_all_section_and_return_series_older(self):
+    #    '各columnsについて、全区間を算術平均し、計算結果をpd.Series型オブジェクトで返したかテスト'
+    #    '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
+    #    df_test = ap3.average_data(df_real_columns)
+    #    # HACK:2020.12.7:テストコード内でメインコードと同様の方法で算術平均を計算しているため、あまり好ましいテスト方法でない
+    #    '2. テストコード内で全区画算術平均を計算'
+    #    df_real_columns_average = (df_real_columns.describe()).loc['mean',:]
+    #    print(df_real_columns_average, '\n')
+    #    print(df_test)
+    #    pd.testing.assert_series_equal(df_test, df_real_columns_average)
+
+
+    def test_average_data_in_all_section_and_return_series(self):
+        '各columnsについて、全区間を算術平均し、計算結果をpd.Series型オブジェクトで返したかテスト'
+        '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
         df_test = ap3.average_data(df_real_columns)
-        df_real_columns_average = (df_real_columns.describe()).loc['mean',:]
-        print(df_real_columns_average)
-        print()
-        print(df_test)
-        #pd.testing.assert_frame_equal(df_test, df_real_columns_average)
-        pd.testing.assert_series_equal(df_test, df_real_columns_average)
+        print(df_test, '\n')
+        '2. average_data関数の返り値の型がpd.Seriesになっているかでアサーション'
+        self.assertIsInstance(df_test, pd.Series)
 
 
 if __name__ == '__main__':

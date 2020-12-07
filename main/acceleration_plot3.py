@@ -30,14 +30,11 @@ def read_csv_(input_path_to_csv):
 
 
 def average_data(input_df):
-    #return (input_df.describe()).loc['mean', :].transpose()
-    #return (input_df.describe()).loc['mean', :].T
     return (input_df.describe()).loc['mean', :]
 
 
 def main():
     df_read = read_csv_(config.data_read_by_api)
-    #print(df_read)
 
 
 if __name__ == '__main__':
