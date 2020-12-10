@@ -115,14 +115,40 @@ class TestAccelerationPlot3(unittest.TestCase):
     #    print(df_test)
     #    pd.testing.assert_series_equal(df_test, df_real_columns_average)
 
-
-    def test_average_data_in_all_section_and_return_series(self):
+    def _test_average_data_in_all_section_and_return_series(self):
         '各columnsについて、全区間を算術平均し、計算結果をpd.Series型オブジェクトで返したかテスト'
         '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
         df_test = ap3.average_data(df_real_columns)
         print(df_test, '\n')
         '2. average_data関数の返り値の型がpd.Seriesになっているかでアサーション'
         self.assertIsInstance(df_test, pd.Series)
+
+    def test_average_data_in_partly_section_and_return_dataframe(self):
+        '各columnsについて、部分的に区間を算術平均し、計算結果をpd.DataFrame型オブジェクトで返したかテスト'
+        mean_range = 5  # 平均値をとる要素数
+        '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
+        df_test = ap3.average_data(input_df = df_real_columns, \
+                                input_mean_range = mean_range, \
+                                )
+        print(df_test, '\n')
+        #'2. average_data関数の返り値の型がpd.DataFrameになっているかでアサーション'
+        #self.assertIsInstance(df_test, pd.DataFrame)
+        '2. average_data関数の返り値(↑pd.DataFrame型)の大きさが、(元のテストDataFrame型変数df_real_columnsの大きさ)/(mean_range)\
+        になっているかでアサーション'
+        self.assertEqual(len(df_test), int(len(df_real_columns)/mean_range))
+
+    def test_average_data_in_partly_section_and_return_dataframe_index_type_int(self):
+        '各columnsについて、部分的に区間を算術平均し、計算結果をpd.DataFrame型オブジェクトで返し、\
+        そのオブジェクトのインデックスオブジェクトの型がint型かどうかでテスト'
+        mean_range = 5  # 平均値をとる要素数
+        '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
+        df_test = ap3.average_data(input_df = df_real_columns, \
+                                input_mean_range = mean_range, \
+                                )
+        print(df_test, '\n')
+        '2. average_data関数の返り値のインデックスオブジェクトの型がintになっているかでアサーション\
+        → インデックスオブジェクトの要素をランダムに抽出し、アサーション'
+        self.assertIsInstance(df_test.index[np.random.randint(len(df_test))], int)
 
 
 if __name__ == '__main__':

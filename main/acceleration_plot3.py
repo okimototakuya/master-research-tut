@@ -29,8 +29,10 @@ def read_csv_(input_path_to_csv):
             )
 
 
-def average_data(input_df):
-    return (input_df.describe()).loc['mean', :]
+def average_data(input_df, input_mean_range):
+    len_after_division = int(len(input_df)/input_mean_range)
+    return pd.concat([(input_df.iloc[offset_i:offset_i+input_mean_range].describe()).loc['mean', :] \
+            for offset_i in range(len_after_division)], axis=1).T.reset_index(drop='index')
 
 
 def main():
