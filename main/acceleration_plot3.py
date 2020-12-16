@@ -31,13 +31,20 @@ def read_csv_(input_path_to_csv):
             )
 
 
-def average_data(input_acc_ang_df, input_mean_range):
+def average_data(input_acc_ang_df, input_mean_range, input_how):
     'pd.DataFrame型変数を引数にし、特定区間における平均値を算出し、pd.DataFrame型変数を返す関数 \
      引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)    \
      引数2:平均値を計算する際の、要素数'
-    len_after_division = int(len(input_acc_ang_df)/input_mean_range)    # 固定平均を算出した際、算出後のpd.DataFrame型変数の大きさ
-    return pd.concat([(input_acc_ang_df.iloc[offset_i:offset_i+input_mean_range].describe()).loc['mean', :] \
-            for offset_i in range(len_after_division)], axis=1).T.reset_index(drop='index') # インデックスオブジェクトの型はpd.Int64Index (pd.read_csvのデフォルト)
+    if input_how == 'fixed_mean':  # 固定(?)平均
+       len_after_division = int(len(input_acc_ang_df)/input_mean_range)    # 固定平均を算出した際、算出後のpd.DataFrame型変数の大きさ
+       return pd.concat([(input_acc_ang_df.iloc[offset_i:offset_i+input_mean_range].describe()).loc['mean', :] \
+               for offset_i in range(len_after_division)], axis=1).T.reset_index(drop='index') # インデックスオブジェクトの型はpd.Int64Index (pd.read_csvのデフォルト)
+    elif input_how == 'slide_mean': # 移動平均
+        pass
+    elif input_how == 'slide_median':   # 移動中央値
+        pass
+    else:
+        raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
 
 def main():
