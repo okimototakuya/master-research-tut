@@ -127,7 +127,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         '各columnsについて、部分的に区間を算術平均し、計算結果をpd.DataFrame型オブジェクトで返したかテスト'
         mean_range = 5  # 平均値をとる要素数
         '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
-        df_test = ap3.average_data(input_df = df_real_columns, \
+        df_test = ap3.average_data(input_acc_ang_df = df_real_columns, \
                                 input_mean_range = mean_range, \
                                 )
         print(df_test, '\n')
@@ -142,7 +142,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         そのオブジェクトのインデックスオブジェクトの型がint型かどうかでテスト'
         mean_range = 5  # 平均値をとる要素数
         '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
-        df_test = ap3.average_data(input_df = df_real_columns, \
+        df_test = ap3.average_data(input_acc_ang_df = df_real_columns, \
                                 input_mean_range = mean_range, \
                                 )
         print(df_test, '\n')
@@ -161,8 +161,8 @@ class TestAccelerationPlot3(unittest.TestCase):
         mean_range = 1  # 平均値をとる要素数
         '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
         df_test = ap3.average_data(
-                                #input_df = df_real_columns, \
-                                input_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                #input_acc_ang_df = df_real_columns, \
+                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
                                 input_mean_range = mean_range, \
                                 )
         #print(df_real_columns, '\n')    # 「元のDataFrame型変数」の値を出力
@@ -174,6 +174,17 @@ class TestAccelerationPlot3(unittest.TestCase):
         '2. 関数の出力値としてのDataFrame型変数と元のDataFrame型変数とで、値をアサーション'
         #pd.testing.assert_frame_equal(df_test, df_real_columns)
         pd.testing.assert_frame_equal(df_test, df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'])
+
+    def test_average_data_index_type(self):
+        'ap3.average_data関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでテスト'
+        mean_range = 3  # 平均値をとる要素数
+        '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
+        df_test = ap3.average_data(
+                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_mean_range = mean_range, \
+                                )
+        '2. ap3.average_data関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでアサーション'
+        self.assertIsInstance(df_test.index, pd.Int64Index)
 
 
 if __name__ == '__main__':
