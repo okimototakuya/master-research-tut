@@ -104,7 +104,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         pd.testing.assert_frame_equal(df_test, df_real_columns[TEST_DATA_SAMPLED_FIRST:TEST_DATA_SAMPLED_LAST:1])
         os.remove('./test_dataset/demo_sample.csv')   # 次回のテストのためにテストcsvファイルを削除
 
-    def test_read_csv_index_type(self):
+    def _test_read_csv_index_type(self):
         'ap3.read_csv_関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでテスト'
         '1. テストcsvファイルを書込'
         df_real_columns.to_csv('./test_dataset/demo_sample.csv')
@@ -159,7 +159,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         → インデックスオブジェクトの要素をランダムに抽出し、アサーション'
         self.assertIsInstance(df_test.index[np.random.randint(len(df_test))], int)
 
-    def test_average_data_mean_range_1(self):
+    def _test_average_data_mean_range_1(self):
         'main/ap3/average_data関数の引数について、input_mean_range=1を指定した場合、元のDataFrame型変数と値が変わらないかでテスト\
         →ナイーブなやり方は、if input_mean_range=1: return input_df'
         '注1. 平均値を計算するにあたって, int型の要素はfloat型に変換される.'
@@ -185,7 +185,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         #pd.testing.assert_frame_equal(df_test, df_real_columns)
         pd.testing.assert_frame_equal(df_test, df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'])
 
-    def test_average_data_index_type(self):
+    def _test_average_data_index_type(self):
         'ap3.average_data関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでテスト'
         mean_range = 3  # 平均値をとる要素数
         '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
@@ -197,7 +197,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         '2. ap3.average_data関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでアサーション'
         self.assertIsInstance(df_test.index, pd.Int64Index)
 
-    def test_average_data_input_how_raise_exception(self):
+    def _test_average_data_input_how_raise_exception(self):
         'input_howが不適切な値の場合、例外(Exception)を発生するかどうかでテスト'
         mean_range = 3  # 平均値をとる要素数
         '0. Exceptionオブジェクトが発生かどうかでアサーション'
@@ -209,16 +209,62 @@ class TestAccelerationPlot3(unittest.TestCase):
                                     input_how = 'hoge-hoge',
                                     )
 
-    def _test_average_data_slide_mean_len(self):
-        ''
+    def test_average_data_fixed_mean_len(self):
+        '固定平均を算出した際、返り値のDataFrame型変数の大きさが適切かどうかテスト'
         mean_range = 3  # 平均値をとる要素数
         '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
         df_test = ap3.average_data(
                                 input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
                                 input_mean_range = mean_range, \
-                                input_how = 'slide_mean',
+                                input_how = 'fixed_mean',   # 固定平均
                                 )
-        self.assertEqual(len(df_test), len(df_real_columns)-2)
+        print(df_test, '\n')    # 「関数の出力値のDataFrame型変数」の値を出力
+        '2. 返り値のDataFrame型変数の大きさが、(引数のDataFrame型変数の大きさ)/(平均値幅)(→適切な固定平均の返り値の大きさ)    \
+            になっているかでアサーション'
+        self.assertEqual(len(df_test), int(len(df_real_columns)/mean_range))
+
+    def test_average_data_slide_mean_len(self):
+        '移動平均を算出した際、返り値のDataFrame型変数の大きさが適切かどうかテスト'
+        mean_range = 3  # 平均値をとる要素数
+        '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
+        df_test = ap3.average_data(
+                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_mean_range = mean_range, \
+                                input_how = 'slide_mean',   # 移動平均
+                                )
+        print(df_test, '\n')    # 「関数の出力値のDataFrame型変数」の値を出力
+        '2. 返り値のDataFrame型変数の大きさが、(引数のDataFrame型変数の大きさ)-(平均値幅)+1(→適切な固定平均の返り値の大きさ)    \
+            になっているかでアサーション'
+        self.assertEqual(len(df_test), len(df_real_columns)-mean_range+1)
+
+    def test_average_data_fixed_slide_mean_val(self):
+        '固定/移動平均の算出結果について、値が正しいかテスト    \
+         ＊完璧なテストではない'
+        mean_range = 3  # 平均値をとる要素数
+        '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持   \
+            固定平均'
+        df_test_fixed = ap3.average_data(
+                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_mean_range = mean_range, \
+                                input_how = 'fixed_mean',   # 固定平均
+                                )
+        print(df_test_fixed, '\n')
+        '2. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持   \
+            移動平均'
+        df_test_slide = ap3.average_data(
+                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_mean_range = mean_range, \
+                                input_how = 'slide_mean',   # 移動平均
+                                )
+        print(df_test_slide, '\n')
+        '3. アサーション方法    \
+            3-1. 固定/移動平均の返り値について、pd.DataFrame型変数の先頭行の値が一致しているかどうか    \
+            3-2.    "   、pd.DataFrame型変数の先頭以降の行が一致していないかどうか  \
+            3-3. 上記２つの条件を共に満たすかどうかでアサーション'
+        self.assertTrue(
+                ((df_test_fixed.iloc[0]).equals(df_test_slide.iloc[0]))   # \
+                & (not (df_test_fixed.iloc[1:]).equals(df_test_slide.iloc[1:]))  # \
+                )
 
 
 if __name__ == '__main__':
