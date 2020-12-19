@@ -69,6 +69,12 @@ class TestAccelerationPlot3(unittest.TestCase):
     'FIXME1:2020.11.27:test_save_dataframe_to_csv_とtest_read_csv_real_columnsを同時に走らせるとテストが通らない→一方のみだと通る'
     'FIXME1:2020.11.27:究極的にはtest_read_csv_real_columnsが通れば良いから、大した問題ではない'
 
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
     #def _test_save_dataframe_to_csv_(self):
     #    'テストDataFrame型変数をテストcsvファイルに変換できたかテスト(テストコードのみの関数)'
     #    df_real_columns.to_csv('./test_dataset/demo.csv')
