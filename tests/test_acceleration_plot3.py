@@ -288,10 +288,86 @@ class TestAccelerationPlot3(unittest.TestCase):
         df_test = ap3.hmm_learn_data(df_real_columns[['Acceleration(X)[g]', 'Acceleration(Y)[g]', 'Acceleration(Z)[g]']])
         self.assertIsInstance(df_test, pd.DataFrame)
 
-    def test_hmm_learn_data_is_return_type_ndarray(self):
+    def _test_hmm_learn_data_is_return_type_ndarray(self):
         'ap3.hmm_learn_data関数の返す値がnp.ndarray型かどうかでテスト(回帰テスト)'
         df_test = ap3.hmm_learn_data(df_real_columns[['Acceleration(X)[g]', 'Acceleration(Y)[g]', 'Acceleration(Z)[g]']])
         self.assertIsInstance(df_test, np.ndarray)
+
+    def _test_hmm_learn_data_in_ap3_average_data_parameter(self):
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        df_test = ap3.hmm_learn_data(ap3.average_data(df_real_columns, 1, 'fixed_mean'))
+        self.assertIsInstance(df_test, np.ndarray)
+
+    def _test_hmm_learn_data_in_ap3_average_data_parameter2(self):
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        print(df_real_columns['Acceleration(X)[g]'])
+        df_test = ap3.hmm_learn_data(ap3.average_data(df_real_columns['Acceleration(X)[g]'], 1, 'fixed_mean'))
+        self.assertIsInstance(df_test, np.ndarray)
+
+    def _test_hmm_learn_data_in_ap3_average_data_parameter3(self):
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        print(df_real_columns['Acceleration(X)[g]'])
+        df_test = ap3.hmm_learn_data(ap3.average_data(df_real_columns.loc[:, ['Acceleration(X)[g]']], 1, 'fixed_mean'))
+        self.assertIsInstance(df_test, np.ndarray)
+
+    def _test_hmm_learn_data_in_ap3_average_data_parameter4(self):
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        print(df_real_columns['Acceleration(X)[g]'])
+        df_test = ap3.hmm_learn_data(ap3.average_data(df_real_columns.loc[:, ['Acceleration(X)[g]', 'Acceleration(Y)[g]']], 1, 'fixed_mean'))
+        self.assertIsInstance(df_test, np.ndarray)
+
+    def _test_hmm_learn_data_in_ap3_average_data_parameter5(self):
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        print(df_real_columns['Acceleration(X)[g]'])
+        df_test = ap3.hmm_learn_data(ap3.average_data(df_real_columns.loc[:, ['Acceleration(X)[g]', 'Acceleration(Y)[g]', 'Acceleration(Z)[g]']], 1, 'fixed_mean'))
+        self.assertIsInstance(df_test, np.ndarray)
+
+    def _test_hmm_learn_data_in_ap3_average_data_parameter6(self):
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        print(df_real_columns['Acceleration(X)[g]'])
+        df_test = ap3.hmm_learn_data(ap3.average_data(df_real_columns.loc[:, ['Acceleration(X)[g]', 'Acceleration(Y)[g]', 'Acceleration(Z)[g]',]], 1, 'fixed_mean'))
+        self.assertIsInstance(df_test, np.ndarray)
+
+    def _test_hmm_learn_data_in_ap3_average_data_parameter7(self):
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        print(df_real_columns['Acceleration(X)[g]'])
+        df_test = ap3.hmm_learn_data(ap3.average_data(
+                                            input_acc_ang_df =
+                                                    df_real_columns.loc[:,[
+                                                        'Acceleration(X)[g]',
+                                                        'Acceleration(Y)[g]',
+                                                        'Acceleration(Z)[g]',
+                                                        ]],
+                                            input_mean_range = 1,
+                                            input_how = 'fixed_mean'))
+        self.assertIsInstance(df_test, np.ndarray)
+
+    def _test_hmm_learn_data_in_ap3_average_data_parameter8(self):
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        print(df_real_columns['Acceleration(X)[g]'])
+        df_averaged = ap3.average_data(
+                            input_acc_ang_df =
+                                    df_real_columns.loc[:,[
+                                        'Acceleration(X)[g]',
+                                        'Acceleration(Y)[g]',
+                                        'Acceleration(Z)[g]',
+                                        ]],
+                            input_mean_range = 1,
+                            input_how = 'fixed_mean')
+        df_test = ap3.hmm_learn_data(df_averaged)
+        self.assertIsInstance(df_test, np.ndarray)
+
+    def test_hmm_learn_data_in_ap3_average_data_parameter9(self):   # ver9でテストが通らなくなった。→ ['tuple' object has no attribute 'iloc']
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        df_input = df_real_columns.loc[:,['Acceleration(X)[g]', 'Acceleration(Y)[g]','Acceleration(Z)[g]',]],
+        print(df_input)
+        df_averaged = ap3.average_data(
+                            input_acc_ang_df = df_input,
+                            input_mean_range = 1,
+                            input_how = 'fixed_mean')
+        ndarray_test = ap3.hmm_learn_data(df_averaged)
+        print(ndarray_test)
+        self.assertIsInstance(ndarray_test, np.ndarray)
 
 
 if __name__ == '__main__':
