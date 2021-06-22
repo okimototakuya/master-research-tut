@@ -283,6 +283,16 @@ class TestAccelerationPlot3(unittest.TestCase):
                 & (not (df_test_fixed.iloc[1:]).equals(df_test_slide.iloc[1:]))  # \
                 )
 
+    def _test_hmm_learn_data_is_return_type_dataframe(self):
+        'ap3.hmm_learn_data関数の返す値がpd.DataFrame型かどうかでテスト(回帰テスト)'
+        df_test = ap3.hmm_learn_data(df_real_columns[['Acceleration(X)[g]', 'Acceleration(Y)[g]', 'Acceleration(Z)[g]']])
+        self.assertIsInstance(df_test, pd.DataFrame)
+
+    def test_hmm_learn_data_is_return_type_ndarray(self):
+        'ap3.hmm_learn_data関数の返す値がnp.ndarray型かどうかでテスト(回帰テスト)'
+        df_test = ap3.hmm_learn_data(df_real_columns[['Acceleration(X)[g]', 'Acceleration(Y)[g]', 'Acceleration(Z)[g]']])
+        self.assertIsInstance(df_test, np.ndarray)
+
 
 if __name__ == '__main__':
     unittest.main()

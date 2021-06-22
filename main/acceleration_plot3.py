@@ -80,11 +80,11 @@ def main():
                        'Acceleration(X)[g]',   # 列(特徴量)の指定
                        'Acceleration(Y)[g]',
                        'Acceleration(Z)[g]',
-                       "AngularRate(X)[dps]",
-                       "AngularRate(Y)[dps]",
-                       "AngularRate(Z)[dps]",
+                       #"AngularRate(X)[dps]",
+                       #"AngularRate(Y)[dps]",
+                       #"AngularRate(Z)[dps]",
                        ]],
-            input_mean_range = 100, # 引数2:平均値を計算する際の、要素数
+            input_mean_range = 1, # 引数2:平均値を計算する際の、要素数
             input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
             )
     '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
