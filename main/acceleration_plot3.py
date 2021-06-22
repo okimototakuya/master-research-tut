@@ -4,6 +4,8 @@ import pandas as pd
 sys.path.append('../tests')
 import test_acceleration_plot3 as tap3
 import config
+#import hmmlearn
+from hmmlearn import hmm
 
 
 def read_csv_(input_path_to_csv):
@@ -53,6 +55,21 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
 
+def hmm_learn_data(input_averaged_df):
+    '隠れマルコフモデルを仮定し、pd.DataFrame型引数の訓練及び状態推定を行う関数'
+    #model = hmmlearn.hmm.GaussianHMM(n_components=3, covariance_type="full")    # 隠れマルコフモデルの仮定
+    model = hmm.GaussianHMM(n_components=3, covariance_type="full")    # 隠れマルコフモデルの仮定
+    model.fit(input_averaged_df)    # 隠れマルコフモデルにより、引数のデータを訓練
+    #np.set_printoptions(threshold=np.inf)  # 配列の要素を全て表示(状態系列)
+    #print("初期確率\n", model.startprob_)
+    #print("平均値\n", model.means_)
+    #print("共分散値\n", model.covars_)
+    #print("遷移確率\n", model.transmat_)
+    #print("対数尤度\n", model.score(input_averaged_df))
+    #print("状態系列の復号\n", model.predict(input_averaged_df))
+    return model.predict(input_averaged_df)
+
+
 def main():
     '1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す'
     df_read = read_csv_(config.data_read_by_api)
@@ -70,6 +87,8 @@ def main():
             input_mean_range = 100, # 引数2:平均値を計算する際の、要素数
             input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
             )
+    '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
+    df_predicted = hmm_learn_data(df_averaged)
 
 
 if __name__ == '__main__':
