@@ -118,8 +118,9 @@ class TestAccelerationPlot3(unittest.TestCase):
         df_test = ap3.read_csv_('./test_dataset/demo_sample.csv')
         '3. ap3.read_csv_関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでアサーション'
         self.assertIsInstance(df_test.index, pd.Int64Index)
+        os.remove('./test_dataset/demo_sample.csv')   # 次回のテストのためにテストcsvファイルを削除
 
-    def test_read_csv_data_type(self):
+    def _test_read_csv_data_type(self):
         'ap3.read_csv_関数の返す値がpd.DataFrame型かどうかでテスト'
         '1. テストcsvファイルを書込'
         df_real_columns.to_csv('./test_dataset/demo_sample.csv')
@@ -127,6 +128,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         df_test = ap3.read_csv_('./test_dataset/demo_sample.csv')
         '3. ap3.read_csv_関数の返す値がpd.DataFrame型かどうかでアサーション'
         self.assertIsInstance(df_test, pd.DataFrame)
+        os.remove('./test_dataset/demo_sample.csv')   # 次回のテストのためにテストcsvファイルを削除
 
     #def _test_average_data_in_all_section_and_return_series_older(self):
     #    '各columnsについて、全区間を算術平均し、計算結果をpd.Series型オブジェクトで返したかテスト'

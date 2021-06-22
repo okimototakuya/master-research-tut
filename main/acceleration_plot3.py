@@ -54,7 +54,22 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
 
 
 def main():
-    df_read = read_csv_(config.data_read_by_api) # csvファイル(加速度データ)を読み込み、pd.DataFrame型変数を返す
+    '1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す'
+    df_read = read_csv_(config.data_read_by_api)
+    '2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)'
+    df_averaged = average_data(
+            input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
+                    df_read.loc[:,[  # 行数(データ数)の指定
+                       'Acceleration(X)[g]',   # 列(特徴量)の指定
+                       'Acceleration(Y)[g]',
+                       'Acceleration(Z)[g]',
+                       "AngularRate(X)[dps]",
+                       "AngularRate(Y)[dps]",
+                       "AngularRate(Z)[dps]",
+                       ]],
+            input_mean_range = 100, # 引数2:平均値を計算する際の、要素数
+            input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
+            )
 
 
 if __name__ == '__main__':
