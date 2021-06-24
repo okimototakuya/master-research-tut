@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 sys.path.append('../main')
 import acceleration_plot3 as ap3
+import config
 
 
 AMOUNT_OF_ROW = 30  # テストcsvファイルの列数
@@ -226,7 +227,7 @@ class TestAccelerationPlot3(unittest.TestCase):
                                     input_how = 'hoge-hoge',
                                     )
 
-    def test_average_data_fixed_mean_len(self):
+    def _test_average_data_fixed_mean_len(self):
         '固定平均を算出した際、返り値のDataFrame型変数の大きさが適切かどうかテスト'
         mean_range = 3  # 平均値をとる要素数
         '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
@@ -240,7 +241,7 @@ class TestAccelerationPlot3(unittest.TestCase):
             になっているかでアサーション'
         self.assertEqual(len(df_test), int(len(df_real_columns)/mean_range))
 
-    def test_average_data_slide_mean_len(self):
+    def _test_average_data_slide_mean_len(self):
         '移動平均を算出した際、返り値のDataFrame型変数の大きさが適切かどうかテスト'
         mean_range = 3  # 平均値をとる要素数
         '1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持'
@@ -254,7 +255,7 @@ class TestAccelerationPlot3(unittest.TestCase):
             になっているかでアサーション'
         self.assertEqual(len(df_test), len(df_real_columns)-mean_range+1)
 
-    def test_average_data_fixed_slide_mean_val(self):
+    def _test_average_data_fixed_slide_mean_val(self):
         '固定/移動平均の算出結果について、値が正しいかテスト    \
          ＊完璧なテストではない'
         mean_range = 3  # 平均値をとる要素数
@@ -372,7 +373,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         df_test = ap3.hmm_learn_data(df_averaged)
         self.assertIsInstance(df_test, np.ndarray)
 
-    def test_hmm_learn_data_in_ap3_average_data_parameter10(self):
+    def _test_hmm_learn_data_in_ap3_average_data_parameter10(self):
         'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
         df_input = df_real_columns.loc[:,[
                                          'Acceleration(X)[g]',
@@ -399,6 +400,36 @@ class TestAccelerationPlot3(unittest.TestCase):
         print(ndarray_test)
         self.assertIsInstance(ndarray_test, np.ndarray)
 
+    def test_hmm_learn_data_in_ap3_average_data_parameter11(self):
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        df_input_read_by_function_in_product_code = ap3.read_csv_(config.data_read_by_api)
+        df_input_naive = df_real_columns.loc[:,[
+                                         'Acceleration(X)[g]',
+                                         'Acceleration(Y)[g]',
+                                         'Acceleration(Z)[g]',
+                                         'AngularRate(X)[dps]',
+                                         'AngularRate(Y)[dps]',
+                                         'AngularRate(Z)[dps]'
+                                        ]]
+        print(df_input_read_by_function_in_product_code)
+        print(df_input_naive)
+        df_averaged = ap3.average_data(
+                            input_acc_ang_df =
+                                    df_input_read_by_function_in_product_code.loc[:, [  # 通らない: pd.DataFrame型変数の作成の仕方を再現(→本番csvファイルを読込)
+                                    #df_input_naive.loc[:, [    # 通る: pd.DataFrame型変数をテスト用に自作
+                                        'Acceleration(X)[g]',
+                                        'Acceleration(Y)[g]',
+                                        'Acceleration(Z)[g]',
+                                        #"AngularRate(X)[dps]",
+                                        #"AngularRate(Y)[dps]",
+                                        #"AngularRate(Z)[dps]",
+                                        ]],
+                            input_mean_range = 1,
+                            input_how = 'fixed_mean'
+                    )
+        ndarray_test = ap3.hmm_learn_data(df_averaged)
+        print(ndarray_test)
+        self.assertIsInstance(ndarray_test, np.ndarray)
 
 if __name__ == '__main__':
     unittest.main()
