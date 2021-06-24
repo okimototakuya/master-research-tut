@@ -88,7 +88,10 @@ def main():
                         input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
                 )
     '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
-    df_predicted = hmm_learn_data(df_averaged)
+    # FIXME2021/6/25: バグ発生の条件２つ
+    # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
+    # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
+    ndarray_predicted = hmm_learn_data(df_averaged)
 
 
 if __name__ == '__main__':

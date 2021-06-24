@@ -13,8 +13,8 @@ import config
 
 AMOUNT_OF_ROW = 30  # テストcsvファイルの列数
 'csvファイルを読み取る際の、切り出し区間'
-TEST_DATA_SAMPLED_FIRST = 3    # 切り出し始め(line値TEST_DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-TEST_DATA_SAMPLED_LAST = 7 # 切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
+TEST_DATA_SAMPLED_FIRST = 0    # 切り出し始め(line値TEST_DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
+TEST_DATA_SAMPLED_LAST = 30 # 切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
 
 
 class IterAddMicrosecond():
@@ -413,10 +413,9 @@ class TestAccelerationPlot3(unittest.TestCase):
                                         ]]
         print(df_input_read_by_function_in_product_code)
         print(df_input_naive)
-        df_averaged = ap3.average_data(
+        df_averaged_input_read_by_function_in_product_code = ap3.average_data(
                             input_acc_ang_df =
                                     df_input_read_by_function_in_product_code.loc[:, [  # 通らない: pd.DataFrame型変数の作成の仕方を再現(→本番csvファイルを読込)
-                                    #df_input_naive.loc[:, [    # 通る: pd.DataFrame型変数をテスト用に自作
                                         'Acceleration(X)[g]',
                                         'Acceleration(Y)[g]',
                                         'Acceleration(Z)[g]',
@@ -427,9 +426,49 @@ class TestAccelerationPlot3(unittest.TestCase):
                             input_mean_range = 1,
                             input_how = 'fixed_mean'
                     )
+        df_averaged_input_naive = ap3.average_data(
+                            input_acc_ang_df =
+                                    df_input_naive.loc[:, [    # 通る: pd.DataFrame型変数をテスト用に自作
+                                        'Acceleration(X)[g]',
+                                        'Acceleration(Y)[g]',
+                                        'Acceleration(Z)[g]',
+                                        #"AngularRate(X)[dps]",
+                                        #"AngularRate(Y)[dps]",
+                                        #"AngularRate(Z)[dps]",
+                                        ]],
+                            input_mean_range = 1,
+                            input_how = 'fixed_mean'
+                    )
+        print(df_averaged_input_read_by_function_in_product_code)
+        print(df_averaged_input_naive)
+        ndarray_test_input_read_by_function_in_product_code = ap3.hmm_learn_data(df_averaged_input_read_by_function_in_product_code)
+        ndarray_test_input_naive = ap3.hmm_learn_data(df_averaged_input_naive)
+        print(ndarray_test_input_read_by_function_in_product_code)
+        print(ndarray_test_input_naive)
+        self.assertIsInstance(ndarray_test_input_read_by_function_in_product_code, np.ndarray)
+
+    def _test_hmm_learn_data_in_ap3_average_data_parameter12(self):
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        df_input_read_by_function_in_product_code = ap3.read_csv_(config.data_read_by_api)
+        print(df_input_read_by_function_in_product_code)
+        df_averaged = ap3.average_data(
+                            input_acc_ang_df =
+                                    df_input_read_by_function_in_product_code.loc[:, [
+                                        'Acceleration(X)[g]',
+                                        'Acceleration(Y)[g]',
+                                        'Acceleration(Z)[g]',
+                                        #"AngularRate(X)[dps]",
+                                        #"AngularRate(Y)[dps]",
+                                        #"AngularRate(Z)[dps]",
+                                        ]],
+                            input_mean_range = 1,
+                            input_how = 'fixed_mean'
+                    )
+        print(df_averaged)
         ndarray_test = ap3.hmm_learn_data(df_averaged)
         print(ndarray_test)
         self.assertIsInstance(ndarray_test, np.ndarray)
+
 
 if __name__ == '__main__':
     unittest.main()
