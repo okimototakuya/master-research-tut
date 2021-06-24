@@ -357,14 +357,44 @@ class TestAccelerationPlot3(unittest.TestCase):
         df_test = ap3.hmm_learn_data(df_averaged)
         self.assertIsInstance(df_test, np.ndarray)
 
-    def test_hmm_learn_data_in_ap3_average_data_parameter9(self):   # ver9でテストが通らなくなった。→ ['tuple' object has no attribute 'iloc']
+    def _test_hmm_learn_data_in_ap3_average_data_parameter9(self):   # ver9でテストが通らなくなった。→ ['tuple' object has no attribute 'iloc']
+        # 2021/6/24[解決]: df_inputの代入文の末尾に、余分に「,」が混入し、pd.DataFrame型でなく、tuple型で認識されてしまっていた。
         'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
-        df_input = df_real_columns.loc[:,['Acceleration(X)[g]', 'Acceleration(Y)[g]','Acceleration(Z)[g]',]],
-        print(df_input)
+        df_input = df_real_columns.loc[:,[
+                                        'Acceleration(X)[g]',
+                                        'Acceleration(Y)[g]',
+                                        'Acceleration(Z)[g]',
+                                        ]]
         df_averaged = ap3.average_data(
                             input_acc_ang_df = df_input,
                             input_mean_range = 1,
                             input_how = 'fixed_mean')
+        df_test = ap3.hmm_learn_data(df_averaged)
+        self.assertIsInstance(df_test, np.ndarray)
+
+    def test_hmm_learn_data_in_ap3_average_data_parameter10(self):
+        'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
+        df_input = df_real_columns.loc[:,[
+                                         'Acceleration(X)[g]',
+                                         'Acceleration(Y)[g]',
+                                         'Acceleration(Z)[g]',
+                                         'AngularRate(X)[dps]',
+                                         'AngularRate(Y)[dps]',
+                                         'AngularRate(Z)[dps]'
+                                        ]]
+        df_averaged = ap3.average_data(
+                            input_acc_ang_df =
+                                    df_input.loc[:, [
+                                        'Acceleration(X)[g]',
+                                        'Acceleration(Y)[g]',
+                                        'Acceleration(Z)[g]',
+                                        #"AngularRate(X)[dps]",
+                                        #"AngularRate(Y)[dps]",
+                                        #"AngularRate(Z)[dps]",
+                                        ]],
+                            input_mean_range = 1,
+                            input_how = 'fixed_mean'
+                    )
         ndarray_test = ap3.hmm_learn_data(df_averaged)
         print(ndarray_test)
         self.assertIsInstance(ndarray_test, np.ndarray)
