@@ -92,6 +92,8 @@ def main():
     # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
     # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
     ndarray_predicted = hmm_learn_data(df_averaged)
+    '4. プロット'
+    df_averaged.plot()
 
 
 if __name__ == '__main__':
