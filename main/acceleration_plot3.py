@@ -8,6 +8,7 @@ import test_acceleration_plot3 as tap3
 import config
 #import hmmlearn
 from hmmlearn import hmm
+from sklearn.decomposition import PCA
 
 
 def read_csv_(input_path_to_csv):
@@ -89,6 +90,23 @@ def main():
                         input_mean_range = 1, # 引数2:平均値を計算する際の、要素数
                         input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
                 )
+    '主成分分析を実行する'
+    # 行列の標準化(各列に対して、平均値を引いたものを標準偏差で割る)
+    df_averaged_std = df_averaged.iloc[:, 1:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
+    # 主成分分析の実行
+    pca = PCA()
+    pca.fit(df_averaged_std)
+    # データを主成分空間に写像
+    ndarray_feature = pca.transform(df_averaged_std)
+    # 主成分得点
+    pd.DataFrame(ndarray_feature, columns=["PC{}".format(x+1) for x in range(len(df_averaged_std.columns))])
+    # 第１主成分と第２主成分でプロット
+    plt.figure(figsize=(6, 6))
+    plt.scatter(ndarray_feature[:, 0], ndarray_feature[:, 1], alpha=0.8, c=list(df_averaged_std.iloc[:, 0]))
+    plt.grid()
+    plt.xlabel("PC1")
+    plt.ylabel("PC2")
+    #plt.show()
     '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
     # FIXME2021/6/25: バグ発生の条件２つ
     # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
