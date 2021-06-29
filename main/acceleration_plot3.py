@@ -1,6 +1,7 @@
 import os
 import sys
 import pandas as pd
+import matplotlib.pyplot as plt
 sys.path.append('../tests')
 import test_acceleration_plot3 as tap3
 import config
@@ -94,6 +95,7 @@ def main():
     ndarray_predicted = hmm_learn_data(df_averaged)
     '4. プロット'
     df_averaged.plot()
+    plt.show()
 
 
 if __name__ == '__main__':
