@@ -92,6 +92,49 @@ def hmm_learn_data(input_averaged_df):
     return model.predict(input_averaged_df)
 
 
+def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
+    '4. プロット'
+    #4-1. pd.DataFrame.plotを用いて、プロットする場合
+    if input_how == 'pd':
+        input_df_averaged.plot(
+                x = 'Acceleration(X)[g]',
+                #x = 'Acceleration(Y)[g]',
+                #x = 'Acceleration(Z)[g]',
+                #x = 'AngularRate(X)[dps]',
+                #X = 'AngularRate(Y)[dps]',
+                #x = 'AngularRate(Z)[dps]',
+                #y = 'Acceleration(X)[g]',
+                y = 'Acceleration(Y)[g]',
+                #y = 'Acceleration(Z)[g]',
+                #y = 'AngularRate(X)[dps]',
+                #X = 'AngularRate(Y)[dps]',
+                #y = 'AngularRate(Z)[dps]',
+                kind = 'scatter',
+                #c = 'r',
+                c = input_ndarray_predicted,
+                cmap = 'rainbow'
+               )
+    #4-2. seaborn.pairplotを用いて、プロットする場合
+    elif input_how == 'sns':
+        ser_state = pd.Series(
+                input_ndarray_predicted,
+                name = 'state',
+            )
+        df_averaged_state = pd.concat(
+                [input_df_averaged, ser_state],
+                axis = 1,
+            )
+        sns.pairplot(
+                df_averaged_state,
+                diag_kind = 'kde',
+                plot_kws = {'alpha': 0.2},
+                hue = 'state',
+                palette = 'rainbow',
+            )
+    else:
+        raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
+
+
 def main():
     '1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す'
     df_read = read_csv_(config.data_read_by_api)
@@ -117,43 +160,17 @@ def main():
     # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
     ndarray_predicted = hmm_learn_data(df_averaged)
     '4. プロット'
-    '4-1. pd.DataFrame.plotを用いて、プロットする場合'
-    #df_averaged.plot(
-    #        x = 'Acceleration(X)[g]',
-    #        #x = 'Acceleration(Y)[g]',
-    #        #x = 'Acceleration(Z)[g]',
-    #        #x = 'AngularRate(X)[dps]',
-    #        #X = 'AngularRate(Y)[dps]',
-    #        #x = 'AngularRate(Z)[dps]',
-    #        #y = 'Acceleration(X)[g]',
-    #        y = 'Acceleration(Y)[g]',
-    #        #y = 'Acceleration(Z)[g]',
-    #        #y = 'AngularRate(X)[dps]',
-    #        #X = 'AngularRate(Y)[dps]',
-    #        #y = 'AngularRate(Z)[dps]',
-    #        kind = 'scatter',
-    #        #c = 'r',
-    #        c = ndarray_predicted,
-    #        cmap = 'rainbow'
-    #       )
-    '4-2. seaborn.pairplotを用いて、プロットする場合'
-    ser_state = pd.Series(
-            ndarray_predicted,
-            name = 'state',
-            )
-    df_averaged_state = pd.concat(
-            [df_averaged, ser_state],
-            axis = 1,
-            )
-    sns.pairplot(
-            df_averaged_state,
-            diag_kind = 'kde',
-            plot_kws = {'alpha': 0.2},
-            hue = 'state',
-            palette = 'rainbow',
-            )
-    plt.show()  # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
-
+    # 4-1. pd.DataFrame.plotを用いて、プロットする場合: input_how="pd"
+    # 4-2. seaborn.pairplotを用いて、プロットする場合: input_how="sns"
+    plot_data(
+            input_df_averaged = df_averaged,
+            input_ndarray_predicted = ndarray_predicted,
+            input_how = 'sns',
+        )
+    'プロットの可視化'
+    # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
+    # [関連]: data_decompose, plot_data
+    plt.show()
 
 if __name__ == '__main__':
     main()
