@@ -95,30 +95,42 @@ def main():
     # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
     ndarray_predicted = hmm_learn_data(df_averaged)
     '4. プロット'
-    df_averaged.plot(
-            x = 'Acceleration(X)[g]',
-            #x = 'Acceleration(Y)[g]',
-            #x = 'Acceleration(Z)[g]',
-            #x = 'AngularRate(X)[dps]',
-            #X = 'AngularRate(Y)[dps]',
-            #x = 'AngularRate(Z)[dps]',
-            #y = 'Acceleration(X)[g]',
-            y = 'Acceleration(Y)[g]',
-            #y = 'Acceleration(Z)[g]',
-            #y = 'AngularRate(X)[dps]',
-            #X = 'AngularRate(Y)[dps]',
-            #y = 'AngularRate(Z)[dps]',
-            kind = 'scatter',
-            #c = 'r',
-            c = ndarray_predicted,
-            cmap = 'rainbow'
-           )
-    #sns.pairplot(
-    #        df_averaged,
-    #        diag_kind = 'kde',
-    #        plot_kws = {'alpha': 0.2}
-    #        )
-    plt.show()
+    '4-1. pd.DataFrame.plotを用いて、プロットする場合'
+    #df_averaged.plot(
+    #        x = 'Acceleration(X)[g]',
+    #        #x = 'Acceleration(Y)[g]',
+    #        #x = 'Acceleration(Z)[g]',
+    #        #x = 'AngularRate(X)[dps]',
+    #        #X = 'AngularRate(Y)[dps]',
+    #        #x = 'AngularRate(Z)[dps]',
+    #        #y = 'Acceleration(X)[g]',
+    #        y = 'Acceleration(Y)[g]',
+    #        #y = 'Acceleration(Z)[g]',
+    #        #y = 'AngularRate(X)[dps]',
+    #        #X = 'AngularRate(Y)[dps]',
+    #        #y = 'AngularRate(Z)[dps]',
+    #        kind = 'scatter',
+    #        #c = 'r',
+    #        c = ndarray_predicted,
+    #        cmap = 'rainbow'
+    #       )
+    '4-2. seaborn.pairplotを用いて、プロットする場合'
+    ser_state = pd.Series(
+            ndarray_predicted,
+            name = 'state',
+            )
+    df_averaged_state = pd.concat(
+            [df_averaged, ser_state],
+            axis = 1,
+            )
+    sns.pairplot(
+            df_averaged_state,
+            diag_kind = 'kde',
+            plot_kws = {'alpha': 0.2},
+            hue = 'state',
+            palette = 'rainbow',
+            )
+    plt.show()  # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
 
 
 if __name__ == '__main__':
