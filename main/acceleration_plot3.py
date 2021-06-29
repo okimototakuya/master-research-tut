@@ -94,7 +94,21 @@ def main():
     # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
     ndarray_predicted = hmm_learn_data(df_averaged)
     '4. プロット'
-    df_averaged.plot()
+    df_averaged.plot(
+            x = 'Acceleration(X)[g]',
+            #x = 'Acceleration(Y)[g]',
+            #x = 'Acceleration(Z)[g]',
+            #x = 'AngularRate(X)[dps]',
+            #X = 'AngularRate(Y)[dps]',
+            #x = 'AngularRate(Z)[dps]',
+            #y = 'Acceleration(X)[g]',
+            y = 'Acceleration(Y)[g]',
+            #y = 'Acceleration(Z)[g]',
+            #y = 'AngularRate(X)[dps]',
+            #X = 'AngularRate(Y)[dps]',
+            #y = 'AngularRate(Z)[dps]',
+            kind = 'scatter',
+            )
     plt.show()
 
 
