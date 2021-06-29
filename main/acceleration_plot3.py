@@ -58,6 +58,25 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
 
+def data_decompose(input_averaged_df):
+    '主成分分析を実行する'
+    # 行列の標準化(各列に対して、平均値を引いたものを標準偏差で割る)
+    df_averaged_std = input_averaged_df.iloc[:, 1:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
+    # 主成分分析の実行
+    pca = PCA()
+    pca.fit(df_averaged_std)
+    # データを主成分空間に写像
+    ndarray_feature = pca.transform(df_averaged_std)
+    # 主成分得点
+    pd.DataFrame(ndarray_feature, columns=["PC{}".format(x+1) for x in range(len(df_averaged_std.columns))])
+    # 第１主成分と第２主成分でプロット
+    plt.figure(figsize=(6, 6))
+    plt.scatter(ndarray_feature[:, 0], ndarray_feature[:, 1], alpha=0.8, c=list(df_averaged_std.iloc[:, 0]))
+    plt.grid()
+    plt.xlabel("PC1")
+    plt.ylabel("PC2")
+
+
 def hmm_learn_data(input_averaged_df):
     '隠れマルコフモデルを仮定し、pd.DataFrame型引数の訓練及び状態推定を行う関数'
     #model = hmmlearn.hmm.GaussianHMM(n_components=3, covariance_type="full")    # 隠れマルコフモデルの仮定
@@ -91,22 +110,7 @@ def main():
                         input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
                 )
     '主成分分析を実行する'
-    # 行列の標準化(各列に対して、平均値を引いたものを標準偏差で割る)
-    df_averaged_std = df_averaged.iloc[:, 1:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
-    # 主成分分析の実行
-    pca = PCA()
-    pca.fit(df_averaged_std)
-    # データを主成分空間に写像
-    ndarray_feature = pca.transform(df_averaged_std)
-    # 主成分得点
-    pd.DataFrame(ndarray_feature, columns=["PC{}".format(x+1) for x in range(len(df_averaged_std.columns))])
-    # 第１主成分と第２主成分でプロット
-    plt.figure(figsize=(6, 6))
-    plt.scatter(ndarray_feature[:, 0], ndarray_feature[:, 1], alpha=0.8, c=list(df_averaged_std.iloc[:, 0]))
-    plt.grid()
-    plt.xlabel("PC1")
-    plt.ylabel("PC2")
-    #plt.show()
+    data_decompose(df_averaged)
     '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
     # FIXME2021/6/25: バグ発生の条件２つ
     # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
