@@ -111,6 +111,7 @@ def main():
             kind = 'scatter',
             #c = 'r',
             c = ndarray_predicted,
+            cmap = 'rainbow'
            )
     #sns.pairplot(
     #        df_averaged,
