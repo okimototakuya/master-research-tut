@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 sys.path.append('../tests')
 import test_acceleration_plot3 as tap3
 import config
@@ -81,9 +82,9 @@ def main():
                                    'Acceleration(X)[g]',   # 列(特徴量)の指定
                                    'Acceleration(Y)[g]',
                                    'Acceleration(Z)[g]',
-                                   #"AngularRate(X)[dps]",
-                                   #"AngularRate(Y)[dps]",
-                                   #"AngularRate(Z)[dps]",
+                                   "AngularRate(X)[dps]",
+                                   "AngularRate(Y)[dps]",
+                                   "AngularRate(Z)[dps]",
                                    ]],
                         input_mean_range = 1, # 引数2:平均値を計算する際の、要素数
                         input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
@@ -94,20 +95,25 @@ def main():
     # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
     ndarray_predicted = hmm_learn_data(df_averaged)
     '4. プロット'
-    df_averaged.plot(
-            x = 'Acceleration(X)[g]',
-            #x = 'Acceleration(Y)[g]',
-            #x = 'Acceleration(Z)[g]',
-            #x = 'AngularRate(X)[dps]',
-            #X = 'AngularRate(Y)[dps]',
-            #x = 'AngularRate(Z)[dps]',
-            #y = 'Acceleration(X)[g]',
-            y = 'Acceleration(Y)[g]',
-            #y = 'Acceleration(Z)[g]',
-            #y = 'AngularRate(X)[dps]',
-            #X = 'AngularRate(Y)[dps]',
-            #y = 'AngularRate(Z)[dps]',
-            kind = 'scatter',
+    #df_averaged.plot(
+    #        x = 'Acceleration(X)[g]',
+    #        #x = 'Acceleration(Y)[g]',
+    #        #x = 'Acceleration(Z)[g]',
+    #        #x = 'AngularRate(X)[dps]',
+    #        #X = 'AngularRate(Y)[dps]',
+    #        #x = 'AngularRate(Z)[dps]',
+    #        #y = 'Acceleration(X)[g]',
+    #        y = 'Acceleration(Y)[g]',
+    #        #y = 'Acceleration(Z)[g]',
+    #        #y = 'AngularRate(X)[dps]',
+    #        #X = 'AngularRate(Y)[dps]',
+    #        #y = 'AngularRate(Z)[dps]',
+    #        kind = 'scatter',
+    #       )
+    sns.pairplot(
+            df_averaged,
+            diag_kind = 'kde',
+            plot_kws = {'alpha': 0.2}
             )
     plt.show()
 
