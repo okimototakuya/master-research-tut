@@ -8,7 +8,11 @@ import pandas as pd
 class TestApi(unittest.TestCase):
 
     def setUp(self):
-        pass
+        if glob.glob('./test_plot/*'):
+            print('test_plotディレクトリ下に、ファイルが存在します.')
+        else:
+            print('ファイルは存在しません.')
+        print(os.path.isfile('test_plot/*'))
 
     def tearDown(self):
         pass
@@ -26,15 +30,5 @@ class TestApi(unittest.TestCase):
         self.assertTrue(glob.glob('./test_plot_api'))
 
 
-def main():
-    if glob.glob('./test_plot/*'):
-        print('test_plotディレクトリ下に、ファイルが存在します.')
-    else:
-        print('ファイルは存在しません.')
-
-    #print(os.path.isfile('./test_plot/*'))
-    print(os.path.isfile('test_plot/*'))
-
 if __name__ == '__main__':
-    #main()
     unittest.main()
