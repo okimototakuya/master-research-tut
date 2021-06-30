@@ -9,6 +9,7 @@ import config
 #import hmmlearn
 from hmmlearn import hmm
 from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
 
 
 def read_csv_(input_path_to_csv):
@@ -58,10 +59,10 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
 
-def data_decompose(input_averaged_df):
+def decompose_data(input_df_averaged):
     '主成分分析を実行する'
     # 行列の標準化(各列に対して、平均値を引いたものを標準偏差で割る)
-    df_averaged_std = input_averaged_df.iloc[:, 1:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
+    df_averaged_std = input_df_averaged.iloc[:, 1:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
     # 主成分分析の実行
     pca = PCA()
     pca.fit(df_averaged_std)
@@ -77,19 +78,26 @@ def data_decompose(input_averaged_df):
     plt.ylabel("PC2")
 
 
-def hmm_learn_data(input_averaged_df):
+def estimate_state_data(input_df_averaged, input_how):
     '隠れマルコフモデルを仮定し、pd.DataFrame型引数の訓練及び状態推定を行う関数'
-    #model = hmmlearn.hmm.GaussianHMM(n_components=3, covariance_type="full")    # 隠れマルコフモデルの仮定
-    model = hmm.GaussianHMM(n_components=3, covariance_type="full")    # 隠れマルコフモデルの仮定
-    model.fit(input_averaged_df)    # 隠れマルコフモデルにより、引数のデータを訓練
-    #np.set_printoptions(threshold=np.inf)  # 配列の要素を全て表示(状態系列)
-    #print("初期確率\n", model.startprob_)
-    #print("平均値\n", model.means_)
-    #print("共分散値\n", model.covars_)
-    #print("遷移確率\n", model.transmat_)
-    #print("対数尤度\n", model.score(input_averaged_df))
-    #print("状態系列の復号\n", model.predict(input_averaged_df))
-    return model.predict(input_averaged_df)
+    if input_how == 'clustering':
+        model = KMeans(n_clusters = 3)   # クラスタリング(混合ガウス分布)の仮定
+        model.fit(input_df_averaged)    # クラスタリングにより、引数のデータを訓練
+        return model.labels_
+    elif input_how == 'hmm':
+        #model = hmmlearn.hmm.GaussianHMM(n_components=3, covariance_type="full")    # 隠れマルコフモデルの仮定
+        model = hmm.GaussianHMM(n_components=3, covariance_type="full")    # 隠れマルコフモデルの仮定
+        model.fit(input_df_averaged)    # 隠れマルコフモデルにより、引数のデータを訓練
+        #np.set_printoptions(threshold=np.inf)  # 配列の要素を全て表示(状態系列)
+        #print("初期確率\n", model.startprob_)
+        #print("平均値\n", model.means_)
+        #print("共分散値\n", model.covars_)
+        #print("遷移確率\n", model.transmat_)
+        #print("対数尤度\n", model.score(input_df_averaged))
+        #print("状態系列の復号\n", model.predict(input_df_averaged))
+        return model.predict(input_df_averaged)
+    else:
+        raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
 
 def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
@@ -153,12 +161,15 @@ def main():
                         input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
                 )
     '主成分分析を実行する'
-    data_decompose(df_averaged)
+    decompose_data(df_averaged)
     '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
     # FIXME2021/6/25: バグ発生の条件２つ
     # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
     # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
-    ndarray_predicted = hmm_learn_data(df_averaged)
+    ndarray_predicted = estimate_state_data(
+                            input_df_averaged = df_averaged,
+                            input_how = 'clustering',
+                        )
     '4. プロット'
     # 4-1. pd.DataFrame.plotを用いて、プロットする場合: input_how="pd"
     # 4-2. seaborn.pairplotを用いて、プロットする場合: input_how="sns"
@@ -169,7 +180,7 @@ def main():
         )
     'プロットの可視化'
     # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
-    # [関連]: data_decompose, plot_data
+    # [関連]: decompose_data, plot_data
     plt.show()
 
 if __name__ == '__main__':
