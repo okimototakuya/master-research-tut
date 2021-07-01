@@ -8,35 +8,16 @@ import pandas as pd
 ## HACK
 ## 方法1.python公式ドキュメント(https://docs.python.org/ja/3/faq/programming.html):グローバル変数モジュールのグローバル変数はカプセル化せず、剥き出し.
 ## 方法2.実践Python3:シングルトンデザインパターンでは、変数をプライベート化し、変数を取得するメソッドをパブリック化.
-' 加速度データファイル(csv)のパス'
-#data_read_by_api = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
-#data_read_by_api = "../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
-data_read_by_api = "../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
-#data_read_by_api = "../dataset/labeledEditedLOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19(交差点ラベル付)
-
-' 時系列/加速度2次元プロット画像ファイルの保存先'
-#save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
-save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge/"
-#save_graph_to_path = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
-#save_graph_to_path = "/Users/okimototakuya/Desktop/tmp/"
-
 ' 1つのグラフにおけるプロット数'
 #plot_amount_in_graph = 10000
 plot_amount_in_graph = 131663
 
 
 def main():
-    print("pred_by_prob_model:", pred_by_prob_model)
-    print("data_read_by_api:", data_read_by_api)
-    print("features_selected_manually:", features_selected_manually)
-    print("save_graph_to_path:", save_graph_to_path)
     print("plot_amount_in_graph:", plot_amount_in_graph)
-    print("data_sampled_first:", data_sampled_first)
-    print("data_sampled_last:", data_sampled_last)
-    print("data_sampled_by_func:", data_sampled_by_func)
-
     #pprint(globals())
     #pprint(OrderedDict(globals()))
+
 
 if __name__ == '__main__':
     main()

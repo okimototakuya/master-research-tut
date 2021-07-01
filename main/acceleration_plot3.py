@@ -12,6 +12,20 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
 
+' 加速度データファイル(csv)のパス'
+#PATH_CSV_ACCELERATION_DATA = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
+#PATH_CSV_ACCELERATION_DATA = "../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
+PATH_CSV_ACCELERATION_DATA = "../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
+#PATH_CSV_ACCELERATION_DATA = "../dataset/labeledEditedLOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19(交差点ラベル付)
+
+
+' 時系列/加速度2次元プロット画像ファイルの保存先'
+#PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
+PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge/"
+#PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
+#PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/tmp/"
+
+
 def read_csv_(input_path_to_csv):
     'csvファイル(加速度データ)を読み込み、pd.DataFrame型変数を返す関数  \
      引数1:csvファイルの相対パス'
@@ -145,7 +159,7 @@ def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
 
 def main():
     '1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す'
-    df_read = read_csv_(config.data_read_by_api)
+    df_read = read_csv_(PATH_CSV_ACCELERATION_DATA)
     '2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)'
     df_averaged = average_data(
                         input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
