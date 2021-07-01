@@ -12,6 +12,11 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
 
+' 2021/7/1:HACK1: Pythonにおけるグローバル変数の取り扱いについて'
+' 方法1.python公式ドキュメント(https://docs.python.org/ja/3/faq/programming.html):グローバル変数モジュールのグローバル変数はカプセル化せず、剥き出し.'
+' 方法2.実践Python3:シングルトンデザインパターンでは、変数をプライベート化し、変数を取得するメソッドをパブリック化.'
+' 2021/7/1:HACK2: PLOT_AMOUNT_IN_GRAPHの必要性について。一応config.pyから移動させてけども。'
+
 ' 加速度データファイル(csv)のパス'
 #PATH_CSV_ACCELERATION_DATA = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
 #PATH_CSV_ACCELERATION_DATA = "../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
@@ -24,6 +29,11 @@ PATH_CSV_ACCELERATION_DATA = "../dataset/labeledEditedLOG_20181219141837_0001053
 PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge/"
 #PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
 #PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/tmp/"
+
+
+#' 1つのグラフにおけるプロット数'
+##PLOT_AMOUNT_IN_GRAPH = 10000
+#PLOT_AMOUNT_IN_GRAPH = 131663
 
 
 def read_csv_(input_path_to_csv):
