@@ -37,44 +37,6 @@ def print_dataframe(func):
 
 
 ##################################################################
-##########テストに用いる諸関数####################################
-##################################################################
-def make_allone_dataframe(**kwargs):
-    '行数と列数を引数にとり、データフレーム型オブジェクト(要素は全て１)を返す'
-    df = pd.DataFrame(
-            np.reshape(np.ones(kwargs['row']*kwargs['columns']),
-                       (kwargs['row'], kwargs['columns'])
-                      ),
-            )
-    #print(df)
-    return df
-
-
-def make_arange_dataframe(**kwargs):
-    '行数と列数を引数にとり、データフレーム型オブジェクト(要素は全て１)を返す'
-    df = pd.DataFrame(
-            np.reshape(
-                      np.arange(kwargs['row']*kwargs['columns']),
-                      (kwargs['row'], kwargs['columns'])
-                      ),
-            )
-    #print(df)
-    return df
-
-
-def make_random_dataframe(**kwargs):
-    '行数と列数を引数にとり、データフレーム型オブジェクト(要素は全て１)を返す'
-    df = pd.DataFrame(
-            np.reshape(
-                      np.random.rand(kwargs['row']*kwargs['columns']),
-                      (kwargs['row'], kwargs['columns'])
-                      ),
-            )
-    #print(df)
-    return df
-
-
-##################################################################
 ##########テストクラス############################################
 ##################################################################
 class TestConfig(unittest.TestCase):
