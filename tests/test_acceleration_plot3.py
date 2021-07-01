@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 sys.path.append('../main')
 import acceleration_plot3 as ap3
-import config
 
 
 AMOUNT_OF_ROW = 30  # テストcsvファイルの列数
@@ -177,7 +176,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         → インデックスオブジェクトの要素をランダムに抽出し、アサーション'
         self.assertIsInstance(df_test.index[np.random.randint(len(df_test))], int)
 
-    def _test_average_data_mean_range_1(self):
+    def test_average_data_mean_range_1(self):
         'main/ap3/average_data関数の引数について、input_mean_range=1を指定した場合、元のDataFrame型変数と値が変わらないかでテスト\
         →ナイーブなやり方は、if input_mean_range=1: return input_df'
         '注1. 平均値を計算するにあたって, int型の要素はfloat型に変換される.'
@@ -402,7 +401,7 @@ class TestAccelerationPlot3(unittest.TestCase):
 
     def test_hmm_learn_data_in_ap3_average_data_parameter11(self):
         'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
-        df_input_read_by_function_in_product_code = ap3.read_csv_(config.data_read_by_api)
+        df_input_read_by_function_in_product_code = ap3.read_csv_(ap3.PATH_CSV_ACCELERATION_DATA)
         df_input_naive = df_real_columns.loc[:,[
                                          'Acceleration(X)[g]',
                                          'Acceleration(Y)[g]',
@@ -449,7 +448,7 @@ class TestAccelerationPlot3(unittest.TestCase):
 
     def _test_hmm_learn_data_in_ap3_average_data_parameter12(self):
         'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
-        df_input_read_by_function_in_product_code = ap3.read_csv_(config.data_read_by_api)
+        df_input_read_by_function_in_product_code = ap3.read_csv_(ap3.PATH_CSV_ACCELERATION_DATA)
         print(df_input_read_by_function_in_product_code)
         df_averaged = ap3.average_data(
                             input_acc_ang_df =
