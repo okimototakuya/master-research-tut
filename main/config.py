@@ -17,27 +17,6 @@ pred_by_prob_model = None
 data_read_by_api = "../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
 #data_read_by_api = "../dataset/labeledEditedLOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19(交差点ラベル付)
 
-'グラフ描画に用いる特徴量(時系列/加速度2次元)'
-features_selected_manually = [
-    'time'
-    'Acceleration(X)[g]',
-    'Acceleration(Y)[g]',
-    'Acceleration(Z)[g]',
-    #'AngularRate(X)[dps]',
-    #'AngularRate(Y)[dps]',
-    #'AngularRate(Z)[dps]',
-    ]
-
-'PCA分析にかける特徴量'
-features_analyzed_by_pca = [
-    'Acceleration(X)[g]',
-    'Acceleration(Y)[g]',
-    'Acceleration(Z)[g]',
-    #'AngularRate(X)[dps]',
-    #'AngularRate(Y)[dps]',
-    #'AngularRate(Z)[dps]',
-    ]
-
 ' 時系列/加速度2次元プロット画像ファイルの保存先'
 #save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
 save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge/"
