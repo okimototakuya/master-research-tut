@@ -58,27 +58,6 @@ data_sampled_last = 80000
 ' 加工した加速度データファイルを格納するDataFrame型変数'
 data_sampled_by_func = None
 
-'平均値をとる要素数'
-mean_range = 1
-
-
-##HACK:反例ありそう→データフレームの大きさと平均値幅のすり合わせ、例外処理
-def aveData(input_dataframe):
-    '加速度の平均値をとり、DataFrame型変数にして返す'
-    # 加速度の平均値を格納するためのDataFrame型変数
-    try:
-        ave_dataframe = pd.DataFrame(index=[], columns=list(input_dataframe.columns))
-        for i in range(int(len(input_dataframe)/mean_range)):
-            #ave_dataframe = ave_dataframe.append(input_dataframe.iloc[i*mean_range:i*mean_range+mean_range, :].mean(), ignore_index=True)
-            ave_dataframe = ave_dataframe.append(input_dataframe.iloc[i*mean_range:i*mean_range+mean_range, :].describe().loc['mean'], ignore_index=True)
-    except ZeroDivisionError as err:
-        print('平均値をとる要素数(mean_range)が０です.')
-        sys.exit()
-    except Exception as other:
-        print('原因不明のエラーです.')
-        sys.exit()
-    return ave_dataframe
-
 
 def main():
     print("pred_by_prob_model:", pred_by_prob_model)
