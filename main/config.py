@@ -27,16 +27,6 @@ save_graph_to_path = "/Users/okimototakuya/Desktop/研究データ/サンフ�
 #plot_amount_in_graph = 10000
 plot_amount_in_graph = 131663
 
-#' 加速度データファイルで、隠れマルコフモデルを適用させる範囲:始まり'
-'加速度データファイル(csv)を抽出する範囲(first-last:リーダブルコードの包含関係をsedの挙動から確認済)'
-data_sampled_first = 70000
-
-' ":終わり'
-data_sampled_last = 80000
-
-' 加工した加速度データファイルを格納するDataFrame型変数'
-data_sampled_by_func = None
-
 
 def main():
     print("pred_by_prob_model:", pred_by_prob_model)
