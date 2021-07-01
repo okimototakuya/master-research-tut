@@ -8,9 +8,6 @@ import pandas as pd
 ## HACK
 ## 方法1.python公式ドキュメント(https://docs.python.org/ja/3/faq/programming.html):グローバル変数モジュールのグローバル変数はカプセル化せず、剥き出し.
 ## 方法2.実践Python3:シングルトンデザインパターンでは、変数をプライベート化し、変数を取得するメソッドをパブリック化.
-' 確率モデルによる予測値'
-pred_by_prob_model = None
-
 ' 加速度データファイル(csv)のパス'
 #data_read_by_api = "../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
 #data_read_by_api = "../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
