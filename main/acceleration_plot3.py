@@ -22,25 +22,28 @@ from sklearn.cluster import KMeans
 PATH_CSV_ACCELERATION_DATA = "../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
 #PATH_CSV_ACCELERATION_DATA = "../dataset/labeledEditedLOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19(交差点ラベル付)
 
-
 ' 時系列/加速度2次元プロット画像ファイルの保存先'
 #PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
 PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge/"
 #PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
 #PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/tmp/"
 
-
 'csvファイルを読み取る際の、切り出し区間'
-DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値TEST_DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-DATA_SAMPLED_LAST = 3 # 切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
+DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
+DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
 
-'確率モデルを用いる際の、仮定する状態数(クラスタ数)'
-NUMBER_OF_ASSUMED_STATE = 3
+'平均値計算の設定: 関数average_data'
+MEAN_RANGE = 1  # 平均値を計算する際の、要素数
+HOW_TO_CALCULATE_MEAN = 'fixed_mean'    # 平均値の算出方法 ('fixed_mean': 固定(?)平均, 'slide_mean': 移動平均, 'slide_median': 移動中央値)
 
+'確率モデルの設定: 関数estimate_state_data'
+ASSUMED_PROBABILISTIC_MODEL = 'hmm' # 仮定する確率モデル (クラスタリング: 'clustering', 隠れマルコフモデル: 'hmm')
+NUMBER_OF_ASSUMED_STATE = 3 # 仮定する状態数(クラスタ数)
 
-#' 1つのグラフにおけるプロット数'
-##PLOT_AMOUNT_IN_GRAPH = 10000
+'プロットの設定: 関数plot_data'
+#PLOT_AMOUNT_IN_GRAPH = 10000   # 1つのグラフにおけるプロット数
 #PLOT_AMOUNT_IN_GRAPH = 131663
+HOW_TO_PLOT = 'sns' # プロットに用いるライブラリ (pd.DataFrame.plot: 'pd', seaborn.pairplot: 'sns')
 
 
 def read_csv_(input_path_to_csv):
@@ -105,7 +108,7 @@ def decompose_data(input_df_averaged):
     plt.ylabel("PC2")
 
 
-def estimate_state_data(input_df_averaged, input_number_of_assumed_state, input_how):
+def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_state):
     '隠れマルコフモデルを仮定し、pd.DataFrame型引数の訓練及び状態推定を行う関数'
     if input_how == 'clustering':
         model = KMeans(n_clusters = input_number_of_assumed_state)   # クラスタリング(混合ガウス分布)の仮定
@@ -187,13 +190,13 @@ def main():
                                        "AngularRate(Y)[dps]",
                                        "AngularRate(Z)[dps]",
                                        ]],
-                            input_mean_range = 1, # 引数2:平均値を計算する際の、要素数
-                            input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
+                            input_mean_range = MEAN_RANGE, # 引数2:平均値を計算する際の、要素数
+                            input_how = HOW_TO_CALCULATE_MEAN,   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値
                     )
         '主成分分析を実行する'
         # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
         # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
-        #decompose_data(df_averaged)
+        decompose_data(df_averaged)
         '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
         # FIXME2021/6/25: バグ発生の条件２つ
         # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
@@ -204,8 +207,8 @@ def main():
         else:
             ndarray_predicted = estimate_state_data(
                                     input_df_averaged = df_averaged,
+                                    input_how = ASSUMED_PROBABILISTIC_MODEL,
                                     input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
-                                    input_how = 'clustering',
                                 )
         '4. プロット'
         # 4-1. pd.DataFrame.plotを用いて、プロットする場合: input_how="pd"
@@ -213,7 +216,7 @@ def main():
         plot_data(
                 input_df_averaged = df_averaged,
                 input_ndarray_predicted = ndarray_predicted,
-                input_how = 'sns',
+                input_how = HOW_TO_PLOT,
             )
         'プロットの可視化'
         # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
