@@ -32,7 +32,7 @@ PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンフ�
 
 'csvファイルを読み取る際の、切り出し区間'
 DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値TEST_DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
+DATA_SAMPLED_LAST = 3 # 切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
 
 '確率モデルを用いる際の、仮定する状態数(クラスタ数)'
 NUMBER_OF_ASSUMED_STATE = 3
@@ -193,16 +193,20 @@ def main():
         '主成分分析を実行する'
         # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
         # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
-        decompose_data(df_averaged)
+        #decompose_data(df_averaged)
         '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
         # FIXME2021/6/25: バグ発生の条件２つ
         # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
         # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
-        ndarray_predicted = estimate_state_data(
-                                input_df_averaged = df_averaged,
-                                input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
-                                input_how = 'clustering',
-                            )
+        if NUMBER_OF_ASSUMED_STATE > (DATA_SAMPLED_LAST - DATA_SAMPLED_FIRST):
+            raise Exception('確率モデルを用いる際に仮定する状態数の値が不適切です:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})'  \
+                    .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
+        else:
+            ndarray_predicted = estimate_state_data(
+                                    input_df_averaged = df_averaged,
+                                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
+                                    input_how = 'clustering',
+                                )
         '4. プロット'
         # 4-1. pd.DataFrame.plotを用いて、プロットする場合: input_how="pd"
         # 4-2. seaborn.pairplotを用いて、プロットする場合: input_how="sns"
