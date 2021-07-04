@@ -34,6 +34,9 @@ PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンフ�
 DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値TEST_DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
 DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
 
+'確率モデルを用いる際の、仮定する状態数(クラスタ数)'
+NUMBER_OF_ASSUMED_STATE = 3
+
 
 #' 1つのグラフにおけるプロット数'
 ##PLOT_AMOUNT_IN_GRAPH = 10000
@@ -102,15 +105,15 @@ def decompose_data(input_df_averaged):
     plt.ylabel("PC2")
 
 
-def estimate_state_data(input_df_averaged, input_how):
+def estimate_state_data(input_df_averaged, input_number_of_assumed_state, input_how):
     '隠れマルコフモデルを仮定し、pd.DataFrame型引数の訓練及び状態推定を行う関数'
     if input_how == 'clustering':
-        model = KMeans(n_clusters = 3)   # クラスタリング(混合ガウス分布)の仮定
+        model = KMeans(n_clusters = input_number_of_assumed_state)   # クラスタリング(混合ガウス分布)の仮定
         model.fit(input_df_averaged)    # クラスタリングにより、引数のデータを訓練
         return model.labels_
     elif input_how == 'hmm':
-        #model = hmmlearn.hmm.GaussianHMM(n_components=3, covariance_type="full")    # 隠れマルコフモデルの仮定
-        model = hmm.GaussianHMM(n_components=3, covariance_type="full")    # 隠れマルコフモデルの仮定
+        #model = hmmlearn.hmm.GaussianHMM(n_components=input_number_of_assumed_state, covariance_type="full")    # 隠れマルコフモデルの仮定
+        model = hmm.GaussianHMM(n_components=input_number_of_assumed_state, covariance_type="full")    # 隠れマルコフモデルの仮定
         model.fit(input_df_averaged)    # 隠れマルコフモデルにより、引数のデータを訓練
         #np.set_printoptions(threshold=np.inf)  # 配列の要素を全て表示(状態系列)
         #print("初期確率\n", model.startprob_)
@@ -170,16 +173,10 @@ def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
 def main():
     if (DATA_SAMPLED_FIRST >= DATA_SAMPLED_LAST) or (DATA_SAMPLED_FIRST < 0 or DATA_SAMPLED_LAST < 0):
         raise Exception('csvファイルの切り出し区間の指定が不適切です:{wrong_first}, {wrong_last}'.format(wrong_first=DATA_SAMPLED_FIRST, wrong_last=DATA_SAMPLED_LAST))
-    # FIXME2021/7/4: 上記の場合以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
-    # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
-    # ここでなく、main関数内で関数decompose_dataを呼び出す際に例外確認するのがいいかも。
-    #elif :
-    #    raise Exception()
     else:
         '1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す'
         df_read = read_csv_(PATH_CSV_ACCELERATION_DATA)
         '2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)'
-        #if DATA_SAMPLED_FIRST >= DATA_SAMPLED_LAST - 1
         df_averaged = average_data(
                             input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
                                     df_read.loc[:,[  # 行数(データ数)の指定
@@ -194,6 +191,8 @@ def main():
                             input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
                     )
         '主成分分析を実行する'
+        # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
+        # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
         decompose_data(df_averaged)
         '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
         # FIXME2021/6/25: バグ発生の条件２つ
@@ -201,6 +200,7 @@ def main():
         # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
         ndarray_predicted = estimate_state_data(
                                 input_df_averaged = df_averaged,
+                                input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
                                 input_how = 'clustering',
                             )
         '4. プロット'
