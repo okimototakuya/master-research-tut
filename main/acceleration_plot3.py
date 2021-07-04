@@ -31,7 +31,7 @@ PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンフ�
 
 
 'csvファイルを読み取る際の、切り出し区間'
-DATA_SAMPLED_FIRST = 0    # 切り出し始め(line値TEST_DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
+DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値TEST_DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
 DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
 
 
@@ -168,44 +168,53 @@ def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
 
 
 def main():
-    '1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す'
-    df_read = read_csv_(PATH_CSV_ACCELERATION_DATA)
-    '2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)'
-    df_averaged = average_data(
-                        input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
-                                df_read.loc[:,[  # 行数(データ数)の指定
-                                   'Acceleration(X)[g]',   # 列(特徴量)の指定
-                                   'Acceleration(Y)[g]',
-                                   'Acceleration(Z)[g]',
-                                   "AngularRate(X)[dps]",
-                                   "AngularRate(Y)[dps]",
-                                   "AngularRate(Z)[dps]",
-                                   ]],
-                        input_mean_range = 1, # 引数2:平均値を計算する際の、要素数
-                        input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
-                )
-    '主成分分析を実行する'
-    decompose_data(df_averaged)
-    '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
-    # FIXME2021/6/25: バグ発生の条件２つ
-    # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
-    # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
-    ndarray_predicted = estimate_state_data(
-                            input_df_averaged = df_averaged,
-                            input_how = 'clustering',
-                        )
-    '4. プロット'
-    # 4-1. pd.DataFrame.plotを用いて、プロットする場合: input_how="pd"
-    # 4-2. seaborn.pairplotを用いて、プロットする場合: input_how="sns"
-    plot_data(
-            input_df_averaged = df_averaged,
-            input_ndarray_predicted = ndarray_predicted,
-            input_how = 'sns',
-        )
-    'プロットの可視化'
-    # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
-    # [関連]: decompose_data, plot_data
-    plt.show()
+    if (DATA_SAMPLED_FIRST >= DATA_SAMPLED_LAST) or (DATA_SAMPLED_FIRST < 0 or DATA_SAMPLED_LAST < 0):
+        raise Exception('csvファイルの切り出し区間の指定が不適切です:{wrong_first}, {wrong_last}'.format(wrong_first=DATA_SAMPLED_FIRST, wrong_last=DATA_SAMPLED_LAST))
+    # FIXME2021/7/4: 上記の場合以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
+    # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
+    # ここでなく、main関数内で関数decompose_dataを呼び出す際に例外確認するのがいいかも。
+    #elif :
+    #    raise Exception()
+    else:
+        '1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す'
+        df_read = read_csv_(PATH_CSV_ACCELERATION_DATA)
+        '2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)'
+        #if DATA_SAMPLED_FIRST >= DATA_SAMPLED_LAST - 1
+        df_averaged = average_data(
+                            input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
+                                    df_read.loc[:,[  # 行数(データ数)の指定
+                                       'Acceleration(X)[g]',   # 列(特徴量)の指定
+                                       'Acceleration(Y)[g]',
+                                       'Acceleration(Z)[g]',
+                                       "AngularRate(X)[dps]",
+                                       "AngularRate(Y)[dps]",
+                                       "AngularRate(Z)[dps]",
+                                       ]],
+                            input_mean_range = 1, # 引数2:平均値を計算する際の、要素数
+                            input_how = 'fixed_mean',   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
+                    )
+        '主成分分析を実行する'
+        decompose_data(df_averaged)
+        '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
+        # FIXME2021/6/25: バグ発生の条件２つ
+        # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
+        # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
+        ndarray_predicted = estimate_state_data(
+                                input_df_averaged = df_averaged,
+                                input_how = 'clustering',
+                            )
+        '4. プロット'
+        # 4-1. pd.DataFrame.plotを用いて、プロットする場合: input_how="pd"
+        # 4-2. seaborn.pairplotを用いて、プロットする場合: input_how="sns"
+        plot_data(
+                input_df_averaged = df_averaged,
+                input_ndarray_predicted = ndarray_predicted,
+                input_how = 'sns',
+            )
+        'プロットの可視化'
+        # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
+        # [関連]: decompose_data, plot_data
+        plt.show()
 
 if __name__ == '__main__':
     main()
