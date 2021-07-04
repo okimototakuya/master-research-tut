@@ -32,7 +32,7 @@ PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンフ�
 
 'csvファイルを読み取る際の、切り出し区間'
 DATA_SAMPLED_FIRST = 0    # 切り出し始め(line値TEST_DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-DATA_SAMPLED_LAST = 30 # 切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
+DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
 
 
 #' 1つのグラフにおけるプロット数'
@@ -47,14 +47,10 @@ def read_csv_(input_path_to_csv):
     return pd.read_csv(
             input_path_to_csv,  # 入力のcsvファイルパス
             index_col = 0,  # 列0 (列名オブジェクトがNone) をインデックスに
-            skiprows = tap3.TEST_DATA_SAMPLED_FIRST + default_num_skip_row,    \
-                    # テスト:切り出し始め(line値TEST_DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-            skipfooter = sum([1 for _ in open(input_path_to_csv)]) - (tap3.TEST_DATA_SAMPLED_LAST + default_num_skip_row),    \
-                    # テスト:切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
-            #skiprows = DATA_SAMPLED_FIRST + default_num_skip_row,    \
-            #        # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-            #skipfooter = sum([1 for _ in open(input_path_to_csv)]) - (DATA_SAMPLED_LAST + default_num_skip_row),    \
-            #        # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
+            skiprows = DATA_SAMPLED_FIRST + default_num_skip_row,    \
+                    # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
+            skipfooter = sum([1 for _ in open(input_path_to_csv)]) - (DATA_SAMPLED_LAST + default_num_skip_row),    \
+                    # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
             header = None,
             names = ['Unnamed: 0', 'line', 'time',
                 'Acceleration(X)[g]', 'Acceleration(Y)[g]', 'Acceleration(Z)[g]',

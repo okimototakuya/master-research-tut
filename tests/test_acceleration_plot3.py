@@ -11,9 +11,6 @@ import acceleration_plot3 as ap3
 
 
 AMOUNT_OF_ROW = 30  # テストcsvファイルの列数
-'csvファイルを読み取る際の、切り出し区間'
-TEST_DATA_SAMPLED_FIRST = 0    # 切り出し始め(line値TEST_DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-TEST_DATA_SAMPLED_LAST = 30 # 切り出し終わり(line値TEST_DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
 
 
 class IterAddMicrosecond():
@@ -105,9 +102,9 @@ class TestAccelerationPlot3(unittest.TestCase):
         df_real_columns.to_csv('./test_dataset/demo_sample.csv')
         '2. テストcsvファイルの一部を読込'
         df_test = ap3.read_csv_('./test_dataset/demo_sample.csv')
-        print(df_real_columns[TEST_DATA_SAMPLED_FIRST:TEST_DATA_SAMPLED_LAST:1], '\n')
+        print(df_real_columns[ap3.DATA_SAMPLED_FIRST:ap3.DATA_SAMPLED_LAST:1], '\n')
         print(df_test)
-        pd.testing.assert_frame_equal(df_test, df_real_columns[TEST_DATA_SAMPLED_FIRST:TEST_DATA_SAMPLED_LAST:1])
+        pd.testing.assert_frame_equal(df_test, df_real_columns[ap3.DATA_SAMPLED_FIRST:ap3.DATA_SAMPLED_LAST:1])
         os.remove('./test_dataset/demo_sample.csv')   # 次回のテストのためにテストcsvファイルを削除
 
     def _test_read_csv_index_type(self):
