@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-sys.path.append('../tests')
+sys.path.append('../test')
 import test_acceleration_plot3 as tap3
 #import hmmlearn
 from hmmlearn import hmm
