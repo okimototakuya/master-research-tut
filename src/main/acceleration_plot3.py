@@ -196,13 +196,27 @@ def main():
         '主成分分析を実行する'
         # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
         # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
-        decompose_data(df_averaged)
+        #decompose_data(df_averaged)
         '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
         # FIXME2021/6/25: バグ発生の条件２つ
         # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
         # 2. 切り出し区間: サンプル数 >= クラスタ数でないといけない。
-        if NUMBER_OF_ASSUMED_STATE > (DATA_SAMPLED_LAST - DATA_SAMPLED_FIRST):
+        if NUMBER_OF_ASSUMED_STATE > (DATA_SAMPLED_LAST - DATA_SAMPLED_FIRST):  # 2021/7/5 2時頃: clustering, hmm共に、全く同じ例外が投げられることを確認した。
             raise Exception('確率モデルを用いる際に仮定する状態数の値が不適切です:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})'  \
+                    .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
+        elif NUMBER_OF_ASSUMED_STATE == (DATA_SAMPLED_LAST - DATA_SAMPLED_FIRST)    \
+                and ASSUMED_PROBABILISTIC_MODEL == 'hmm':   # HMMを仮定した場合、状態数=サンプル数の時でも警告や例外が発生する。
+            # HACK2021/7/5: 今後、状態数とサンプル数、尤度関数の関係について考える機会があると思う。
+            '[例外パターン]: (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(0, 3), NUMBER_OF_ASSUMED_STATE=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [1. 0. 1.])'
+            '[警告パターン]: (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(108, 111), NUMBER_OF_ASSUMED_STATE=3の時、    \
+                Fitting a model with 89 free scalar parameters with only 18 data points will result in a degenerate solution.   \
+                /Users/okimototakuya/anaconda3/lib/python3.6/site-packages/seaborn/distributions.py:306: UserWarning: Dataset has 0 variance; skipping density estimate.    \
+                warnings.warn(msg, UserWarning) \
+                /Users/okimototakuya/anaconda3/lib/python3.6/site-packages/seaborn/distributions.py:306: UserWarning: Dataset has 0 variance; skipping density estimate.    \
+                warnings.warn(msg, UserWarning) \
+                /Users/okimototakuya/anaconda3/lib/python3.6/site-packages/seaborn/distributions.py:306: UserWarning: Dataset has 0 variance; skipping density estimate.    \
+                warnings.warn(msg, UserWarning), NUMBER_OF_ASSUMED_STATE=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [1. 0. 1.])'
+            raise Exception('HMMを仮定した場合、状態数=サンプル数の時でも警告や例外が発生します:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})' \
                     .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
         else:
             ndarray_predicted = estimate_state_data(
