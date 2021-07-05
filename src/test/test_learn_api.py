@@ -6,7 +6,7 @@ import unittest
 
 
 class IterAdd():
-
+    'テスト用のイテレータプロトコル'
     def __init__(self, input_date_time):
         self.date_time = input_date_time
 
