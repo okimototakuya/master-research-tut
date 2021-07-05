@@ -92,20 +92,26 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
 def decompose_data(input_df_averaged):
     '主成分分析を実行する'
     # 行列の標準化(各列に対して、平均値を引いたものを標準偏差で割る)
-    df_averaged_std = input_df_averaged.iloc[:, 1:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
+    df_averaged_std = input_df_averaged.iloc[:, 0:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
     # 主成分分析の実行
     pca = PCA()
     pca.fit(df_averaged_std)
     # データを主成分空間に写像
     ndarray_feature = pca.transform(df_averaged_std)
     # 主成分得点
-    pd.DataFrame(ndarray_feature, columns=["PC{}".format(x+1) for x in range(len(df_averaged_std.columns))])
-    # 第１主成分と第２主成分でプロット
-    plt.figure(figsize=(6, 6))
-    plt.scatter(ndarray_feature[:, 0], ndarray_feature[:, 1], alpha=0.8, c=list(df_averaged_std.iloc[:, 0]))
-    plt.grid()
-    plt.xlabel("PC1")
-    plt.ylabel("PC2")
+    df_pca = pd.DataFrame(ndarray_feature, columns=["PC{}".format(x+1) for x in range(len(df_averaged_std.columns))])
+    ## 第１主成分と第２主成分でプロット
+    #plt.figure(figsize=(6, 6))
+    #plt.scatter(ndarray_feature[:, 0], ndarray_feature[:, 1], alpha=0.8, c=list(df_averaged_std.iloc[:, 0]))
+    #plt.grid()
+    #plt.xlabel("PC1")
+    #plt.ylabel("PC2")
+    # 第１~６主成分まで、sns.pairplotでプロット
+    sns.pairplot(
+            df_pca,
+            diag_kind = 'kde',
+            plot_kws = {'alpha': 0.2},
+        )
 
 
 def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_state):
@@ -196,7 +202,7 @@ def main():
         '主成分分析を実行する'
         # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
         # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
-        #decompose_data(df_averaged)
+        decompose_data(df_averaged)
         '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
         # FIXME2021/6/25: バグ発生の条件２つ
         # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
