@@ -107,11 +107,12 @@ def decompose_data(input_df_averaged):
     #plt.xlabel("PC1")
     #plt.ylabel("PC2")
     # 第１~６主成分まで、sns.pairplotでプロット
-    sns.pairplot(
-            df_pca,
-            diag_kind = 'kde',
-            plot_kws = {'alpha': 0.2},
-        )
+    #sns.pairplot(
+    #        df_pca,
+    #        diag_kind = 'kde',
+    #        plot_kws = {'alpha': 0.2},
+    #    )
+    return df_pca
 
 
 def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_state):
@@ -202,7 +203,7 @@ def main():
         '主成分分析を実行する'
         # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
         # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
-        decompose_data(df_averaged)
+        df_pca = decompose_data(df_averaged)
         '3. 上記で算出したdf_averagedについて、隠れマルコフモデルを適用する'
         # FIXME2021/6/25: バグ発生の条件２つ
         # 1. 切り出し始め: サンプル数=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [0. 1. 1.])
@@ -225,8 +226,13 @@ def main():
             raise Exception('HMMを仮定した場合、状態数=サンプル数の時でも警告や例外が発生します:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})' \
                     .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
         else:
-            ndarray_predicted = estimate_state_data(
+            ndarray_predicted_original = estimate_state_data(
                                     input_df_averaged = df_averaged,
+                                    input_how = ASSUMED_PROBABILISTIC_MODEL,
+                                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
+                                )
+            ndarray_predicted_pca = estimate_state_data(
+                                    input_df_averaged = df_pca,
                                     input_how = ASSUMED_PROBABILISTIC_MODEL,
                                     input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
                                 )
@@ -235,7 +241,12 @@ def main():
         # 4-2. seaborn.pairplotを用いて、プロットする場合: input_how="sns"
         plot_data(
                 input_df_averaged = df_averaged,
-                input_ndarray_predicted = ndarray_predicted,
+                input_ndarray_predicted = ndarray_predicted_original,
+                input_how = HOW_TO_PLOT,
+            )
+        plot_data(
+                input_df_averaged = df_pca,
+                input_ndarray_predicted = ndarray_predicted_pca,
                 input_how = HOW_TO_PLOT,
             )
         'プロットの可視化'
