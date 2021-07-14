@@ -173,7 +173,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         → インデックスオブジェクトの要素をランダムに抽出し、アサーション'
         self.assertIsInstance(df_test.index[np.random.randint(len(df_test))], int)
 
-    def test_average_data_mean_range_1(self):
+    def _test_average_data_mean_range_1(self):
         'main/ap3/average_data関数の引数について、input_mean_range=1を指定した場合、元のDataFrame型変数と値が変わらないかでテスト\
         →ナイーブなやり方は、if input_mean_range=1: return input_df'
         '注1. 平均値を計算するにあたって, int型の要素はfloat型に変換される.'
@@ -396,7 +396,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         print(ndarray_test)
         self.assertIsInstance(ndarray_test, np.ndarray)
 
-    def test_hmm_learn_data_in_ap3_average_data_parameter11(self):
+    def _test_hmm_learn_data_in_ap3_average_data_parameter11(self):
         'ap3.hmm_learn_data関数の引数について、ap3.average_data関数が返したpd.DataFrame型変数で動くかどうかテスト'
         df_input_read_by_function_in_product_code = ap3.read_csv_(ap3.PATH_CSV_ACCELERATION_DATA)
         df_input_naive = df_real_columns.loc[:,[
@@ -464,6 +464,12 @@ class TestAccelerationPlot3(unittest.TestCase):
         ndarray_test = ap3.hmm_learn_data(df_averaged)
         print(ndarray_test)
         self.assertIsInstance(ndarray_test, np.ndarray)
+
+    def test_decompose_data(self):
+        'scipyによる特異値分解と、ap3.decompose_data関数による主成分分析が一致するかテスト'
+        df_pca = ap3.decompose_data(df_real_columns[['Acceleration(X)[g]', 'Acceleration(Y)[g]', 'Acceleration(Z)[g]']])
+        df_test = df_real_columns
+        pd.testing.assert_frame_equal(df_test, df_pca)
 
 
 if __name__ == '__main__':
