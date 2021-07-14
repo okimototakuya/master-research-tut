@@ -6,7 +6,9 @@ import unittest
 
 
 class IterAdd():
-    'テスト用のイテレータプロトコル'
+    '''
+    テスト用のイテレータプロトコル
+    '''
     def __init__(self, input_date_time):
         self.date_time = input_date_time
 
@@ -19,7 +21,9 @@ class IterAdd():
 class TestApi(unittest.TestCase):
 
     def setUp(self):
-        'イテレータプロトコルの簡易出力テスト'
+        '''
+        イテレータプロトコルの簡易出力テスト
+        '''
         date_time = datetime.datetime(2018, 12, 19, 14, minute=00, second=00, microsecond=0)
         iter_add = IterAdd(date_time)
         for i in iter_add:
@@ -29,15 +33,22 @@ class TestApi(unittest.TestCase):
         pass
 
     def _test_os_path_isfile(self):
-        'os.path.isfileの学習用テスト'
+        '''
+        os.path.isfileの学習用テスト
+        '''
         self.assertTrue(os.path.isfile('test_plot/*'))
 
     def _test_glob_glob(self):
-        'glob.globの学習用テスト'
-        # 書き方その１: unittestでなく、標準のassert文を利用
-        #assert glob.glob('./test_plot/*.png') is not None  # 的を得ていない書き方。Noneはシングルトンオブジェクト。
-        #assert glob.glob('./test_plot/*.png')
-        # 書き方その２: unittestのassertメソッド(assertTrue)を利用
+        '''
+        glob.globの学習用テスト
+
+        Notes
+        -----
+        書き方その１: unittestでなく、標準のassert文を利用
+        assert glob.glob('./test_plot/*.png') is not None  # 的を得ていない書き方。Noneはシングルトンオブジェクト。
+        assert glob.glob('./test_plot/*.png')
+        書き方その２: unittestのassertメソッド(assertTrue)を利用
+        '''
         self.assertTrue(glob.glob('./test_plot/*.png'))
 
 
