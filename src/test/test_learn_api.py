@@ -58,12 +58,13 @@ class TestApi(unittest.TestCase):
         '''
         scipy.fftpackの学習用テスト
         '''
-        f0_1 = 440            # 
-        f0_2 = 1320            # 
-        amplitude_1 = 1
-        amplitude_2 = 2
-        fs = 96000          # 
         N = 1000            # データ数(個)
+        f0 = [x*440 for x in range(N)]
+        #f0 = [440*np.random.randint(5) for _ in range(N)]
+        amp = [x for x in range(N)]
+        #amp = [np.random.randint(5) for _ in range(N)]
+        #amp = [1 for _ in range(N)]
+        fs = 96000          # 
         addnum = 5.0
         output_type = 'series'  # 関数create_sin_waveの出力型
         def create_sin_wave(sample, input_output_type):
@@ -77,9 +78,7 @@ class TestApi(unittest.TestCase):
             fs: 
             sample: データ数
             '''
-            wave1 = [amplitude_1 * np.sin(2.0 * np.pi * f0_1 * n / fs) for n in np.arange(sample)]
-            wave2 = [amplitude_2 * np.sin(2.0 * np.pi * f0_2 * n / fs) for n in np.arange(sample)]
-            wave = [(w1 + w2) for (w1, w2) in zip(wave1, wave2)]
+            wave = [(amp[n] * np.sin(2.0 * np.pi * f0[n] * n / fs)) for n in np.arange(sample)]
             if input_output_type == 'list':
                 return wave                 # (標準)リスト型
             elif input_output_type == 'dataframe':
