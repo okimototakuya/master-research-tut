@@ -3,6 +3,7 @@ import glob
 import numpy as np
 import datetime
 import unittest
+import pandas as pd
 import scipy.fftpack as spfft
 import matplotlib.pyplot as plt
 
@@ -65,18 +66,11 @@ class TestApi(unittest.TestCase):
             '''
             sin関数配列を、シーケンスで出力.
             '''
-            wave_table = [] # (標準)リスト型
-            for n in np.arange(sample):
-                sine = amplitude * np.sin(2.0 * np.pi * f0 * n / fs)
-                wave_table.append(sine)
-            #return wave_table   # (標準)リスト型
-            wave_table1 = wave_table
-            wave_table2 = [amplitude * np.sin(2.0 * np.pi * f0 * n / fs) for n in np.arange(sample)]
-            self.assertEqual(wave_table1, wave_table2)
-            #return [amplitude * np.sin(2.0 * np.pi * f0 * n / fs) for n in np.arange(sample)]
-            #return pd.DataFrame(    # pd.DataFrame型
-            #            [amplitude * np.sin(2.0 * np.pi * f0 * n / fs) for n in np.arange(sample)]
-            #        )
+            wave = [amplitude * np.sin(2.0 * np.pi * f0 * n / fs) for n in np.arange(sample)]
+            #return wave                 # (標準)リスト型
+            return pd.DataFrame(wave)   # pd.DataFrame型
+        print(type(create_sin_wave(1.0, f0, fs, N)))    # create_sin_waveの返り値の型を出力.
+        print(create_sin_wave(1.0, f0, fs, N))          # create_sin_waveの返り値の値を出力.
         #wave1 = create_sin_wave(1.0, f0, fs, N)
         #X = spfft.fft(wave1[0:N])
         #freqList = spfft.fftfreq(N, d=1.0/ fs)
