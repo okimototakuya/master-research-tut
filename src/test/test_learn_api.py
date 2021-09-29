@@ -58,12 +58,15 @@ class TestApi(unittest.TestCase):
         '''
         scipy.fftpackの学習用テスト
         '''
-        f0 = 440            # 
+        f0_1 = 440            # 
+        f0_2 = 1320            # 
+        amplitude_1 = 1
+        amplitude_2 = 2
         fs = 96000          # 
         N = 1000            # データ数(個)
         addnum = 5.0
         output_type = 'series'  # 関数create_sin_waveの出力型
-        def create_sin_wave(amplitude, f0, fs, sample, input_output_type):
+        def create_sin_wave(sample, input_output_type):
             '''
             sin関数配列を、シーケンスで出力.
 
@@ -74,7 +77,9 @@ class TestApi(unittest.TestCase):
             fs: 
             sample: データ数
             '''
-            wave = [amplitude * np.sin(2.0 * np.pi * f0 * n / fs) for n in np.arange(sample)]
+            wave1 = [amplitude_1 * np.sin(2.0 * np.pi * f0_1 * n / fs) for n in np.arange(sample)]
+            wave2 = [amplitude_2 * np.sin(2.0 * np.pi * f0_2 * n / fs) for n in np.arange(sample)]
+            wave = [(w1 + w2) for (w1, w2) in zip(wave1, wave2)]
             if input_output_type == 'list':
                 return wave                 # (標準)リスト型
             elif input_output_type == 'dataframe':
@@ -83,7 +88,7 @@ class TestApi(unittest.TestCase):
                 return pd.Series(wave)   # pd.DataFrame型(columns:0, rows:0,1,2,...)
             else:
                 raise Exception('関数create_sin_waveに与える引数に誤りがあります.')
-        wave = create_sin_wave(1.0, f0, fs, N, output_type)
+        wave = create_sin_wave(N, output_type)
         X = spfft.fft(wave.values.tolist())
         freqList = spfft.fftfreq(N, d=1.0/ fs)
         amplitude = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in X]  # 振幅スペクトル
