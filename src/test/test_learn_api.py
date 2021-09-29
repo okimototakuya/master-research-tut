@@ -23,7 +23,7 @@ class IterAdd():
 
 class TestApi(unittest.TestCase):
 
-    def setUp(self):
+    def _setUp(self):
         '''
         イテレータプロトコルの簡易出力テスト
         '''
@@ -58,33 +58,65 @@ class TestApi(unittest.TestCase):
         '''
         scipy.fftpackの学習用テスト
         '''
-        f0 = 440
-        fs = 96000
-        N = 1000
+        f0 = 440            # 
+        fs = 96000          # 
+        N = 1000            # データ数(個)
         addnum = 5.0
-        def create_sin_wave(amplitude, f0, fs, sample):
+        output_type = 'dataframe'
+        def create_sin_wave(amplitude, f0, fs, sample, input_output_type):
             '''
             sin関数配列を、シーケンスで出力.
+
+            Note
+            -----
+            amplitude: 振幅
+            f0: 
+            fs: 
+            sample: データ数
             '''
             wave = [amplitude * np.sin(2.0 * np.pi * f0 * n / fs) for n in np.arange(sample)]
-            #return wave                 # (標準)リスト型
-            return pd.DataFrame(wave)   # pd.DataFrame型
-        print(type(create_sin_wave(1.0, f0, fs, N)))    # create_sin_waveの返り値の型を出力.
-        print(create_sin_wave(1.0, f0, fs, N))          # create_sin_waveの返り値の値を出力.
-        #wave1 = create_sin_wave(1.0, f0, fs, N)
-        #X = spfft.fft(wave1[0:N])
-        #freqList = spfft.fftfreq(N, d=1.0/ fs)
-        #amplitude = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in X]  # 振幅スペクトル
-        ## グラフの描画
-        #fig = plt.figure()
-        #ax1 = fig.add_subplot(211)  # 波形描画用のサブプロット
-        #ax2 = fig.add_subplot(212)  # 振幅スペクトル描画用のサブプロット
-        ### 波形を描画
-        #ax1.plot(range(0,N), wave1[0:N],label = "wave1")
-        ## 振幅スペクトルを描画
-        #ax2.plot(freqList, amplitude, marker='.', linestyle='-',label = "fft plot")
-        ## グラフの出力
-        #plt.show()
+            if input_output_type == 'list':
+                return wave                 # (標準)リスト型
+            elif input_output_type == 'dataframe':
+                return pd.DataFrame(wave)   # pd.DataFrame型(columns:0, rows:0,1,2,...)
+            else:
+                raise Exception('関数create_sin_waveに与える引数に誤りがあります.')
+        #wave = create_sin_wave(1.0, f0, fs, N, output_type)
+        wave1 = create_sin_wave(1.0, f0, fs, N, 'list')
+        wave2 = create_sin_wave(1.0, f0, fs, N, 'dataframe')
+        #X = spfft.fft(wave[0:N])
+        X1 = spfft.fft(wave1)
+        X2 = spfft.fft(wave2.values.tolist())
+        print(type(X1))
+        print(X1[:10])
+        print(type(X2))
+        print(X2[:10])
+        self.assertEqual(X1, X2)
+        freqList = spfft.fftfreq(N, d=1.0/ fs)
+        amplitude = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in X]  # 振幅スペクトル
+        # グラフの描画
+        fig = plt.figure()
+        ax1 = fig.add_subplot(211)  # 波形描画用のサブプロット
+        ax2 = fig.add_subplot(212)  # 振幅スペクトル描画用のサブプロット
+        ## 波形を描画
+        ax1.plot(range(0,N), wave[0:N], label = "wave")
+        #ax1 = wave.plot()
+        # 振幅スペクトルを描画
+        ax2.plot(freqList, amplitude, marker='.', linestyle='-',label = "fft plot")
+        # グラフの出力
+        plt.show()
+
+    def _test_pandas_dataframe(self):
+        '''
+        pandas.DataFrame型の学習用テスト
+        '''
+        wave = [1.0 * np.sin(2.0 * np.pi * 440 * n  / 96000) for n in np.arange(10)]
+        data_frame = pd.DataFrame(wave)
+        #print(data_frame[:5])
+        #print([x for x in data_frame.values])
+        print(type(data_frame.values))
+        print(data_frame.values)
+        print(data_frame.values.tolist())
 
 
 if __name__ == '__main__':
