@@ -63,27 +63,34 @@ class TestApi(unittest.TestCase):
         addnum = 5.0
         def create_sin_wave(amplitude, f0, fs, sample):
             '''
-            sin関数配列を、(標準)リスト型で出力.
+            sin関数配列を、シーケンスで出力.
             '''
-            wave_table = []
+            wave_table = [] # (標準)リスト型
             for n in np.arange(sample):
                 sine = amplitude * np.sin(2.0 * np.pi * f0 * n / fs)
                 wave_table.append(sine)
-            return wave_table   # (標準)リスト型
-        wave1 = create_sin_wave(1.0, f0, fs, N)
-        X = spfft.fft(wave1[0:N])
-        freqList = spfft.fftfreq(N, d=1.0/ fs)
-        amplitude = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in X]  # 振幅スペクトル
-        # グラフの描画
-        fig = plt.figure()
-        ax1 = fig.add_subplot(211)  # 波形描画用のサブプロット
-        ax2 = fig.add_subplot(212)  # 振幅スペクトル描画用のサブプロット
-        ## 波形を描画
-        ax1.plot(range(0,N), wave1[0:N],label = "wave1")
-        # 振幅スペクトルを描画
-        ax2.plot(freqList, amplitude, marker='.', linestyle='-',label = "fft plot")
-        # グラフの出力
-        plt.show()
+            #return wave_table   # (標準)リスト型
+            wave_table1 = wave_table
+            wave_table2 = [amplitude * np.sin(2.0 * np.pi * f0 * n / fs) for n in np.arange(sample)]
+            self.assertEqual(wave_table1, wave_table2)
+            #return [amplitude * np.sin(2.0 * np.pi * f0 * n / fs) for n in np.arange(sample)]
+            #return pd.DataFrame(    # pd.DataFrame型
+            #            [amplitude * np.sin(2.0 * np.pi * f0 * n / fs) for n in np.arange(sample)]
+            #        )
+        #wave1 = create_sin_wave(1.0, f0, fs, N)
+        #X = spfft.fft(wave1[0:N])
+        #freqList = spfft.fftfreq(N, d=1.0/ fs)
+        #amplitude = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in X]  # 振幅スペクトル
+        ## グラフの描画
+        #fig = plt.figure()
+        #ax1 = fig.add_subplot(211)  # 波形描画用のサブプロット
+        #ax2 = fig.add_subplot(212)  # 振幅スペクトル描画用のサブプロット
+        ### 波形を描画
+        #ax1.plot(range(0,N), wave1[0:N],label = "wave1")
+        ## 振幅スペクトルを描画
+        #ax2.plot(freqList, amplitude, marker='.', linestyle='-',label = "fft plot")
+        ## グラフの出力
+        #plt.show()
 
 
 if __name__ == '__main__':
