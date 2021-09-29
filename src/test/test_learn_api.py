@@ -3,6 +3,8 @@ import glob
 import numpy as np
 import datetime
 import unittest
+import scipy.fftpack as spfft
+import matplotlib.pyplot as plt
 
 
 class IterAdd():
@@ -50,6 +52,38 @@ class TestApi(unittest.TestCase):
         書き方その２: unittestのassertメソッド(assertTrue)を利用
         '''
         self.assertTrue(glob.glob('./test_plot/*.png'))
+
+    def test_scipy_fftpack(self):
+        '''
+        scipy.fftpackの学習用テスト
+        '''
+        f0 = 440
+        fs = 96000
+        N = 1000
+        addnum = 5.0
+        def create_sin_wave(amplitude, f0, fs, sample):
+            '''
+            sin関数配列を、(標準)リスト型で出力.
+            '''
+            wave_table = []
+            for n in np.arange(sample):
+                sine = amplitude * np.sin(2.0 * np.pi * f0 * n / fs)
+                wave_table.append(sine)
+            return wave_table   # (標準)リスト型
+        wave1 = create_sin_wave(1.0, f0, fs, N)
+        X = spfft.fft(wave1[0:N])
+        freqList = spfft.fftfreq(N, d=1.0/ fs)
+        amplitude = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in X]  # 振幅スペクトル
+        # グラフの描画
+        fig = plt.figure()
+        ax1 = fig.add_subplot(211)  # 波形描画用のサブプロット
+        ax2 = fig.add_subplot(212)  # 振幅スペクトル描画用のサブプロット
+        ## 波形を描画
+        ax1.plot(range(0,N), wave1[0:N],label = "wave1")
+        # 振幅スペクトルを描画
+        ax2.plot(freqList, amplitude, marker='.', linestyle='-',label = "fft plot")
+        # グラフの出力
+        plt.show()
 
 
 if __name__ == '__main__':
