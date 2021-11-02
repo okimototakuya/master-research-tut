@@ -45,7 +45,6 @@ NUMBER_OF_ASSUMED_STATE = 3 # 仮定する状態数(クラスタ数)
 #PLOT_AMOUNT_IN_GRAPH = 131663
 HOW_TO_PLOT = 'sns' # プロットに用いるライブラリ (pd.DataFrame.plot: 'pd', seaborn.pairplot: 'sns')
 
-
 def read_csv_(input_path_to_csv):
     '''
     csvファイル(加速度データ)を読み込み、pd.DataFrame型変数を返す関数
@@ -137,7 +136,7 @@ def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_st
         #print("初期確率\n", model.startprob_)
         #print("平均値\n", model.means_)
         #print("共分散値\n", model.covars_)
-        #print("遷移確率\n", model.transmat_)
+        print("遷移確率\n", model.transmat_)
         #print("対数尤度\n", model.score(input_df_averaged))
         #print("状態系列の復号\n", model.predict(input_df_averaged))
         return model.predict(input_df_averaged)
