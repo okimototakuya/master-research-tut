@@ -30,7 +30,8 @@ PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンフ�
 
 # csvファイルを読み取る際の、切り出し区間
 DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
+#DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
+DATA_SAMPLED_LAST = 30 # テスト用
 
 # 平均値計算の設定: 関数average_data
 MEAN_RANGE = 1  # 平均値を計算する際の、要素数
@@ -50,6 +51,20 @@ def read_csv_(input_path_to_csv):
     csvファイル(加速度データ)を読み込み、pd.DataFrame型変数を返す関数
     引数1:csvファイルの相対パス
     '''
+    def sample_all_crossroad():
+        '''
+        全ての交差点を抽出
+        '''
+        if names['onCrossroad'] == 1:
+            return True
+        return False
+    def sample_any_crossroad(input_id):
+        '''
+        特定の交差点を抽出
+        '''
+        if names['crossroadID'] == input_id:
+            return True
+        return False
     default_num_skip_row = 1    # 列名の行に欠損値 (None) が含まれるため、スキップし、列名をユーザが再定義(names)
     return pd.read_csv(
             input_path_to_csv,  # 入力のcsvファイルパス
@@ -63,7 +78,9 @@ def read_csv_(input_path_to_csv):
                 'AngularRate(X)[dps]', 'AngularRate(Y)[dps]', 'AngularRate(Z)[dps]',
                 'Temperature[degree]', 'Pressure[hPa]', 'MagnetCount', 'MagnetSwitch',
                 'onCrossroad', 'crossroadID'],
-            skiprows = DATA_SAMPLED_FIRST + default_num_skip_row,    \
+            skiprows = lambda x: x not in [5+default_num_skip_row, 7+default_num_skip_row], # 特定行5, 7のみを抽出
+            #skiprows = DATA_SAMPLED_FIRST + default_num_skip_row and lambda x: sample_all_crossroad(x) # 全ての交差点を抽出    \
+            #skiprows = lambda x: sample_all_crossroad(x)   # 特定の交差点を抽出    \
             engine = 'python',
             )
 
