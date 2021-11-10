@@ -30,7 +30,8 @@ PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンフ�
 
 # csvファイルを読み取る際の、切り出し区間
 DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
+#DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
+DATA_SAMPLED_LAST = 30 # テスト用
 
 # 平均値計算の設定: 関数average_data
 MEAN_RANGE = 1  # 平均値を計算する際の、要素数
@@ -54,7 +55,6 @@ def read_csv_(input_path_to_csv):
     return pd.read_csv(
             input_path_to_csv,  # 入力のcsvファイルパス
             index_col = 0,  # 列0 (列名オブジェクトがNone) をインデックスに
-            skiprows = DATA_SAMPLED_FIRST + default_num_skip_row,    \
                     # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
             skipfooter = sum([1 for _ in open(input_path_to_csv)]) - (DATA_SAMPLED_LAST + default_num_skip_row),    \
                     # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
@@ -64,6 +64,7 @@ def read_csv_(input_path_to_csv):
                 'AngularRate(X)[dps]', 'AngularRate(Y)[dps]', 'AngularRate(Z)[dps]',
                 'Temperature[degree]', 'Pressure[hPa]', 'MagnetCount', 'MagnetSwitch',
                 'onCrossroad', 'crossroadID'],
+            skiprows = DATA_SAMPLED_FIRST + default_num_skip_row,
             engine = 'python',
             )
 
@@ -195,6 +196,8 @@ def main():
     else:
         # 1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す
         df_read = read_csv_(PATH_CSV_ACCELERATION_DATA)
+        #df_read = df_read[df_read['onCrossroad']=='1']    # 全ての交差点を抽出
+        df_read = df_read[df_read['crossroadID']=='83']    # 交差点83を抽出
         # 2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)
         df_averaged = average_data(
                             input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
