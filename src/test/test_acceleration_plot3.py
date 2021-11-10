@@ -141,15 +141,30 @@ class TestAccelerationPlot3(unittest.TestCase):
         self.assertIsInstance(df_test, pd.DataFrame)
         os.remove('./test_dataset/demo_sample.csv')   # 次回のテストのためにテストcsvファイルを削除
 
-    def test_read_csv_sample_specific_rows(self):
+    def _test_read_csv_sample_specific_rows(self):
         '''
         ap3.read_csv_関数が特定行を抽出できるかテスト
 
         Notes
         -----
         - 特定行の番号は、プロダクトコードにベタ書き.
+        - テストの挙動から、pd.DataFrame型オブジェクト内インデックスオブジェクトの値により判定している.
         '''
         df_test = ap3.read_csv_('./test_dataset/demo.csv')
+        os.remove('./test_dataset/demo.csv')   # 次回のテストのためにテストcsvファイルを削除
+        print(df_test)
+
+    def test_read_csv_sample_all_crossroad(self):
+        '''
+        ap3.read_csv_関数が全ての交差点を抽出できるかテスト
+        '''
+        df_test = ap3.read_csv_('./test_dataset/demo.csv')
+        #print(df_test)                          # df_test本体
+        #print(df_test.columns)                  # df_testのカラム(列名)
+        #print(df_test.values)                   # df_testのバリュー(値)
+        #df_test = df_test[df_test['line']=='0']                 # カラム'line'
+        #df_test = df_test[df_test['onCrossroad']=='0']          # カラム'onCrossroad'
+        #df_test = df_test.query('onCrossroad == 1')            # HACK
         os.remove('./test_dataset/demo.csv')   # 次回のテストのためにテストcsvファイルを削除
         print(df_test)
 
