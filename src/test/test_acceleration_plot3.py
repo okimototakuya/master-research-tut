@@ -162,7 +162,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         #print(df_test)                          # df_test本体
         #print(df_test.columns)                  # df_testのカラム(列名)
         #print(df_test.values)                   # df_testのバリュー(値)
-        #df_test = df_test[df_test['line']=='0']                 # カラム'line'
+        df_test = df_test[df_test['line']=='0']                 # カラム'line'
         #df_test = df_test[df_test['onCrossroad']=='0']          # カラム'onCrossroad'
         #df_test = df_test.query('onCrossroad == 1')            # HACK
         os.remove('./test_dataset/demo.csv')   # 次回のテストのためにテストcsvファイルを削除
