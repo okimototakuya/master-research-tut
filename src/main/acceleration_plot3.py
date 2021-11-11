@@ -155,7 +155,7 @@ def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
     if input_how == 'pd':
         input_df_averaged.plot(
                 #x = input_df_averaged.columns[0],
-                x = input_df_averaged.columns[1],
+                #x = input_df_averaged.columns[1],
                 #x = input_df_averaged.columns[2],
                 #x = input_df_averaged.columns[3],
                 #X = input_df_averaged.columns[4],
@@ -166,10 +166,10 @@ def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
                 #y = input_df_averaged.columns[3],
                 #X = input_df_averaged.columns[4],
                 #y = input_df_averaged.columns[5],
-                kind = 'scatter',
+                #kind = 'scatter',
                 #c = 'r',
-                c = input_ndarray_predicted,
-                cmap = 'rainbow'
+                #c = input_ndarray_predicted,
+                #cmap = 'rainbow'
                )
     #4-2. seaborn.pairplotを用いて、プロットする場合
     elif input_how == 'sns':
