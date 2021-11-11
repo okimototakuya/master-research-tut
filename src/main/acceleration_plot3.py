@@ -44,8 +44,8 @@ ASSUMED_PROBABILISTIC_MODEL = 'hmm' # 仮定する確率モデル (クラスタ�
 NUMBER_OF_ASSUMED_STATE = 3 # 仮定する状態数(クラスタ数)
 
 # プロットの設定: 関数plot_data
-PLOT_AMOUNT_IN_GRAPH = 10000   # 1つのグラフにおけるプロット数
-PLOT_AMOUNT_IN_GRAPH = 131663
+#PLOT_AMOUNT_IN_GRAPH = 10000   # 1つのグラフにおけるプロット数
+#PLOT_AMOUNT_IN_GRAPH = 131663
 HOW_TO_PLOT = 'pd' # プロットに用いるライブラリ (pd.DataFrame.plot: 'pd', seaborn.pairplot: 'sns')
 
 def read_csv_(input_path_to_csv):
