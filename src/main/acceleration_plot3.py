@@ -19,8 +19,9 @@ from sklearn.cluster import KMeans
 # 加速度データファイル(csv)のパス
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
-PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
+#PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19(交差点ラベル付)
+PATH_CSV_ACCELERATION_DATA = "../../dataset/83番交差点.csv"
 
 # 時系列/加速度2次元プロット画像ファイルの保存先
 #PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
@@ -30,7 +31,9 @@ PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンフ�
 
 # csvファイルを読み取る際の、切り出し区間
 DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
+#DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
+#DATA_SAMPLED_LAST = sum([1 for _ in open(PATH_CSV_ACCELERATION_DATA)]) - 1  # 最後のサンプル
+DATA_SAMPLED_LAST = 30 # テスト用
 
 # 平均値計算の設定: 関数average_data
 MEAN_RANGE = 1  # 平均値を計算する際の、要素数
@@ -43,7 +46,7 @@ NUMBER_OF_ASSUMED_STATE = 3 # 仮定する状態数(クラスタ数)
 # プロットの設定: 関数plot_data
 #PLOT_AMOUNT_IN_GRAPH = 10000   # 1つのグラフにおけるプロット数
 #PLOT_AMOUNT_IN_GRAPH = 131663
-HOW_TO_PLOT = 'sns' # プロットに用いるライブラリ (pd.DataFrame.plot: 'pd', seaborn.pairplot: 'sns')
+HOW_TO_PLOT = 'pd' # プロットに用いるライブラリ (pd.DataFrame.plot: 'pd', seaborn.pairplot: 'sns')
 
 def read_csv_(input_path_to_csv):
     '''
@@ -54,7 +57,6 @@ def read_csv_(input_path_to_csv):
     return pd.read_csv(
             input_path_to_csv,  # 入力のcsvファイルパス
             index_col = 0,  # 列0 (列名オブジェクトがNone) をインデックスに
-            skiprows = DATA_SAMPLED_FIRST + default_num_skip_row,    \
                     # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
             skipfooter = sum([1 for _ in open(input_path_to_csv)]) - (DATA_SAMPLED_LAST + default_num_skip_row),    \
                     # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
@@ -64,6 +66,7 @@ def read_csv_(input_path_to_csv):
                 'AngularRate(X)[dps]', 'AngularRate(Y)[dps]', 'AngularRate(Z)[dps]',
                 'Temperature[degree]', 'Pressure[hPa]', 'MagnetCount', 'MagnetSwitch',
                 'onCrossroad', 'crossroadID'],
+            skiprows = DATA_SAMPLED_FIRST + default_num_skip_row,
             engine = 'python',
             )
 
@@ -151,18 +154,18 @@ def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
     #4-1. pd.DataFrame.plotを用いて、プロットする場合
     if input_how == 'pd':
         input_df_averaged.plot(
-                x = 'Acceleration(X)[g]',
-                #x = 'Acceleration(Y)[g]',
-                #x = 'Acceleration(Z)[g]',
-                #x = 'AngularRate(X)[dps]',
-                #X = 'AngularRate(Y)[dps]',
-                #x = 'AngularRate(Z)[dps]',
-                #y = 'Acceleration(X)[g]',
-                y = 'Acceleration(Y)[g]',
-                #y = 'Acceleration(Z)[g]',
-                #y = 'AngularRate(X)[dps]',
-                #X = 'AngularRate(Y)[dps]',
-                #y = 'AngularRate(Z)[dps]',
+                #x = input_df_averaged.columns[0],
+                x = input_df_averaged.columns[1],
+                #x = input_df_averaged.columns[2],
+                #x = input_df_averaged.columns[3],
+                #X = input_df_averaged.columns[4],
+                #x = input_df_averaged.columns[5],
+                #y = input_df_averaged.columns[0],
+                #y = input_df_averaged.columns[1],
+                y = input_df_averaged.columns[2],
+                #y = input_df_averaged.columns[3],
+                #X = input_df_averaged.columns[4],
+                #y = input_df_averaged.columns[5],
                 kind = 'scatter',
                 #c = 'r',
                 c = input_ndarray_predicted,
@@ -195,6 +198,9 @@ def main():
     else:
         # 1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す
         df_read = read_csv_(PATH_CSV_ACCELERATION_DATA)
+        #df_read = df_read['onCrossroad']    # テスト: 列'onCrossroad'の抽出 (成功)
+        #df_read = df_read[df_read['onCrossroad']=='0']    # 全ての交差点を抽出
+        #df_read = df_read[df_read['crossroadID']=='83']    # 交差点83を抽出
         # 2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)
         df_averaged = average_data(
                             input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
