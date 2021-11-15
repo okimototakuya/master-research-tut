@@ -82,7 +82,8 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
        #len_after_division = int(len(input_acc_ang_df)/input_mean_range)    # 固定平均を算出した際、算出後のpd.DataFrame型変数の大きさ
        return pd.concat([(input_acc_ang_df.iloc[offset_i:offset_i+input_mean_range].describe()).loc['mean', :] \
                #for offset_i in range(0, len_after_division, input_mean_range)], axis=1).T.reset_index(drop='index') # インデックスオブジェクトの型はpd.Int64Index (pd.read_csvのデフォルト)
-               for offset_i in range(0, len(input_acc_ang_df), input_mean_range)], axis=1).T.reset_index(drop='index') # インデックスオブジェクトの型はpd.Int64Index (pd.read_csvのデフォルト)
+               for offset_i in range(0, len(input_acc_ang_df), input_mean_range)], axis=1).T.reset_index(drop='index')  \
+                       .join(input_acc_ang_df['time'].reset_index(drop='index'))
     elif input_how == 'slide_mean': # 移動平均
        #len_after_division = int(len(input_acc_ang_df)/input_mean_range)    # 固定平均を算出した際、算出後のpd.DataFrame型変数の大きさ
        #len_after_division = 28
@@ -154,17 +155,18 @@ def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
     #4-1. pd.DataFrame.plotを用いて、プロットする場合
     if input_how == 'pd':
         input_df_averaged.plot(
-                #x = input_df_averaged.columns[0],
+                x = 'time',                             # 時系列プロット
+                #x = input_df_averaged.columns[0],      # 特徴量/主成分の散布図プロット
                 #x = input_df_averaged.columns[1],
                 #x = input_df_averaged.columns[2],
                 #x = input_df_averaged.columns[3],
-                #X = input_df_averaged.columns[4],
+                #x = input_df_averaged.columns[4],
                 #x = input_df_averaged.columns[5],
                 #y = input_df_averaged.columns[0],
                 #y = input_df_averaged.columns[1],
                 y = input_df_averaged.columns[2],
                 #y = input_df_averaged.columns[3],
-                #X = input_df_averaged.columns[4],
+                #y = input_df_averaged.columns[4],
                 #y = input_df_averaged.columns[5],
                 #kind = 'scatter',
                 #c = 'r',
@@ -205,12 +207,13 @@ def main():
         df_averaged = average_data(
                             input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
                                     df_read.loc[:,[  # 行数(データ数)の指定
-                                       'Acceleration(X)[g]',   # 列(特徴量)の指定
-                                       'Acceleration(Y)[g]',
-                                       'Acceleration(Z)[g]',
-                                       'AngularRate(X)[dps]',
-                                       'AngularRate(Y)[dps]',
-                                       'AngularRate(Z)[dps]',
+                                        'time',                 # 時刻
+                                        'Acceleration(X)[g]',   # 列(特徴量)の指定
+                                        'Acceleration(Y)[g]',
+                                        'Acceleration(Z)[g]',
+                                        'AngularRate(X)[dps]',
+                                        'AngularRate(Y)[dps]',
+                                        'AngularRate(Z)[dps]',
                                        ]],
                             input_mean_range = MEAN_RANGE, # 引数2:平均値を計算する際の、要素数
                             input_how = HOW_TO_CALCULATE_MEAN,   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値
