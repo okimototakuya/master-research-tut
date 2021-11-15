@@ -37,7 +37,7 @@ DATA_SAMPLED_LAST = 30 # テスト用
 
 # 平均値計算の設定: 関数average_data
 MEAN_RANGE = 10  # 平均値を計算する際の、要素数
-HOW_TO_CALCULATE_MEAN = 'slide_mean'    # 平均値の算出方法 ('fixed_mean': 固定(?)平均, 'slide_mean': 移動平均, 'slide_median': 移動中央値)
+HOW_TO_CALCULATE_MEAN = 'slide_median'    # 平均値の算出方法 ('fixed_mean': 固定(?)平均, 'slide_mean': 移動平均, 'slide_median': 移動中央値)
 
 # 確率モデルの設定: 関数estimate_state_data
 ASSUMED_PROBABILISTIC_MODEL = 'hmm' # 仮定する確率モデル (クラスタリング: 'clustering', 隠れマルコフモデル: 'hmm')
@@ -93,7 +93,9 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
                        .join(input_acc_ang_df['time'].reset_index(drop='index'))
     elif input_how == 'slide_median':   # 移動中央値
        return pd.concat([(input_acc_ang_df.iloc[offset_i:offset_i+input_mean_range].describe()).loc['50%', :] \
-               for offset_i in range(len(input_acc_ang_df)-input_mean_range+1)], axis=1).T.reset_index(drop='index') # インデックスオブジェクトの型はpd.Int64Index (pd.read_csvのデフォルト)
+               #for offset_i in range(len(input_acc_ang_df)-input_mean_range+1)], axis=1).T.reset_index(drop='index') # for文上と下: 下は元のinput_acc_ang_dfと大きさが変わらない。
+               for offset_i in range(len(input_acc_ang_df))], axis=1).T.reset_index(drop='index')    \
+                       .join(input_acc_ang_df['time'].reset_index(drop='index'))
     else:
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
