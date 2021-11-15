@@ -36,7 +36,7 @@ DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFra
 DATA_SAMPLED_LAST = 30 # テスト用
 
 # 平均値計算の設定: 関数average_data
-MEAN_RANGE = 1  # 平均値を計算する際の、要素数
+MEAN_RANGE = 10  # 平均値を計算する際の、要素数
 HOW_TO_CALCULATE_MEAN = 'slide_mean'    # 平均値の算出方法 ('fixed_mean': 固定(?)平均, 'slide_mean': 移動平均, 'slide_median': 移動中央値)
 
 # 確率モデルの設定: 関数estimate_state_data
@@ -88,7 +88,8 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
        #len_after_division = int(len(input_acc_ang_df)/input_mean_range)    # 固定平均を算出した際、算出後のpd.DataFrame型変数の大きさ
        #len_after_division = 28
        return pd.concat([(input_acc_ang_df.iloc[offset_i:offset_i+input_mean_range].describe()).loc['mean', :] \
-               for offset_i in range(len(input_acc_ang_df)-input_mean_range+1)], axis=1).T.reset_index(drop='index')    \
+               #for offset_i in range(len(input_acc_ang_df)-input_mean_range+1)], axis=1).T.reset_index(drop='index')   # for文上と下: 下は元のinput_acc_ang_dfと大きさが変わらない。
+               for offset_i in range(len(input_acc_ang_df))], axis=1).T.reset_index(drop='index')    \
                        .join(input_acc_ang_df['time'].reset_index(drop='index'))
     elif input_how == 'slide_median':   # 移動中央値
        return pd.concat([(input_acc_ang_df.iloc[offset_i:offset_i+input_mean_range].describe()).loc['50%', :] \
