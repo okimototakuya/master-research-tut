@@ -246,12 +246,12 @@ def main():
                     .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
         else:
             ndarray_predicted_original = estimate_state_data(   # 主成分分析をせずに、隠れマルコフモデルを適用する場合
-                                    input_df_averaged = df_averaged,
+                                    input_df_averaged = df_averaged.drop('time', axis=1),
                                     input_how = ASSUMED_PROBABILISTIC_MODEL,
                                     input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
                                 )
             ndarray_predicted_pca = estimate_state_data(   # 主成分分析をして、隠れマルコフモデルを適用する場合
-                                    input_df_averaged = df_pca,
+                                    input_df_averaged = df_pca.drop('time', axis=1),
                                     input_how = ASSUMED_PROBABILISTIC_MODEL,
                                     input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
                                 )
