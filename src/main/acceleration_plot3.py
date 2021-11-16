@@ -225,7 +225,7 @@ def main():
         # 3. 主成分分析を実行する
         # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
         # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
-        df_pca = decompose_data(df_averaged)
+        df_pca = decompose_data(df_averaged.drop('time', axis=1)).join(df_averaged['time'])
         # 4. 隠れマルコフモデルを適用する
         if NUMBER_OF_ASSUMED_STATE > (DATA_SAMPLED_LAST - DATA_SAMPLED_FIRST):  # 2021/7/5 2時頃: clustering, hmm共に、全く同じ例外が投げられることを確認した。
             raise Exception('確率モデルを用いる際に仮定する状態数の値が不適切です:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})'  \
