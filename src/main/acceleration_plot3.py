@@ -36,8 +36,8 @@ DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFra
 DATA_SAMPLED_LAST = 30 # テスト用
 
 # 平均値計算の設定: 関数average_data
-MEAN_RANGE = 1  # 平均値を計算する際の、要素数
-HOW_TO_CALCULATE_MEAN = 'fixed_mean'    # 平均値の算出方法 ('fixed_mean': 固定(?)平均, 'slide_mean': 移動平均, 'slide_median': 移動中央値)
+MEAN_RANGE = 10  # 平均値を計算する際の、要素数
+HOW_TO_CALCULATE_MEAN = 'slide_median'    # 平均値の算出方法 ('fixed_mean': 固定(?)平均, 'slide_mean': 移動平均, 'slide_median': 移動中央値)
 
 # 確率モデルの設定: 関数estimate_state_data
 ASSUMED_PROBABILISTIC_MODEL = 'hmm' # 仮定する確率モデル (クラスタリング: 'clustering', 隠れマルコフモデル: 'hmm')
@@ -46,7 +46,9 @@ NUMBER_OF_ASSUMED_STATE = 3 # 仮定する状態数(クラスタ数)
 # プロットの設定: 関数plot_data
 #PLOT_AMOUNT_IN_GRAPH = 10000   # 1つのグラフにおけるプロット数
 #PLOT_AMOUNT_IN_GRAPH = 131663
-HOW_TO_PLOT = 'pd' # プロットに用いるライブラリ (pd.DataFrame.plot: 'pd', seaborn.pairplot: 'sns')
+# プロットに用いるライブラリ (pd.DataFrame.plot: 'pd', seaborn.pairplot: 'sns')
+# 'pd': 時系列プロット, 'sns': 特徴量や主成分の散布図プロット
+HOW_TO_PLOT = 'sns'
 
 def read_csv_(input_path_to_csv):
     '''
@@ -82,15 +84,20 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
        #len_after_division = int(len(input_acc_ang_df)/input_mean_range)    # 固定平均を算出した際、算出後のpd.DataFrame型変数の大きさ
        return pd.concat([(input_acc_ang_df.iloc[offset_i:offset_i+input_mean_range].describe()).loc['mean', :] \
                #for offset_i in range(0, len_after_division, input_mean_range)], axis=1).T.reset_index(drop='index') # インデックスオブジェクトの型はpd.Int64Index (pd.read_csvのデフォルト)
-               for offset_i in range(0, len(input_acc_ang_df), input_mean_range)], axis=1).T.reset_index(drop='index') # インデックスオブジェクトの型はpd.Int64Index (pd.read_csvのデフォルト)
+               for offset_i in range(0, len(input_acc_ang_df), input_mean_range)], axis=1).T.reset_index(drop='index')  \
+                       .join(input_acc_ang_df['time'][::input_mean_range].reset_index(drop='index'))
     elif input_how == 'slide_mean': # 移動平均
        #len_after_division = int(len(input_acc_ang_df)/input_mean_range)    # 固定平均を算出した際、算出後のpd.DataFrame型変数の大きさ
        #len_after_division = 28
        return pd.concat([(input_acc_ang_df.iloc[offset_i:offset_i+input_mean_range].describe()).loc['mean', :] \
-               for offset_i in range(len(input_acc_ang_df)-input_mean_range+1)], axis=1).T.reset_index(drop='index') # インデックスオブジェクトの型はpd.Int64Index (pd.read_csvのデフォルト)
+               #for offset_i in range(len(input_acc_ang_df)-input_mean_range+1)], axis=1).T.reset_index(drop='index')   # for文上と下: 下は元のinput_acc_ang_dfと大きさが変わらない。
+               for offset_i in range(len(input_acc_ang_df))], axis=1).T.reset_index(drop='index')    \
+                       .join(input_acc_ang_df['time'].reset_index(drop='index'))
     elif input_how == 'slide_median':   # 移動中央値
        return pd.concat([(input_acc_ang_df.iloc[offset_i:offset_i+input_mean_range].describe()).loc['50%', :] \
-               for offset_i in range(len(input_acc_ang_df)-input_mean_range+1)], axis=1).T.reset_index(drop='index') # インデックスオブジェクトの型はpd.Int64Index (pd.read_csvのデフォルト)
+               #for offset_i in range(len(input_acc_ang_df)-input_mean_range+1)], axis=1).T.reset_index(drop='index') # for文上と下: 下は元のinput_acc_ang_dfと大きさが変わらない。
+               for offset_i in range(len(input_acc_ang_df))], axis=1).T.reset_index(drop='index')    \
+                       .join(input_acc_ang_df['time'].reset_index(drop='index'))
     else:
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
@@ -154,22 +161,23 @@ def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
     #4-1. pd.DataFrame.plotを用いて、プロットする場合
     if input_how == 'pd':
         input_df_averaged.plot(
-                #x = input_df_averaged.columns[0],
-                x = input_df_averaged.columns[1],
+                x = 'time',                             # 時系列プロット
+                #x = input_df_averaged.columns[0],      # 特徴量/主成分の散布図プロット
+                #x = input_df_averaged.columns[1],
                 #x = input_df_averaged.columns[2],
                 #x = input_df_averaged.columns[3],
-                #X = input_df_averaged.columns[4],
+                #x = input_df_averaged.columns[4],
                 #x = input_df_averaged.columns[5],
                 #y = input_df_averaged.columns[0],
                 #y = input_df_averaged.columns[1],
                 y = input_df_averaged.columns[2],
                 #y = input_df_averaged.columns[3],
-                #X = input_df_averaged.columns[4],
+                #y = input_df_averaged.columns[4],
                 #y = input_df_averaged.columns[5],
-                kind = 'scatter',
+                #kind = 'scatter',
                 #c = 'r',
-                c = input_ndarray_predicted,
-                cmap = 'rainbow'
+                #c = input_ndarray_predicted,
+                #cmap = 'rainbow'
                )
     #4-2. seaborn.pairplotを用いて、プロットする場合
     elif input_how == 'sns':
@@ -205,12 +213,13 @@ def main():
         df_averaged = average_data(
                             input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
                                     df_read.loc[:,[  # 行数(データ数)の指定
-                                       'Acceleration(X)[g]',   # 列(特徴量)の指定
-                                       'Acceleration(Y)[g]',
-                                       'Acceleration(Z)[g]',
-                                       'AngularRate(X)[dps]',
-                                       'AngularRate(Y)[dps]',
-                                       'AngularRate(Z)[dps]',
+                                        'time',                 # 時刻
+                                        'Acceleration(X)[g]',   # 列(特徴量)の指定
+                                        'Acceleration(Y)[g]',
+                                        'Acceleration(Z)[g]',
+                                        'AngularRate(X)[dps]',
+                                        'AngularRate(Y)[dps]',
+                                        'AngularRate(Z)[dps]',
                                        ]],
                             input_mean_range = MEAN_RANGE, # 引数2:平均値を計算する際の、要素数
                             input_how = HOW_TO_CALCULATE_MEAN,   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値
@@ -218,7 +227,7 @@ def main():
         # 3. 主成分分析を実行する
         # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
         # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
-        df_pca = decompose_data(df_averaged)
+        df_pca = decompose_data(df_averaged.drop('time', axis=1)).join(df_averaged['time'])
         # 4. 隠れマルコフモデルを適用する
         if NUMBER_OF_ASSUMED_STATE > (DATA_SAMPLED_LAST - DATA_SAMPLED_FIRST):  # 2021/7/5 2時頃: clustering, hmm共に、全く同じ例外が投げられることを確認した。
             raise Exception('確率モデルを用いる際に仮定する状態数の値が不適切です:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})'  \
@@ -239,12 +248,12 @@ def main():
                     .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
         else:
             ndarray_predicted_original = estimate_state_data(   # 主成分分析をせずに、隠れマルコフモデルを適用する場合
-                                    input_df_averaged = df_averaged,
+                                    input_df_averaged = df_averaged.drop('time', axis=1),
                                     input_how = ASSUMED_PROBABILISTIC_MODEL,
                                     input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
                                 )
             ndarray_predicted_pca = estimate_state_data(   # 主成分分析をして、隠れマルコフモデルを適用する場合
-                                    input_df_averaged = df_pca,
+                                    input_df_averaged = df_pca.drop('time', axis=1),
                                     input_how = ASSUMED_PROBABILISTIC_MODEL,
                                     input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
                                 )
