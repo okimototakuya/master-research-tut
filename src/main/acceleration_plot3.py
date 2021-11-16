@@ -146,10 +146,19 @@ def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_st
         #print("初期確率\n", model.startprob_)
         #print("平均値\n", model.means_)
         #print("共分散値\n", model.covars_)
-        print("遷移確率\n", model.transmat_)
+        #print("遷移確率\n", model.transmat_)
         #print("対数尤度\n", model.score(input_df_averaged))
         #print("状態系列の復号\n", model.predict(input_df_averaged))
-        return model.predict(input_df_averaged)
+        dict_param = {
+                 "初期確率": model.startprob_,
+                 "平均値": model.means_,
+                 "共分散値": model.covars_,
+                 "遷移行列": model.transmat_,
+                 "対数尤度": model.score(input_df_averaged),
+                 "状態系列の復号": model.predict(input_df_averaged)
+                 }
+        #return model.predict(input_df_averaged)
+        return dict_param
     else:
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
@@ -247,16 +256,16 @@ def main():
             raise Exception('HMMを仮定した場合、状態数=サンプル数の時でも警告や例外が発生します:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})' \
                     .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
         else:
-            ndarray_predicted_original = estimate_state_data(   # 主成分分析をせずに、隠れマルコフモデルを適用する場合
-                                    input_df_averaged = df_averaged.drop('time', axis=1),
-                                    input_how = ASSUMED_PROBABILISTIC_MODEL,
-                                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
-                                )
-            ndarray_predicted_pca = estimate_state_data(   # 主成分分析をして、隠れマルコフモデルを適用する場合
-                                    input_df_averaged = df_pca.drop('time', axis=1),
-                                    input_how = ASSUMED_PROBABILISTIC_MODEL,
-                                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
-                                )
+            dict_param_original = estimate_state_data(   # 主成分分析をせずに、隠れマルコフモデルを適用する場合
+                    input_df_averaged = df_averaged.drop('time', axis=1),
+                    input_how = ASSUMED_PROBABILISTIC_MODEL,
+                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
+                )
+            dict_param_pca = estimate_state_data(   # 主成分分析をして、隠れマルコフモデルを適用する場合
+                    input_df_averaged = df_pca.drop('time', axis=1),
+                    input_how = ASSUMED_PROBABILISTIC_MODEL,
+                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
+                )
         # 5. 上記の算出結果をプロットする
         # 5-1. pd.DataFrame.plotを用いて、プロットする場合: input_how="pd"
         # 5-2. seaborn.pairplotを用いて、プロットする場合: input_how="sns"
@@ -273,7 +282,7 @@ def main():
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax_pos = ax.get_position()                      # 返り値は、Bbox型
-        fig.text(ax_pos.x1, ax_pos.y1, 'hoge-hoge')     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
+        fig.text(ax_pos.x1-0.2, ax_pos.y1, dict_param_original['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
         ax.plot(df_averaged['time'], df_averaged.drop('time', axis=1))
         # プロットの可視化
         # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
