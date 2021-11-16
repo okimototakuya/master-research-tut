@@ -272,7 +272,8 @@ def main():
         #    )
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.text(1,1,'hoge-hoge')
+        ax_pos = ax.get_position()                      # 返り値は、Bbox型
+        fig.text(ax_pos.x1, ax_pos.y1, 'hoge-hoge')     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
         ax.plot(df_averaged['time'], df_averaged.drop('time', axis=1))
         # プロットの可視化
         # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
