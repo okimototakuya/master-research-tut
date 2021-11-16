@@ -279,11 +279,31 @@ def main():
         #        input_ndarray_predicted = ndarray_predicted_pca,
         #        input_how = HOW_TO_PLOT,
         #    )
+        # やり方1
         fig = plt.figure()
         ax = fig.add_subplot(111)
+        # やり方2
+        #fig, ax = plt.subplots(2, 3)     # 時系列プロット
+        # やり方3
+        #plt.figure(figsize=(4, 3))
         ax_pos = ax.get_position()                      # 返り値は、Bbox型
         fig.text(ax_pos.x1-0.2, ax_pos.y1, dict_param_original['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
-        ax.plot(df_averaged['time'], df_averaged.drop('time', axis=1))
+        #ax.plot(df_averaged['time'], df_averaged.drop('time', axis=1))
+        df_averaged = df_averaged.join(pd.Series(dict_param_original['状態系列の復号'], name='state'))
+        #ax = sns.pairplot(
+        #        df_averaged,
+        #        x_vars = ['time'],
+        #        diag_kind = 'kde',
+        #        plot_kws = {'alpha': 0.2},
+        #        hue = 'state',
+        #        hue_order = [0, 1, 2],
+        #        palette = 'rainbow',
+        #    )
+        ax = sns.lineplot(              # 2021.11.17: HACK: seaborn.lineplotだと、plt.subplot使える。
+                x = 'time',
+                hue = 'state',
+                data = df_averaged
+            )
         # プロットの可視化
         # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
         # [関連]: decompose_data, plot_data
