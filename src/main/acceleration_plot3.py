@@ -281,13 +281,13 @@ def main():
         #    )
         # やり方1
         fig = plt.figure()
-        ax = fig.add_subplot(111)
+        #ax = fig.add_subplot(111)
         # やり方2
         #fig, ax = plt.subplots(2, 3)     # 時系列プロット
         # やり方3
         #plt.figure(figsize=(4, 3))
-        ax_pos = ax.get_position()                      # 返り値は、Bbox型
-        fig.text(ax_pos.x1-0.2, ax_pos.y1, dict_param_original['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
+        #ax_pos = ax.get_position()                      # 返り値は、Bbox型
+        #fig.text(ax_pos.x1-0.2, ax_pos.y1, dict_param_original['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
         #ax.plot(df_averaged['time'], df_averaged.drop('time', axis=1))
         df_averaged = df_averaged.join(pd.Series(dict_param_original['状態系列の復号'], name='state'))
         #ax = sns.pairplot(
@@ -299,11 +299,17 @@ def main():
         #        hue_order = [0, 1, 2],
         #        palette = 'rainbow',
         #    )
-        ax = sns.lineplot(              # 2021.11.17: HACK: seaborn.lineplotだと、plt.subplot使える。
+        for i in range(1, 6+1):
+            ax = fig.add_subplot(2, 3, i)
+            sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
                 x = 'time',
+                y = df_averaged.iloc[:, i-1].name,
                 hue = 'state',
+                palette = 'rainbow',
                 data = df_averaged
             )
+        ax_pos = ax.get_position()                                              # 返り値は、Bbox型
+        fig.text(ax_pos.x1-0.2, ax_pos.y1, dict_param_original['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
         # プロットの可視化
         # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
         # [関連]: decompose_data, plot_data
