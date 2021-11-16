@@ -260,16 +260,20 @@ def main():
         # 5. 上記の算出結果をプロットする
         # 5-1. pd.DataFrame.plotを用いて、プロットする場合: input_how="pd"
         # 5-2. seaborn.pairplotを用いて、プロットする場合: input_how="sns"
-        plot_data(  # 主成分分析をしなかったもの
-                input_df_averaged = df_averaged,
-                input_ndarray_predicted = ndarray_predicted_original,
-                input_how = HOW_TO_PLOT,
-            )
-        plot_data(  # 主成分分析をしたもの
-                input_df_averaged = df_pca,
-                input_ndarray_predicted = ndarray_predicted_pca,
-                input_how = HOW_TO_PLOT,
-            )
+        #plot_data(  # 主成分分析をしなかったもの
+        #        input_df_averaged = df_averaged,
+        #        input_ndarray_predicted = ndarray_predicted_original,
+        #        input_how = HOW_TO_PLOT,
+        #    )
+        #plot_data(  # 主成分分析をしたもの
+        #        input_df_averaged = df_pca,
+        #        input_ndarray_predicted = ndarray_predicted_pca,
+        #        input_how = HOW_TO_PLOT,
+        #    )
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.text(1,1,'hoge-hoge')
+        ax.plot(df_averaged['time'], df_averaged.drop('time', axis=1))
         # プロットの可視化
         # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
         # [関連]: decompose_data, plot_data
