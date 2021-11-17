@@ -301,13 +301,14 @@ def main():
         #    )
         for i in range(1, 6+1):
             ax = fig.add_subplot(2, 3, i)
-            sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
-                x = 'time',
-                y = df_averaged.iloc[:, i-1].name,
-                hue = 'state',
-                palette = 'rainbow',
-                data = df_averaged
-            )
+            g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
+                    x = 'time',
+                    y = df_averaged.iloc[:, i-1].name,
+                    hue = 'state',
+                    palette = 'rainbow',
+                    data = df_averaged
+                )
+            g.set_xticklabels(labels=df_averaged['time'], rotation=90)
         ax_pos = ax.get_position()                                              # 返り値は、Bbox型
         fig.text(ax_pos.x1-0.2, ax_pos.y1, dict_param_original['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
         # プロットの可視化
