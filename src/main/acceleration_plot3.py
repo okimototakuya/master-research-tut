@@ -32,8 +32,8 @@ PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンフ�
 # csvファイルを読み取る際の、切り出し区間
 DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
 #DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
-#DATA_SAMPLED_LAST = sum([1 for _ in open(PATH_CSV_ACCELERATION_DATA)]) - 1  # 最後のサンプル
-DATA_SAMPLED_LAST = 30 # テスト用
+DATA_SAMPLED_LAST = sum([1 for _ in open(PATH_CSV_ACCELERATION_DATA)]) - 1  # 最後のサンプル
+#DATA_SAMPLED_LAST = 30 # テスト用
 
 # 平均値計算の設定: 関数average_data
 MEAN_RANGE = 10  # 平均値を計算する際の、要素数
@@ -46,9 +46,6 @@ NUMBER_OF_ASSUMED_STATE = 3 # 仮定する状態数(クラスタ数)
 # プロットの設定: 関数plot_data
 #PLOT_AMOUNT_IN_GRAPH = 10000   # 1つのグラフにおけるプロット数
 #PLOT_AMOUNT_IN_GRAPH = 131663
-# プロットに用いるライブラリ (pd.DataFrame.plot: 'pd', seaborn.pairplot: 'sns')
-# 'pd': 時系列プロット, 'sns': 特徴量や主成分の散布図プロット
-HOW_TO_PLOT = 'sns'
 
 def read_csv_(input_path_to_csv):
     '''
@@ -146,58 +143,52 @@ def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_st
         #print("初期確率\n", model.startprob_)
         #print("平均値\n", model.means_)
         #print("共分散値\n", model.covars_)
-        print("遷移確率\n", model.transmat_)
+        #print("遷移確率\n", model.transmat_)
         #print("対数尤度\n", model.score(input_df_averaged))
         #print("状態系列の復号\n", model.predict(input_df_averaged))
-        return model.predict(input_df_averaged)
+        dict_param = {
+                 "初期確率": model.startprob_,
+                 "平均値": model.means_,
+                 "共分散値": model.covars_,
+                 "遷移行列": model.transmat_,
+                 "対数尤度": model.score(input_df_averaged),
+                 "状態系列の復号": model.predict(input_df_averaged)
+                 }
+        #return model.predict(input_df_averaged)
+        return dict_param
     else:
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
 
-def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
+def plot_data(input_df_averaged, input_dict_param):
     '''
     pd.DataFrame型変数のプロットを行う関数
     '''
-    #4-1. pd.DataFrame.plotを用いて、プロットする場合
-    if input_how == 'pd':
-        input_df_averaged.plot(
-                x = 'time',                             # 時系列プロット
-                #x = input_df_averaged.columns[0],      # 特徴量/主成分の散布図プロット
-                #x = input_df_averaged.columns[1],
-                #x = input_df_averaged.columns[2],
-                #x = input_df_averaged.columns[3],
-                #x = input_df_averaged.columns[4],
-                #x = input_df_averaged.columns[5],
-                #y = input_df_averaged.columns[0],
-                #y = input_df_averaged.columns[1],
-                y = input_df_averaged.columns[2],
-                #y = input_df_averaged.columns[3],
-                #y = input_df_averaged.columns[4],
-                #y = input_df_averaged.columns[5],
-                #kind = 'scatter',
-                #c = 'r',
-                #c = input_ndarray_predicted,
-                #cmap = 'rainbow'
-               )
-    #4-2. seaborn.pairplotを用いて、プロットする場合
-    elif input_how == 'sns':
-        ser_state = pd.Series(
-                input_ndarray_predicted,
-                name = 'state',
-            )
-        df_averaged_state = pd.concat(
-                [input_df_averaged, ser_state],
-                axis = 1,
-            )
-        sns.pairplot(
-                df_averaged_state,
-                diag_kind = 'kde',
-                plot_kws = {'alpha': 0.2},
+    input_df_averaged = input_df_averaged.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
+    #4-1. 時系列プロット
+    fig = plt.figure()
+    for i in range(1, 6+1):
+        ax = fig.add_subplot(2, 3, i)
+        if i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
+            ax_pos = ax.get_position()                                              # 返り値は、Bbox型
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, input_dict_param['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
+        g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
+                x = 'time',
+                y = input_df_averaged.iloc[:, i-1].name,
                 hue = 'state',
                 palette = 'rainbow',
+                data = input_df_averaged
             )
-    else:
-        raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
+        g.set_xticklabels(labels=input_df_averaged['time'], rotation=90)
+        plt.grid()
+    #4-2. 散布図プロット
+    sns.pairplot(
+            input_df_averaged,
+            diag_kind = 'kde',
+            plot_kws = {'alpha': 0.2},
+            hue = 'state',
+            palette = 'rainbow',
+        )
 
 
 def main():
@@ -247,28 +238,26 @@ def main():
             raise Exception('HMMを仮定した場合、状態数=サンプル数の時でも警告や例外が発生します:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})' \
                     .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
         else:
-            ndarray_predicted_original = estimate_state_data(   # 主成分分析をせずに、隠れマルコフモデルを適用する場合
-                                    input_df_averaged = df_averaged.drop('time', axis=1),
-                                    input_how = ASSUMED_PROBABILISTIC_MODEL,
-                                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
-                                )
-            ndarray_predicted_pca = estimate_state_data(   # 主成分分析をして、隠れマルコフモデルを適用する場合
-                                    input_df_averaged = df_pca.drop('time', axis=1),
-                                    input_how = ASSUMED_PROBABILISTIC_MODEL,
-                                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
-                                )
+            dict_param_original = estimate_state_data(   # 主成分分析をせずに、隠れマルコフモデルを適用する場合
+                    input_df_averaged = df_averaged.drop('time', axis=1),
+                    input_how = ASSUMED_PROBABILISTIC_MODEL,
+                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
+                )
+            dict_param_pca = estimate_state_data(   # 主成分分析をして、隠れマルコフモデルを適用する場合
+                    input_df_averaged = df_pca.drop('time', axis=1),
+                    input_how = ASSUMED_PROBABILISTIC_MODEL,
+                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
+                )
         # 5. 上記の算出結果をプロットする
         # 5-1. pd.DataFrame.plotを用いて、プロットする場合: input_how="pd"
         # 5-2. seaborn.pairplotを用いて、プロットする場合: input_how="sns"
         plot_data(  # 主成分分析をしなかったもの
                 input_df_averaged = df_averaged,
-                input_ndarray_predicted = ndarray_predicted_original,
-                input_how = HOW_TO_PLOT,
+                input_dict_param = dict_param_original,
             )
         plot_data(  # 主成分分析をしたもの
                 input_df_averaged = df_pca,
-                input_ndarray_predicted = ndarray_predicted_pca,
-                input_how = HOW_TO_PLOT,
+                input_dict_param = dict_param_pca,
             )
         # プロットの可視化
         # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
