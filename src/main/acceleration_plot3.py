@@ -207,6 +207,7 @@ def plot_data(input_df_averaged, input_ndarray_predicted, input_how):
             )
     else:
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
+    plt.grid()
 
 
 def main():
@@ -269,16 +270,16 @@ def main():
         # 5. 上記の算出結果をプロットする
         # 5-1. pd.DataFrame.plotを用いて、プロットする場合: input_how="pd"
         # 5-2. seaborn.pairplotを用いて、プロットする場合: input_how="sns"
-        #plot_data(  # 主成分分析をしなかったもの
-        #        input_df_averaged = df_averaged,
-        #        input_ndarray_predicted = ndarray_predicted_original,
-        #        input_how = HOW_TO_PLOT,
-        #    )
-        #plot_data(  # 主成分分析をしたもの
-        #        input_df_averaged = df_pca,
-        #        input_ndarray_predicted = ndarray_predicted_pca,
-        #        input_how = HOW_TO_PLOT,
-        #    )
+        plot_data(  # 主成分分析をしなかったもの
+                input_df_averaged = df_averaged,
+                input_ndarray_predicted = dict_param_original['状態系列の復号'],
+                input_how = HOW_TO_PLOT,
+            )
+        plot_data(  # 主成分分析をしたもの
+                input_df_averaged = df_pca,
+                input_ndarray_predicted = dict_param_pca['状態系列の復号'],
+                input_how = HOW_TO_PLOT,
+            )
         # やり方1
         fig = plt.figure()
         #ax = fig.add_subplot(111)
@@ -299,7 +300,7 @@ def main():
         #        hue_order = [0, 1, 2],
         #        palette = 'rainbow',
         #    )
-        for i in range(1, 6+1):
+        for i in range(1, 6+1):             # 時系列プロット
             ax = fig.add_subplot(2, 3, i)
             if i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
                 ax_pos = ax.get_position()                                              # 返り値は、Bbox型
