@@ -1,5 +1,6 @@
 import os
 import sys
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -137,7 +138,8 @@ def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_st
         return model.labels_
     elif input_how == 'hmm':
         #model = hmmlearn.hmm.GaussianHMM(n_components=input_number_of_assumed_state, covariance_type="full")    # 隠れマルコフモデルの仮定
-        model = hmm.GaussianHMM(n_components=input_number_of_assumed_state, covariance_type="full")    # 隠れマルコフモデルの仮定
+        model = hmm.GaussianHMM(n_components=input_number_of_assumed_state, covariance_type="full", init_params='mtc')    # 隠れマルコフモデルの仮定
+        model.startprob_ = np.array([1.0, 0.0, 0.0])
         model.fit(input_df_averaged)    # 隠れマルコフモデルにより、引数のデータを訓練
         #np.set_printoptions(threshold=np.inf)  # 配列の要素を全て表示(状態系列)
         #print("初期確率\n", model.startprob_)
