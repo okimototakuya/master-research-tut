@@ -301,6 +301,9 @@ def main():
         #    )
         for i in range(1, 6+1):
             ax = fig.add_subplot(2, 3, i)
+            if i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
+                ax_pos = ax.get_position()                                              # 返り値は、Bbox型
+                fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, dict_param_original['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
             g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
                     x = 'time',
                     y = df_averaged.iloc[:, i-1].name,
@@ -310,8 +313,6 @@ def main():
                 )
             g.set_xticklabels(labels=df_averaged['time'], rotation=90)
             plt.grid()
-        ax_pos = ax.get_position()                                              # 返り値は、Bbox型
-        fig.text(ax_pos.x1-0.2, ax_pos.y1, dict_param_original['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
         # プロットの可視化
         # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
         # [関連]: decompose_data, plot_data
