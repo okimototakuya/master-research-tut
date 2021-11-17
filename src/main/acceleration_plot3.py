@@ -309,6 +309,7 @@ def main():
                     data = df_averaged
                 )
             g.set_xticklabels(labels=df_averaged['time'], rotation=90)
+            plt.grid()
         ax_pos = ax.get_position()                                              # 返り値は、Bbox型
         fig.text(ax_pos.x1-0.2, ax_pos.y1, dict_param_original['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
         # プロットの可視化
