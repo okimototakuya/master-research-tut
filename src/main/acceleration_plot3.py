@@ -1,6 +1,5 @@
 import os
 import sys
-from datetime import datetime
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -213,6 +212,7 @@ def main():
         #df_read = df_read['onCrossroad']    # テスト: 列'onCrossroad'の抽出 (成功)
         #df_read = df_read[df_read['onCrossroad']=='0']    # 全ての交差点を抽出
         #df_read = df_read[df_read['crossroadID']=='83']    # 交差点83を抽出
+        df_read['time'] = pd.to_datetime(df_read['time'], format='%M:%S.%f')    # 列'time'をpd.datetime64[ns]型に変換
         # 2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)
         df_averaged = average_data(
                             input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
