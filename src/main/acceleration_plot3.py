@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -173,7 +174,11 @@ def plot_data(input_df_averaged, input_dict_param):
         ax = fig.add_subplot(2, 3, i)
         if i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
             ax_pos = ax.get_position()                                              # 返り値は、Bbox型
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, input_dict_param['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
+            # 1. 遷移行列, 2. プロット点数, 3. 交差点内の滞在時間
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'transition matrix:\n{matrix}'.format(matrix=input_dict_param['遷移行列']))     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'amount of plot:{amount}'.format(amount=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
+            #fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'stay time in crossroad:{time}s'    \
+            #        .format(time = datetime(input_df_averaged['time'][DATA_SAMPLED_LAST-1]) - datetime(input_df_averaged['time'][DATA_SAMPLED_FIRST])))
         g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
                 x = 'time',
                 y = input_df_averaged.iloc[:, i-1].name,
