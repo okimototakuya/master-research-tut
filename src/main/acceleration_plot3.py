@@ -67,6 +67,11 @@ def read_csv_(input_path_to_csv):
                 'AngularRate(X)[dps]', 'AngularRate(Y)[dps]', 'AngularRate(Z)[dps]',
                 'Temperature[degree]', 'Pressure[hPa]', 'MagnetCount', 'MagnetSwitch',
                 'onCrossroad', 'crossroadID'],
+            dtype = {'Unnamed: 0': int, 'line':int, 'time':"string",
+                'Acceleration(X)[g]':float,  'Acceleration(Y)[g]':float,  'Acceleration(Z)[g]':float,
+                'AngularRate(X)[dps]':float,  'AngularRate(Y)[dps]':float,  'AngularRate(Z)[dps]':float,
+                'Temperature[degree]':float,  'Pressure[hPa]':float,  'MagnetCount':int, 'MagnetSwitch':int,
+                'onCrossroad':int, 'crossroadID':int},
             skiprows = DATA_SAMPLED_FIRST + default_num_skip_row,
             engine = 'python',
             )
