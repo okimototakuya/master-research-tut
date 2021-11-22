@@ -181,7 +181,8 @@ def plot_data(input_df_averaged, input_dict_param):
                 palette = 'rainbow',
                 data = input_df_averaged
             )
-        g.set_xticklabels(labels=input_df_averaged['time'], rotation=90)
+        xlabels = [input_df_averaged['time'][i] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        g.set_xticklabels(labels=xlabels, rotation=90)
         plt.grid()
     #4-2. 散布図プロット
     sns.pairplot(
