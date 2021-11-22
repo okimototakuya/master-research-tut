@@ -217,11 +217,7 @@ def main():
                             input_mean_range = MEAN_RANGE, # 引数2:平均値を計算する際の、要素数
                             input_how = HOW_TO_CALCULATE_MEAN,   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値
                     )
-        # 3. 主成分分析を実行する
-        # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
-        # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
-        df_pca = decompose_data(df_averaged.drop('time', axis=1)).join(df_averaged['time'])
-        # 4. 隠れマルコフモデルを適用する
+        # 3. 隠れマルコフモデルを適用する
         if NUMBER_OF_ASSUMED_STATE > (DATA_SAMPLED_LAST - DATA_SAMPLED_FIRST):  # 2021/7/5 2時頃: clustering, hmm共に、全く同じ例外が投げられることを確認した。
             raise Exception('確率モデルを用いる際に仮定する状態数の値が不適切です:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})'  \
                     .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
@@ -240,26 +236,27 @@ def main():
             raise Exception('HMMを仮定した場合、状態数=サンプル数の時でも警告や例外が発生します:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})' \
                     .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
         else:
-            dict_param_original = estimate_state_data(   # 主成分分析をせずに、隠れマルコフモデルを適用する場合
+            # 主成分分析をせずに、隠れマルコフモデルを適用する
+            # [目的]: 次元削減でなく、データ可視化
+            dict_param_original = estimate_state_data(
                     input_df_averaged = df_averaged.drop('time', axis=1),
                     input_how = ASSUMED_PROBABILISTIC_MODEL,
                     input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
                 )
-            dict_param_pca = estimate_state_data(   # 主成分分析をして、隠れマルコフモデルを適用する場合
-                    input_df_averaged = df_pca.drop('time', axis=1),
-                    input_how = ASSUMED_PROBABILISTIC_MODEL,
-                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
-                )
+        # 4. 主成分分析を実行する
+        # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
+        # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
+        # [目的]: 次元削減でなく、データ可視化
+        # - 2021.11.18の進捗報告時: 局所解に陥っている可能性があることを指摘された。
+        df_pca = decompose_data(df_averaged.drop('time', axis=1)).join(df_averaged['time'])
         # 5. 上記の算出結果をプロットする
-        # 5-1. pd.DataFrame.plotを用いて、プロットする場合: input_how="pd"
-        # 5-2. seaborn.pairplotを用いて、プロットする場合: input_how="sns"
-        plot_data(  # 主成分分析をしなかったもの
-                input_df_averaged = df_averaged,
-                input_dict_param = dict_param_original,
+        plot_data(  # no-pca
+                input_df_averaged = df_averaged,            # PCAしていないデータ
+                input_dict_param = dict_param_original,     # [＊]: 次元削減でなくデータ可視化が目的のため、HMMは原データのみに適用
             )
-        plot_data(  # 主成分分析をしたもの
-                input_df_averaged = df_pca,
-                input_dict_param = dict_param_pca,
+        plot_data(  # pca
+                input_df_averaged = df_pca,                 # PCAしたデータ
+                input_dict_param = dict_param_original,
             )
         # プロットの可視化
         # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
