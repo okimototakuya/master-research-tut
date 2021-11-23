@@ -3,6 +3,7 @@ import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import seaborn as sns
 sys.path.append('../test')
 import test_acceleration_plot3 as tap3
@@ -189,8 +190,43 @@ def plot_data(input_df_averaged, input_dict_param):
                 palette = 'rainbow',
                 data = input_df_averaged
             )
-        xlabels = [input_df_averaged['time'][i] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-        g.set_xticklabels(labels=xlabels, rotation=90)
+        # 4-1-2. Locatorの設定
+        # - 目盛りの設定 (例. 線形目盛り, 対数目盛りなど)
+        # - 下記
+        # - xaxis: 線形目盛り
+        # - yaxis: 自動目盛り (＊: 外れ値が含まれるため、ユーザが前もって目盛りの上限/下限を設定するのは望ましくない。
+        xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        #g.set_xticks(xlabels)                                          # Locatorは、FixedLocator: [*]: 目盛りに設定できない。
+        #g.set_xticks([i for i in range(len(input_df_averaged))])      # Locatorは、FixedLocator: [**]: プロットがグラフ左端に潰れた。
+        g.set_xticks(input_df_averaged['time'])      # Locatorは、FixedLocator: 2021.11.23: とりあえずのプロットに成功した。
+        #g.xaxis.set_major_locator(ticker.LinearLocator(len(input_df_averaged['time'])))    # [警告]: FormatterをFixedFormatter (自由設定) する場合、LocatorもFixedLocatorが望ましい。
+        #g.xaxis.set_major_locator(ticker.FixedLocator())                                   # [*]: パラメータlocsに値が与えられていない。
+        g.xaxis.set_minor_locator(ticker.NullLocator())                 # 2021.11.23: FIXME: 補助目盛りが含まれたまま。
+        ## ↓y軸の設定
+        #ax.set_yticks([])
+        #g.yaxis.set_major_locator(ticker.AutoLocator())
+        #g.yaxis.set_minor_locator(ticker.AutoLocator())
+        # 4-1-3. Formatterの設定
+        # - 目盛りラベルの設定
+        # - xticklabelsにリストを渡すと、その値の箇所だけ目盛りが配置される。
+        # - ↑この時、FormatterはFixedFormatter
+        @ticker.FuncFormatter               # HACK: 2021.11.23: xが何なのかが分からない。
+        def tostring_formatter(x, pos):
+            '''
+            # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+            '''
+            print('x: ', x)
+            print('"[%.2f]" % x: ', "[%.2f]" % x)
+            print('pos: ', pos)
+            #return x.strftime('%M:%S.%f').split('00000')[0] if pos % 10 == 0 else ''
+            return x
+        #g.xaxis.set_major_formatter(tostring_formatter)                # 2021.11.23: HACK: ticker.FuncFormatterの仕様が分からない。
+        #print('major_formatter: ', g.xaxis.get_major_formatter())
+        g.xaxis.set_minor_formatter(ticker.NullFormatter())             # 2021.11.23: FIXME: これでも、補助目盛りが含まれたまま。
+        ## ↓y軸の設定
+        #g.yaxis.set_major_formatter(ticker.AutoFormatter())
+        #g.yaxis.set_minor_formatter(ticker.AutoFormatter())
+        g.set_xticklabels(labels=xlabels, rotation=90)  # FormatterはFixedFormatter
         plt.grid()
     #4-2. 散布図プロット
     sns.pairplot(
