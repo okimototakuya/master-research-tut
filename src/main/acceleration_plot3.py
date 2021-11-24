@@ -3,6 +3,7 @@ import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import seaborn as sns
 sys.path.append('../test')
 import test_acceleration_plot3 as tap3
@@ -66,6 +67,11 @@ def read_csv_(input_path_to_csv):
                 'AngularRate(X)[dps]', 'AngularRate(Y)[dps]', 'AngularRate(Z)[dps]',
                 'Temperature[degree]', 'Pressure[hPa]', 'MagnetCount', 'MagnetSwitch',
                 'onCrossroad', 'crossroadID'],
+            dtype = {'Unnamed: 0': int, 'line':int, 'time':"string",
+                'Acceleration(X)[g]':float,  'Acceleration(Y)[g]':float,  'Acceleration(Z)[g]':float,
+                'AngularRate(X)[dps]':float,  'AngularRate(Y)[dps]':float,  'AngularRate(Z)[dps]':float,
+                'Temperature[degree]':float,  'Pressure[hPa]':float,  'MagnetCount':int, 'MagnetSwitch':int,
+                'onCrossroad':int, 'crossroadID':int},
             skiprows = DATA_SAMPLED_FIRST + default_num_skip_row,
             engine = 'python',
             )
@@ -173,7 +179,12 @@ def plot_data(input_df_averaged, input_dict_param):
         ax = fig.add_subplot(2, 3, i)
         if i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
             ax_pos = ax.get_position()                                              # 返り値は、Bbox型
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, input_dict_param['遷移行列'])     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
+            # 1. 遷移行列, 2. プロット点数, 3. 交差点内の滞在時間, 4. 状態系列の復号(最初/最後から数10点)
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'transition matrix:\n{matrix}'.format(matrix=input_dict_param['遷移行列']))     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'amount of plot:{amount}'.format(amount=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'stay time in crossroad:{stay}'.format(stay=input_df_averaged['time'][DATA_SAMPLED_LAST-1]-input_df_averaged['time'][DATA_SAMPLED_FIRST]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.02, 'state series (first):{series}'.format(series=input_dict_param['状態系列の復号'][:25]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.01, 'state series (last):{series}'.format(series=input_dict_param['状態系列の復号'][-25:]))
         g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
                 x = 'time',
                 y = input_df_averaged.iloc[:, i-1].name,
@@ -181,7 +192,43 @@ def plot_data(input_df_averaged, input_dict_param):
                 palette = 'rainbow',
                 data = input_df_averaged
             )
-        g.set_xticklabels(labels=input_df_averaged['time'], rotation=90)
+        # 4-1-2. Locatorの設定
+        # - 目盛りの設定 (例. 線形目盛り, 対数目盛りなど)
+        # - 下記
+        # - xaxis: 線形目盛り
+        # - yaxis: 自動目盛り (＊: 外れ値が含まれるため、ユーザが前もって目盛りの上限/下限を設定するのは望ましくない。
+        xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        #g.set_xticks(xlabels)                                          # Locatorは、FixedLocator: [*]: 目盛りに設定できない。
+        #g.set_xticks([i for i in range(len(input_df_averaged))])      # Locatorは、FixedLocator: [**]: プロットがグラフ左端に潰れた。
+        g.set_xticks(input_df_averaged['time'])      # Locatorは、FixedLocator: 2021.11.23: とりあえずのプロットに成功した。
+        #g.xaxis.set_major_locator(ticker.LinearLocator(len(input_df_averaged['time'])))    # [警告]: FormatterをFixedFormatter (自由設定) する場合、LocatorもFixedLocatorが望ましい。
+        #g.xaxis.set_major_locator(ticker.FixedLocator())                                   # [*]: パラメータlocsに値が与えられていない。
+        g.xaxis.set_minor_locator(ticker.NullLocator())                 # 2021.11.23: FIXME: 補助目盛りが含まれたまま。
+        ## ↓y軸の設定
+        #ax.set_yticks([])
+        #g.yaxis.set_major_locator(ticker.AutoLocator())
+        #g.yaxis.set_minor_locator(ticker.AutoLocator())
+        # 4-1-3. Formatterの設定
+        # - 目盛りラベルの設定
+        # - xticklabelsにリストを渡すと、その値の箇所だけ目盛りが配置される。
+        # - ↑この時、FormatterはFixedFormatter
+        @ticker.FuncFormatter               # HACK: 2021.11.23: xが何なのかが分からない。
+        def tostring_formatter(x, pos):
+            '''
+            # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+            '''
+            print('x: ', x)
+            print('"[%.2f]" % x: ', "[%.2f]" % x)
+            print('pos: ', pos)
+            #return x.strftime('%M:%S.%f').split('00000')[0] if pos % 10 == 0 else ''
+            return x
+        #g.xaxis.set_major_formatter(tostring_formatter)                # 2021.11.23: HACK: ticker.FuncFormatterの仕様が分からない。
+        #print('major_formatter: ', g.xaxis.get_major_formatter())
+        g.xaxis.set_minor_formatter(ticker.NullFormatter())             # 2021.11.23: FIXME: これでも、補助目盛りが含まれたまま。
+        ## ↓y軸の設定
+        #g.yaxis.set_major_formatter(ticker.AutoFormatter())
+        #g.yaxis.set_minor_formatter(ticker.AutoFormatter())
+        g.set_xticklabels(labels=xlabels, rotation=90)  # FormatterはFixedFormatter
         plt.grid()
     #4-2. 散布図プロット
     sns.pairplot(
@@ -202,6 +249,7 @@ def main():
         #df_read = df_read['onCrossroad']    # テスト: 列'onCrossroad'の抽出 (成功)
         #df_read = df_read[df_read['onCrossroad']=='0']    # 全ての交差点を抽出
         #df_read = df_read[df_read['crossroadID']=='83']    # 交差点83を抽出
+        df_read['time'] = pd.to_datetime(df_read['time'], format='%M:%S.%f')    # 列'time'をpd.datetime64[ns]型に変換
         # 2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)
         df_averaged = average_data(
                             input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
