@@ -143,9 +143,9 @@ def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_st
         model.fit(input_df_averaged)    # クラスタリングにより、引数のデータを訓練
         return model.labels_
     elif input_how == 'hmm':
-        #model = hmmlearn.hmm.GaussianHMM(n_components=input_number_of_assumed_state, covariance_type="full")    # 隠れマルコフモデルの仮定
+        np.random.seed(seed=7)
         model = hmm.GaussianHMM(n_components=input_number_of_assumed_state, covariance_type="full", init_params='mtc')    # 隠れマルコフモデルの仮定
-        model.startprob_ = np.array([1.0, 0.0, 0.0])
+        model.startprob_ = np.array([1.0 if i == 0 else 0.0 for i in range(NUMBER_OF_ASSUMED_STATE)])   # 初期状態を状態1で固定
         model.fit(input_df_averaged)    # 隠れマルコフモデルにより、引数のデータを訓練
         #np.set_printoptions(threshold=np.inf)  # 配列の要素を全て表示(状態系列)
         #print("初期確率\n", model.startprob_)
