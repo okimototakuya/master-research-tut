@@ -16,20 +16,13 @@ from sklearn.cluster import KMeans
 # 2021/7/1:HACK1: Pythonにおけるグローバル変数の取り扱いについて
 # 方法1.python公式ドキュメント(https://docs.python.org/ja/3/faq/programming.html):グローバル変数モジュールのグローバル変数はカプセル化せず、剥き出し.
 # 方法2.実践Python3:シングルトンデザインパターンでは、変数をプライベート化し、変数を取得するメソッドをパブリック化.
-# 2021/7/1:HACK2: PLOT_AMOUNT_IN_GRAPHの必要性について。一応config.pyから移動させてけども。
 
 # 加速度データファイル(csv)のパス
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19(交差点ラベル付)
-PATH_CSV_ACCELERATION_DATA = "../../dataset/83番交差点.csv"
-
-# 時系列/加速度2次元プロット画像ファイルの保存先
-#PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
-PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge/"
-#PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
-#PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/tmp/"
+PATH_CSV_ACCELERATION_DATA = "../../dataset/2crossroad.csv"
 
 # csvファイルを読み取る際の、切り出し区間
 DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
@@ -38,16 +31,13 @@ DATA_SAMPLED_LAST = sum([1 for _ in open(PATH_CSV_ACCELERATION_DATA)]) - 1  # �
 #DATA_SAMPLED_LAST = 30 # テスト用
 
 # 平均値計算の設定: 関数average_data
-MEAN_RANGE = 40  # 平均値を計算する際の、要素数
-HOW_TO_CALCULATE_MEAN = 'slide_median'    # 平均値の算出方法 ('fixed_mean': 固定(?)平均, 'slide_mean': 移動平均, 'slide_median': 移動中央値)
+MEAN_RANGE = 1  # 平均値を計算する際の、要素数
+HOW_TO_CALCULATE_MEAN = 'slide_mean'    # 平均値の算出方法 ('fixed_mean': 固定(?)平均, 'slide_mean': 移動平均, 'slide_median': 移動中央値)
 
 # 確率モデルの設定: 関数estimate_state_data
 ASSUMED_PROBABILISTIC_MODEL = 'hmm' # 仮定する確率モデル (クラスタリング: 'clustering', 隠れマルコフモデル: 'hmm')
 NUMBER_OF_ASSUMED_STATE = 3 # 仮定する状態数(クラスタ数)
 
-# プロットの設定: 関数plot_data
-#PLOT_AMOUNT_IN_GRAPH = 10000   # 1つのグラフにおけるプロット数
-#PLOT_AMOUNT_IN_GRAPH = 131663
 
 def read_csv_(input_path_to_csv):
     '''
@@ -181,19 +171,27 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     input_df_averaged = input_df_averaged.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
     #4-1. 時系列プロット
     fig = plt.figure()
+    plt.title(PATH_CSV_ACCELERATION_DATA)
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
-        if i == 2:
-            ax_pos = ax.get_position()                                              # 返り値は、Bbox型
+        if i == 1:
+            # 1. HMMで仮定した状態数, 2. 平均方法, 3. 平均幅
+            ax_pos = ax.get_position()
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, 'assumed state amount in HMM: {hmm}'.format(hmm=NUMBER_OF_ASSUMED_STATE))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'how to mean: {how}'.format(how=HOW_TO_CALCULATE_MEAN))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'mean range: {range_}'.format(range_=MEAN_RANGE))
+        elif i == 2:
+            # 1. Factor Loading
+            ax_pos = ax.get_position()
             fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'Factor Loading:\n{loading}'.format(loading=input_loading))
         elif i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
             ax_pos = ax.get_position()                                              # 返り値は、Bbox型
             # 1. 遷移行列, 2. プロット点数, 3. 交差点内の滞在時間, 4. 状態系列の復号(最初/最後から数10点), 5. Factor Loading
             fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, 'transition matrix:\n{matrix}'.format(matrix=input_dict_param['遷移行列']))     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'amount of plot:{amount}'.format(amount=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'stay time in crossroad:{stay}'.format(stay=input_df_averaged['time'][DATA_SAMPLED_LAST-1]-input_df_averaged['time'][DATA_SAMPLED_FIRST]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'state series (first):{series}'.format(series=input_dict_param['状態系列の復号'][:25]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.02, 'state series (last):{series}'.format(series=input_dict_param['状態系列の復号'][-25:]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'amount of plot: {amount}'.format(amount=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'stay time in crossroad: {stay}'.format(stay=input_df_averaged['time'][DATA_SAMPLED_LAST-1]-input_df_averaged['time'][DATA_SAMPLED_FIRST]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'state series (first): {series}'.format(series=input_dict_param['状態系列の復号'][:25]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.02, 'state series (last): {series}'.format(series=input_dict_param['状態系列の復号'][-25:]))
         g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
                 x = 'time',
                 y = input_df_averaged.iloc[:, i-1].name,
