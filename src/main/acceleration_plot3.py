@@ -38,7 +38,7 @@ DATA_SAMPLED_LAST = sum([1 for _ in open(PATH_CSV_ACCELERATION_DATA)]) - 1  # �
 #DATA_SAMPLED_LAST = 30 # テスト用
 
 # 平均値計算の設定: 関数average_data
-MEAN_RANGE = 10  # 平均値を計算する際の、要素数
+MEAN_RANGE = 40  # 平均値を計算する際の、要素数
 HOW_TO_CALCULATE_MEAN = 'slide_median'    # 平均値の算出方法 ('fixed_mean': 固定(?)平均, 'slide_mean': 移動平均, 'slide_median': 移動中央値)
 
 # 確率モデルの設定: 関数estimate_state_data
@@ -131,7 +131,11 @@ def decompose_data(input_df_averaged):
     #        diag_kind = 'kde',
     #        plot_kws = {'alpha': 0.2},
     #    )
-    return df_pca
+    # ローディングの算出
+    # pca.components_ : ノルム1の固有ベクトル
+    # pca.explained_variance_ : 固有値
+    loading = pca.components_ * np.c_[np.sqrt(pca.explained_variance_)]
+    return df_pca, loading
 
 
 def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_state):
@@ -154,11 +158,13 @@ def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_st
         #print("遷移確率\n", model.transmat_)
         #print("対数尤度\n", model.score(input_df_averaged))
         #print("状態系列の復号\n", model.predict(input_df_averaged))
+        np.set_printoptions(precision=3, suppress=True)        # 小数点以下の有効数字3桁, 指数表記しない
         dict_param = {
                  "初期確率": model.startprob_,
                  "平均値": model.means_,
                  "共分散値": model.covars_,
-                 "遷移行列": model.transmat_,
+                 #"遷移行列": model.transmat_,  # デフォルト
+                 "遷移行列": model.transmat_ * 100,   # 百分率
                  "対数尤度": model.score(input_df_averaged),
                  "状態系列の復号": model.predict(input_df_averaged)
                  }
@@ -168,7 +174,7 @@ def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_st
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
 
-def plot_data(input_df_averaged, input_dict_param):
+def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     '''
     pd.DataFrame型変数のプロットを行う関数
     '''
@@ -177,14 +183,17 @@ def plot_data(input_df_averaged, input_dict_param):
     fig = plt.figure()
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
-        if i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
+        if i == 2:
             ax_pos = ax.get_position()                                              # 返り値は、Bbox型
-            # 1. 遷移行列, 2. プロット点数, 3. 交差点内の滞在時間, 4. 状態系列の復号(最初/最後から数10点)
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'transition matrix:\n{matrix}'.format(matrix=input_dict_param['遷移行列']))     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'amount of plot:{amount}'.format(amount=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'stay time in crossroad:{stay}'.format(stay=input_df_averaged['time'][DATA_SAMPLED_LAST-1]-input_df_averaged['time'][DATA_SAMPLED_FIRST]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.02, 'state series (first):{series}'.format(series=input_dict_param['状態系列の復号'][:25]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.01, 'state series (last):{series}'.format(series=input_dict_param['状態系列の復号'][-25:]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'Factor Loading:\n{loading}'.format(loading=input_loading))
+        elif i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
+            ax_pos = ax.get_position()                                              # 返り値は、Bbox型
+            # 1. 遷移行列, 2. プロット点数, 3. 交差点内の滞在時間, 4. 状態系列の復号(最初/最後から数10点), 5. Factor Loading
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, 'transition matrix:\n{matrix}'.format(matrix=input_dict_param['遷移行列']))     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'amount of plot:{amount}'.format(amount=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'stay time in crossroad:{stay}'.format(stay=input_df_averaged['time'][DATA_SAMPLED_LAST-1]-input_df_averaged['time'][DATA_SAMPLED_FIRST]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'state series (first):{series}'.format(series=input_dict_param['状態系列の復号'][:25]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.02, 'state series (last):{series}'.format(series=input_dict_param['状態系列の復号'][-25:]))
         g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
                 x = 'time',
                 y = input_df_averaged.iloc[:, i-1].name,
@@ -296,7 +305,8 @@ def main():
         # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
         # [目的]: 次元削減でなく、データ可視化
         # - 2021.11.18の進捗報告時: 局所解に陥っている可能性があることを指摘された。
-        df_pca = decompose_data(df_averaged.drop('time', axis=1)).join(df_averaged['time'])
+        df_pca, loading = decompose_data(df_averaged.drop('time', axis=1))
+        df_pca = df_pca.join(df_averaged['time'])
         # 5. 上記の算出結果をプロットする
         plot_data(  # no-pca
                 input_df_averaged = df_averaged,            # PCAしていないデータ
@@ -305,6 +315,7 @@ def main():
         plot_data(  # pca
                 input_df_averaged = df_pca,                 # PCAしたデータ
                 input_dict_param = dict_param_original,
+                input_loading = loading
             )
         # プロットの可視化
         # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
