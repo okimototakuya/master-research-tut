@@ -73,6 +73,12 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
     引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
     引数2:平均値を計算する際の、要素数
     引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
+
+    Notes
+    -----
+    - 関数average_dataの仕様について、
+    　-- param: pd.Dataframeを'time'列ごと与える。固定平均については、'time'列の更新が含まれるため。
+    　-- return: pd.Dataframeを返す。ただし、'time'列は列尾に追加。
     '''
     if input_how == 'fixed_mean':  # 固定(?)平均
        #len_after_division = int(len(input_acc_ang_df)/input_mean_range)    # 固定平均を算出した際、算出後のpd.DataFrame型変数の大きさ

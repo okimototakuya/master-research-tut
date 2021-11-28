@@ -74,7 +74,7 @@ class TestAccelerationPlot3(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_save_dataframe_to_csv_(self):
+    def _test_save_dataframe_to_csv_(self):
         '''
         テストDataFrame型変数をテストcsvファイルに変換できたかテスト(テストコードのみの関数)
         '''
@@ -154,7 +154,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         os.remove('./test_dataset/demo.csv')   # 次回のテストのためにテストcsvファイルを削除
         print(df_test)
 
-    def test_read_csv_sample_all_crossroad(self):
+    def _test_read_csv_sample_all_crossroad(self):
         '''
         ap3.read_csv_関数が全ての交差点を抽出できるかテスト
         '''
@@ -222,7 +222,7 @@ class TestAccelerationPlot3(unittest.TestCase):
         #    インデックスオブジェクトの要素をランダムに抽出し、アサーション
         self.assertIsInstance(df_test.index[np.random.randint(len(df_test))], int)
 
-    def _test_average_data_mean_range_1(self):
+    def test_average_data_mean_range_1(self):
         '''
         main/ap3/average_data関数の引数について、input_mean_range=1を指定した場合、元のDataFrame型変数と値が変わらないかでテスト
         → ナイーブなやり方は、if input_mean_range=1: return input_df
@@ -231,24 +231,31 @@ class TestAccelerationPlot3(unittest.TestCase):
         → 加速度/角速度の列のみを抽出して, 平均値の計算を行うのがベター.
         → 2020.12.16現在, csvから読み込んだpd.DataFrame型変数のインデックスは,
           Int64Index(~, dtype=\'int64\') (デフォルト) であるため好都合.(デフォルトでつけてくれるインデックスでOK)
+
+        Notes
+        -----
+        - 関数average_dataの仕様について、
+        　-- param: pd.Dataframeを'time'列ごと与える。固定平均については、'time'列の更新が含まれるため。
+        　-- return: pd.Dataframeを返す。ただし、'time'列は列尾に追加。
         '''
-        mean_range = 1  # 平均値をとる要素数
-        # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
+        mean_range = 1                                              # テスト準備1: 平均値をとる要素数
+        df_real = df_real_columns.loc[:, [                          # テスト準備2: 関数ap3.average_dataに与える引数
+                                           'time',
+                                           'Acceleration(X)[g]',
+                                           'Acceleration(Y)[g]',
+                                           'Acceleration(Z)[g]',
+                                           'AngularRate(X)[dps]',
+                                           'AngularRate(Y)[dps]',
+                                           'AngularRate(Z)[dps]',
+                                       ]]
         df_test = ap3.average_data(
-                                #input_acc_ang_df = df_real_columns, \
-                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
-                                input_mean_range = mean_range, \
-                                input_how = 'fixed_mean',
+                                input_acc_ang_df = df_real,     # 注. 'time'列ごと与えること
+                                input_mean_range = mean_range,
+                                input_how = 'slide_median',
                                 )
-        #print(df_real_columns, '\n')    # 「元のDataFrame型変数」の値を出力
-        #print(df_real_columns.columns, '\n')    # 「元のDataFrame型変数」の列リストを出力
-        #print(type(df_real_columns['time'][np.random.randint(AMOUNT_OF_ROW)]), '\n') # 「元のDataFrame型変数」のtime列の要素の型を出力
-        print(df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], '\n')    # 「元のDataFrame型変数」の加速度/角速度の列pd.DataFrameを出力
-        print(df_test, '\n')                  # 「関数の出力値のDataFrame型変数」の値を出力
-        #print(df_test.columns, '\n')  # 「関数の出力値のDataFrame型変数」の列リストを出力
-        # 2. 関数の出力値としてのDataFrame型変数と元のDataFrame型変数とで、値をアサーション
-        #pd.testing.assert_frame_equal(df_test, df_real_columns)
-        pd.testing.assert_frame_equal(df_test, df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'])
+        print('df_real\n{real}'.format(real=df_real))
+        print('df_test\n{test}'.format(test=df_test))
+        pd.testing.assert_frame_equal(df_real.drop('time', axis=1), df_test.drop('time', axis=1))   # 'time'列を除いてアサーション
 
     def _test_average_data_index_type(self):
         '''
