@@ -558,18 +558,6 @@ class TestAccelerationPlot3(unittest.TestCase):
         print(ndarray_test)
         self.assertIsInstance(ndarray_test, np.ndarray)
 
-    def _test_decompose_data(self):
-        '''
-        scipyによる特異値分解と、ap3.decompose_data関数による主成分分析が一致するかテスト
-
-        Notes
-        -----
-        - FIXME: 2021.11.9 21:30頃, Assertion Error: DataFrame are different
-        '''
-        df_pca = ap3.decompose_data(df_real_columns[['Acceleration(X)[g]', 'Acceleration(Y)[g]', 'Acceleration(Z)[g]']])
-        df_test = df_real_columns
-        pd.testing.assert_frame_equal(df_test, df_pca)
-
 
 if __name__ == '__main__':
     unittest.main()

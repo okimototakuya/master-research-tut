@@ -4,6 +4,7 @@ import numpy as np
 sys.path.append('../main')
 import acceleration_plot3 as ap3
 
+
 class TestEstimateStateData(unittest.TestCase):
     '''
     HMMの予測結果の妥当性をテスト
