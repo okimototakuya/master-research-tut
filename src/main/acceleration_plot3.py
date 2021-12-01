@@ -2,12 +2,14 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+import matplotlib
+#matplotlib.use('TkAgg')                 # TkAggバックエンド: 最大で表示された後、すぐに最小化。
+matplotlib.use('Qt5Agg')                 # 注. スクリプト環境では、pyqt5が必須。
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
 sys.path.append('../test')
 import test_acceleration_plot3 as tap3
-#import hmmlearn
 from hmmlearn import hmm
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
@@ -177,6 +179,9 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     input_df_averaged = input_df_averaged.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
     #4-1. 時系列プロット
     fig = plt.figure()
+    mng = plt.get_current_fig_manager()     # Mac環境で、pltによる自動フルスクリーンを用いる。
+    #mng.resize(*mng.window.maxsize())       # TkAggバックエンド
+    mng.window.showMaximized()              # QT (QtAgg5) バックエンド
     plt.title(PATH_CSV_ACCELERATION_DATA)
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
@@ -243,6 +248,10 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         #g.yaxis.set_minor_formatter(ticker.AutoFormatter())
         g.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid()
+        if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
+            plt.savefig('../../plot/hoge-hoge/Figure1.png')
+        else:                       # PCA特徴量の場合、Figure3.pngとして保存
+            plt.savefig('../../plot/hoge-hoge/Figure3.png')
     #4-2. 散布図プロット
     sns.pairplot(
             input_df_averaged,
@@ -251,6 +260,10 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
             hue = 'state',
             palette = 'rainbow',
         )
+    if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
+        plt.savefig('../../plot/hoge-hoge/Figure2.png')
+    else:                       # PCA特徴量の場合、Figure3.pngとして保存
+        plt.savefig('../../plot/hoge-hoge/Figure4.png')
 
 
 def main():
@@ -321,6 +334,7 @@ def main():
                 input_dict_param = dict_param_original,
                 input_loading = loading
             )
+
         # プロットの可視化
         # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
         # [関連]: decompose_data, plot_data
