@@ -2,12 +2,14 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+import matplotlib
+#matplotlib.use('TkAgg')                 # TkAggバックエンド: 最大で表示された後、すぐに最小化。
+matplotlib.use('Qt5Agg')                 # 注. スクリプト環境では、pyqt5が必須。
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
 sys.path.append('../test')
 import test_acceleration_plot3 as tap3
-#import hmmlearn
 from hmmlearn import hmm
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
@@ -16,38 +18,25 @@ from sklearn.cluster import KMeans
 # 2021/7/1:HACK1: Pythonにおけるグローバル変数の取り扱いについて
 # 方法1.python公式ドキュメント(https://docs.python.org/ja/3/faq/programming.html):グローバル変数モジュールのグローバル変数はカプセル化せず、剥き出し.
 # 方法2.実践Python3:シングルトンデザインパターンでは、変数をプライベート化し、変数を取得するメソッドをパブリック化.
-# 2021/7/1:HACK2: PLOT_AMOUNT_IN_GRAPHの必要性について。一応config.pyから移動させてけども。
 
 # 加速度データファイル(csv)のパス
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19(交差点ラベル付)
-PATH_CSV_ACCELERATION_DATA = "../../dataset/83番交差点.csv"
+PATH_CSV_ACCELERATION_DATA = "../../dataset/32crossroad_50.csv"
 
-# 時系列/加速度2次元プロット画像ファイルの保存先
-#PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
-PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/研究データ/サンプル2件/ID16/hoge-hoge/"
-#PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Library/Mobile Documents/com~apple~CloudDocs/Documents/研究/M1/研究データ/サンプル2件/ID16/hmm1x1y1z70000-80000_100/"
-#PATH_PNG_PLOT_DATA = "/Users/okimototakuya/Desktop/tmp/"
-
-# csvファイルを読み取る際の、切り出し区間
-DATA_SAMPLED_FIRST = 0  # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-#DATA_SAMPLED_LAST = 1000 # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
-DATA_SAMPLED_LAST = sum([1 for _ in open(PATH_CSV_ACCELERATION_DATA)]) - 1  # 最後のサンプル
-#DATA_SAMPLED_LAST = 30 # テスト用
+# グラフ内のプロット量
+AMOUNT_OF_PLOT = sum([1 for _ in open(PATH_CSV_ACCELERATION_DATA)]) - 1
 
 # 平均値計算の設定: 関数average_data
-MEAN_RANGE = 40  # 平均値を計算する際の、要素数
-HOW_TO_CALCULATE_MEAN = 'slide_median'    # 平均値の算出方法 ('fixed_mean': 固定(?)平均, 'slide_mean': 移動平均, 'slide_median': 移動中央値)
+MEAN_RANGE = 10  # 平均値を計算する際の、要素数
+HOW_TO_CALCULATE_MEAN = 'slide_mean'    # 平均値の算出方法 ('fixed_mean': 固定(?)平均, 'slide_mean': 移動平均, 'slide_median': 移動中央値)
 
 # 確率モデルの設定: 関数estimate_state_data
 ASSUMED_PROBABILISTIC_MODEL = 'hmm' # 仮定する確率モデル (クラスタリング: 'clustering', 隠れマルコフモデル: 'hmm')
 NUMBER_OF_ASSUMED_STATE = 3 # 仮定する状態数(クラスタ数)
 
-# プロットの設定: 関数plot_data
-#PLOT_AMOUNT_IN_GRAPH = 10000   # 1つのグラフにおけるプロット数
-#PLOT_AMOUNT_IN_GRAPH = 131663
 
 def read_csv_(input_path_to_csv):
     '''
@@ -58,9 +47,6 @@ def read_csv_(input_path_to_csv):
     return pd.read_csv(
             input_path_to_csv,  # 入力のcsvファイルパス
             index_col = 0,  # 列0 (列名オブジェクトがNone) をインデックスに
-                    # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-            skipfooter = sum([1 for _ in open(input_path_to_csv)]) - (DATA_SAMPLED_LAST + default_num_skip_row),    \
-                    # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
             header = None,
             names = ['Unnamed: 0', 'line', 'time',
                 'Acceleration(X)[g]', 'Acceleration(Y)[g]', 'Acceleration(Z)[g]',
@@ -72,7 +58,7 @@ def read_csv_(input_path_to_csv):
                 'AngularRate(X)[dps]':float,  'AngularRate(Y)[dps]':float,  'AngularRate(Z)[dps]':float,
                 'Temperature[degree]':float,  'Pressure[hPa]':float,  'MagnetCount':int, 'MagnetSwitch':int,
                 'onCrossroad':int, 'crossroadID':int},
-            skiprows = DATA_SAMPLED_FIRST + default_num_skip_row,
+            skiprows = default_num_skip_row,
             engine = 'python',
             )
 
@@ -83,6 +69,12 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
     引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
     引数2:平均値を計算する際の、要素数
     引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
+
+    Notes
+    -----
+    - 関数average_dataの仕様について、
+    　-- param: pd.Dataframeを'time'列ごと与える。固定平均については、'time'列の更新が含まれるため。
+    　-- return: pd.Dataframeを返す。ただし、'time'列は列尾に追加。
     '''
     if input_how == 'fixed_mean':  # 固定(?)平均
        #len_after_division = int(len(input_acc_ang_df)/input_mean_range)    # 固定平均を算出した際、算出後のpd.DataFrame型変数の大きさ
@@ -181,19 +173,30 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     input_df_averaged = input_df_averaged.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
     #4-1. 時系列プロット
     fig = plt.figure()
+    mng = plt.get_current_fig_manager()     # Mac環境で、pltによる自動フルスクリーンを用いる。
+    #mng.resize(*mng.window.maxsize())       # TkAggバックエンド
+    mng.window.showMaximized()              # QT (QtAgg5) バックエンド
+    plt.title(PATH_CSV_ACCELERATION_DATA)
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
-        if i == 2:
-            ax_pos = ax.get_position()                                              # 返り値は、Bbox型
+        if i == 1:
+            # 1. HMMで仮定した状態数, 2. 平均方法, 3. 平均幅
+            ax_pos = ax.get_position()
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, 'assumed state amount in HMM: {hmm}'.format(hmm=NUMBER_OF_ASSUMED_STATE))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'how to mean: {how}'.format(how=HOW_TO_CALCULATE_MEAN))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'mean range: {range_}'.format(range_=MEAN_RANGE))
+        elif i == 2:
+            # 1. Factor Loading
+            ax_pos = ax.get_position()
             fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'Factor Loading:\n{loading}'.format(loading=input_loading))
         elif i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
             ax_pos = ax.get_position()                                              # 返り値は、Bbox型
             # 1. 遷移行列, 2. プロット点数, 3. 交差点内の滞在時間, 4. 状態系列の復号(最初/最後から数10点), 5. Factor Loading
             fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, 'transition matrix:\n{matrix}'.format(matrix=input_dict_param['遷移行列']))     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'amount of plot:{amount}'.format(amount=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'stay time in crossroad:{stay}'.format(stay=input_df_averaged['time'][DATA_SAMPLED_LAST-1]-input_df_averaged['time'][DATA_SAMPLED_FIRST]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'state series (first):{series}'.format(series=input_dict_param['状態系列の復号'][:25]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.02, 'state series (last):{series}'.format(series=input_dict_param['状態系列の復号'][-25:]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'amount of plot: {amount}'.format(amount=AMOUNT_OF_PLOT))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'stay time in crossroad and around there: {stay}'.format(stay=input_df_averaged['time'][AMOUNT_OF_PLOT-1]-input_df_averaged['time'][0]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'state series (first): {series}'.format(series=input_dict_param['状態系列の復号'][:25]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.02, 'state series (last): {series}'.format(series=input_dict_param['状態系列の復号'][-25:]))
         g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
                 x = 'time',
                 y = input_df_averaged.iloc[:, i-1].name,
@@ -237,8 +240,12 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         ## ↓y軸の設定
         #g.yaxis.set_major_formatter(ticker.AutoFormatter())
         #g.yaxis.set_minor_formatter(ticker.AutoFormatter())
-        g.set_xticklabels(labels=xlabels, rotation=90)  # FormatterはFixedFormatter
+        g.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid()
+        if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
+            plt.savefig('../../plot/hoge-hoge/Figure1.png')
+        else:                       # PCA特徴量の場合、Figure3.pngとして保存
+            plt.savefig('../../plot/hoge-hoge/Figure3.png')
     #4-2. 散布図プロット
     sns.pairplot(
             input_df_averaged,
@@ -247,80 +254,88 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
             hue = 'state',
             palette = 'rainbow',
         )
+    if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
+        plt.savefig('../../plot/hoge-hoge/Figure2.png')
+    else:                       # PCA特徴量の場合、Figure3.pngとして保存
+        plt.savefig('../../plot/hoge-hoge/Figure4.png')
 
 
 def main():
-    if (DATA_SAMPLED_FIRST >= DATA_SAMPLED_LAST) or (DATA_SAMPLED_FIRST < 0 or DATA_SAMPLED_LAST < 0):
-        raise Exception('csvファイルの切り出し区間の指定が不適切です:{wrong_first}, {wrong_last}'.format(wrong_first=DATA_SAMPLED_FIRST, wrong_last=DATA_SAMPLED_LAST))
-    else:
-        # 1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す
-        df_read = read_csv_(PATH_CSV_ACCELERATION_DATA)
-        #df_read = df_read['onCrossroad']    # テスト: 列'onCrossroad'の抽出 (成功)
-        #df_read = df_read[df_read['onCrossroad']=='0']    # 全ての交差点を抽出
-        #df_read = df_read[df_read['crossroadID']=='83']    # 交差点83を抽出
-        df_read['time'] = pd.to_datetime(df_read['time'], format='%M:%S.%f')    # 列'time'をpd.datetime64[ns]型に変換
-        # 2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)
-        df_averaged = average_data(
-                            input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
-                                    df_read.loc[:,[  # 行数(データ数)の指定
-                                        'time',                 # 時刻
-                                        'Acceleration(X)[g]',   # 列(特徴量)の指定
-                                        'Acceleration(Y)[g]',
-                                        'Acceleration(Z)[g]',
-                                        'AngularRate(X)[dps]',
-                                        'AngularRate(Y)[dps]',
-                                        'AngularRate(Z)[dps]',
-                                       ]],
-                            input_mean_range = MEAN_RANGE, # 引数2:平均値を計算する際の、要素数
-                            input_how = HOW_TO_CALCULATE_MEAN,   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値
-                    )
-        # 3. 隠れマルコフモデルを適用する
-        if NUMBER_OF_ASSUMED_STATE > (DATA_SAMPLED_LAST - DATA_SAMPLED_FIRST):  # 2021/7/5 2時頃: clustering, hmm共に、全く同じ例外が投げられることを確認した。
-            raise Exception('確率モデルを用いる際に仮定する状態数の値が不適切です:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})'  \
-                    .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
-        elif NUMBER_OF_ASSUMED_STATE == (DATA_SAMPLED_LAST - DATA_SAMPLED_FIRST)    \
-                and ASSUMED_PROBABILISTIC_MODEL == 'hmm':   # HMMを仮定した場合、状態数=サンプル数の時でも警告や例外が発生する。
-            # HACK2021/7/5: 今後、状態数とサンプル数、尤度関数の関係について考える機会があると思う。
-            # [例外パターン]: (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(0, 3), NUMBER_OF_ASSUMED_STATE=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [1. 0. 1.])
-            # [警告パターン]: (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(108, 111), NUMBER_OF_ASSUMED_STATE=3の時、
-            #   Fitting a model with 89 free scalar parameters with only 18 data points will result in a degenerate solution.
-            #   /Users/okimototakuya/anaconda3/lib/python3.6/site-packages/seaborn/distributions.py:306: UserWarning: Dataset has 0 variance; skipping density estimate.
-            #   warnings.warn(msg, UserWarning)
-            #   /Users/okimototakuya/anaconda3/lib/python3.6/site-packages/seaborn/distributions.py:306: UserWarning: Dataset has 0 variance; skipping density estimate.
-            #   warnings.warn(msg, UserWarning)
-            #   /Users/okimototakuya/anaconda3/lib/python3.6/site-packages/seaborn/distributions.py:306: UserWarning: Dataset has 0 variance; skipping density estimate.
-            #   warnings.warn(msg, UserWarning), NUMBER_OF_ASSUMED_STATE=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [1. 0. 1.])
-            raise Exception('HMMを仮定した場合、状態数=サンプル数の時でも警告や例外が発生します:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})' \
-                    .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=DATA_SAMPLED_LAST-DATA_SAMPLED_FIRST))
-        else:
-            # 主成分分析をせずに、隠れマルコフモデルを適用する
-            # [目的]: 次元削減でなく、データ可視化
-            dict_param_original = estimate_state_data(
-                    input_df_averaged = df_averaged.drop('time', axis=1),
-                    input_how = ASSUMED_PROBABILISTIC_MODEL,
-                    input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
+    # 0. 標準入力がある場合、各パラメータを標準入力から取得する
+    if len(sys.argv) != 1:
+        global MEAN_RANGE, PATH_CSV_ACCELERATION_DATA, AMOUNT_OF_PLOT
+        MEAN_RANGE = int(sys.argv[1])                                                   # 平均区間
+        PATH_CSV_ACCELERATION_DATA = sys.argv[2]                                        # csvファイルのパス
+        AMOUNT_OF_PLOT = sum([1 for _ in open(PATH_CSV_ACCELERATION_DATA)]) - 1         # プロット量
+    # 1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す
+    df_read = read_csv_(PATH_CSV_ACCELERATION_DATA)
+    #df_read = df_read['onCrossroad']    # テスト: 列'onCrossroad'の抽出 (成功)
+    #df_read = df_read[df_read['onCrossroad']=='0']    # 全ての交差点を抽出
+    #df_read = df_read[df_read['crossroadID']==83]    # 交差点83を抽出
+    df_read['time'] = pd.to_datetime(df_read['time'], format='%M:%S.%f')    # 列'time'をpd.datetime64[ns]型に変換
+    # 2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)
+    df_averaged = average_data(
+                        input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
+                                df_read.loc[:,[  # 行数(データ数)の指定
+                                    'time',                 # 時刻
+                                    'Acceleration(X)[g]',   # 列(特徴量)の指定
+                                    'Acceleration(Y)[g]',
+                                    'Acceleration(Z)[g]',
+                                    'AngularRate(X)[dps]',
+                                    'AngularRate(Y)[dps]',
+                                    'AngularRate(Z)[dps]',
+                                   ]],
+                        input_mean_range = MEAN_RANGE, # 引数2:平均値を計算する際の、要素数
+                        input_how = HOW_TO_CALCULATE_MEAN,   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値
                 )
-        # 4. 主成分分析を実行する
-        # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
-        # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
+    # 3. 隠れマルコフモデルを適用する
+    if NUMBER_OF_ASSUMED_STATE > AMOUNT_OF_PLOT:  # 2021/7/5 2時頃: clustering, hmm共に、全く同じ例外が投げられることを確認した。
+        raise Exception('確率モデルを用いる際に仮定する状態数の値が不適切です:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})'  \
+                .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=AMOUNT_OF_PLOT))
+    elif NUMBER_OF_ASSUMED_STATE == AMOUNT_OF_PLOT    \
+            and ASSUMED_PROBABILISTIC_MODEL == 'hmm':   # HMMを仮定した場合、状態数=サンプル数の時でも警告や例外が発生する。
+        # HACK2021/7/5: 今後、状態数とサンプル数、尤度関数の関係について考える機会があると思う。
+        # [例外パターン]: (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(0, 3), NUMBER_OF_ASSUMED_STATE=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [1. 0. 1.])
+        # [警告パターン]: (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(108, 111), NUMBER_OF_ASSUMED_STATE=3の時、
+        #   Fitting a model with 89 free scalar parameters with only 18 data points will result in a degenerate solution.
+        #   /Users/okimototakuya/anaconda3/lib/python3.6/site-packages/seaborn/distributions.py:306: UserWarning: Dataset has 0 variance; skipping density estimate.
+        #   warnings.warn(msg, UserWarning)
+        #   /Users/okimototakuya/anaconda3/lib/python3.6/site-packages/seaborn/distributions.py:306: UserWarning: Dataset has 0 variance; skipping density estimate.
+        #   warnings.warn(msg, UserWarning)
+        #   /Users/okimototakuya/anaconda3/lib/python3.6/site-packages/seaborn/distributions.py:306: UserWarning: Dataset has 0 variance; skipping density estimate.
+        #   warnings.warn(msg, UserWarning), NUMBER_OF_ASSUMED_STATE=3の時、ValueError: rows of transmat_ must sum to 1.0 (got [1. 0. 1.])
+        raise Exception('HMMを仮定した場合、状態数=サンプル数の時でも警告や例外が発生します:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})' \
+                .format(wrong_number_state=NUMBER_OF_ASSUMED_STATE, wrong_number_sample=AMOUNT_OF_PLOT))
+    else:
+        # 主成分分析をせずに、隠れマルコフモデルを適用する
         # [目的]: 次元削減でなく、データ可視化
-        # - 2021.11.18の進捗報告時: 局所解に陥っている可能性があることを指摘された。
-        df_pca, loading = decompose_data(df_averaged.drop('time', axis=1))
-        df_pca = df_pca.join(df_averaged['time'])
-        # 5. 上記の算出結果をプロットする
-        plot_data(  # no-pca
-                input_df_averaged = df_averaged,            # PCAしていないデータ
-                input_dict_param = dict_param_original,     # [＊]: 次元削減でなくデータ可視化が目的のため、HMMは原データのみに適用
+        dict_param_original = estimate_state_data(
+                input_df_averaged = df_averaged.drop('time', axis=1),
+                input_how = ASSUMED_PROBABILISTIC_MODEL,
+                input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
             )
-        plot_data(  # pca
-                input_df_averaged = df_pca,                 # PCAしたデータ
-                input_dict_param = dict_param_original,
-                input_loading = loading
-            )
-        # プロットの可視化
-        # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
-        # [関連]: decompose_data, plot_data
-        plt.show()
+    # 4. 主成分分析を実行する
+    # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
+    # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
+    # [目的]: 次元削減でなく、データ可視化
+    # - 2021.11.18の進捗報告時: 局所解に陥っている可能性があることを指摘された。
+    df_pca, loading = decompose_data(df_averaged.drop('time', axis=1))
+    df_pca = df_pca.join(df_averaged['time'])
+    # 5. 上記の算出結果をプロットする
+    plot_data(  # no-pca
+            input_df_averaged = df_averaged,            # PCAしていないデータ
+            input_dict_param = dict_param_original,     # [＊]: 次元削減でなくデータ可視化が目的のため、HMMは原データのみに適用
+        )
+    plot_data(  # pca
+            input_df_averaged = df_pca,                 # PCAしたデータ
+            input_dict_param = dict_param_original,
+            input_loading = loading
+        )
+
+    # プロットの可視化
+    # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
+    # [関連]: decompose_data, plot_data
+    plt.show()
 
 if __name__ == '__main__':
     main()
