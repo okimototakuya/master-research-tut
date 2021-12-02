@@ -47,10 +47,6 @@ def read_csv_(input_path_to_csv):
     return pd.read_csv(
             input_path_to_csv,  # 入力のcsvファイルパス
             index_col = 0,  # 列0 (列名オブジェクトがNone) をインデックスに
-                    # 切り出し始め(line値DATA_SAMPLED_FIRSTはDataFrame型変数に含まれる)
-            #skipfooter = sum([1 for _ in open(input_path_to_csv)]) - (DATA_SAMPLED_LAST + default_num_skip_row),    \
-            #skipfooter = 2,    \
-                    # 切り出し終わり(line値DATA_SAMPLED_LASTはDataFrame型変数に含まれない)
             header = None,
             names = ['Unnamed: 0', 'line', 'time',
                 'Acceleration(X)[g]', 'Acceleration(Y)[g]', 'Acceleration(Z)[g]',
@@ -62,7 +58,6 @@ def read_csv_(input_path_to_csv):
                 'AngularRate(X)[dps]':float,  'AngularRate(Y)[dps]':float,  'AngularRate(Z)[dps]':float,
                 'Temperature[degree]':float,  'Pressure[hPa]':float,  'MagnetCount':int, 'MagnetSwitch':int,
                 'onCrossroad':int, 'crossroadID':int},
-            #skiprows = DATA_SAMPLED_FIRST + default_num_skip_row,
             skiprows = default_num_skip_row,
             engine = 'python',
             )
