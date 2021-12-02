@@ -63,6 +63,14 @@ df_real_columns = pd.DataFrame(
 class TestReadCsv_(unittest.TestCase):
     '''
     関数read_csv_についてテスト
+
+    Notes
+    -----
+    - HACK: 2021.12.2
+    　-- csvファイルを読み込んで生成されたpd.DataFrame型変数(df_test)が、元のpd.DataFrame型変数(df_real_columns)と、
+    　　 [たて × よこ]の大きさが変わらないことを確認した。
+    　　--- 関数test_read_csv_read_right_length, 関数test_read_csv_read_right_columns_length
+    　-- ただし、各列の型の不変性は確認していない。元々のプロダクトコードの処理からして本質でない。
     '''
     def setUp(self):
         '''
@@ -93,14 +101,29 @@ class TestReadCsv_(unittest.TestCase):
         '''
         # テストcsvファイルを読込
         df_test = ap3.read_csv_('./test_dataset/demo.csv')
-        print('df_test')
-        print('-----')
-        print(df_test)
-        print('df_real_columns')
-        print('-----')
-        print(df_real_columns)
+        #print('df_test')
+        #print('-----')
+        #print(df_test)
+        #print('df_real_columns')
+        #print('-----')
+        #print(df_real_columns)
         #pd.testing.assert_frame_equal(df_test, df_real_columns)
         self.assertEqual(len(df_test), len(df_real_columns))
+
+    def test_read_csv_read_right_columns_length(self):
+        '''
+        テストcsvファイルをDataFrame型変数として正しい列数で読み込めたかテスト
+        '''
+        # テストcsvファイルを読込
+        df_test = ap3.read_csv_('./test_dataset/demo.csv')
+        #print('df_test')
+        #print('-----')
+        #print(df_test)
+        #print('df_real_columns')
+        #print('-----')
+        #print(df_real_columns)
+        #pd.testing.assert_frame_equal(df_test, df_real_columns)
+        self.assertEqual(len(df_test.columns), len(df_real_columns.columns))
 
     def test_read_csv_index_type(self):
         '''
