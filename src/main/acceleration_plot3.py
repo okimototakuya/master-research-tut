@@ -176,27 +176,31 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     mng = plt.get_current_fig_manager()     # Mac環境で、pltによる自動フルスクリーンを用いる。
     #mng.resize(*mng.window.maxsize())       # TkAggバックエンド
     mng.window.showMaximized()              # QT (QtAgg5) バックエンド
-    plt.title(PATH_CSV_ACCELERATION_DATA)
+    #fig.xaxis.set_major_locator(ticker.NullLocator())
+    #fig.xaxis.set_minor_locator(ticker.NullLocator())
+    #fig.yaxis.set_major_locator(ticker.NullLocator())
+    #fig.yaxis.set_minor_locator(ticker.NullLocator())
+    ax = [0 for _ in range(6)]
     for i in range(1, 6+1):
-        ax = fig.add_subplot(2, 3, i)
+        ax[i-1] = fig.add_subplot(2, 3, i)
         if i == 1:
             # 1. HMMで仮定した状態数, 2. 平均方法, 3. 平均幅
-            ax_pos = ax.get_position()
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, 'assumed state amount in HMM: {hmm}'.format(hmm=NUMBER_OF_ASSUMED_STATE))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'how to mean: {how}'.format(how=HOW_TO_CALCULATE_MEAN))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'mean range: {range_}'.format(range_=MEAN_RANGE))
+            ax_pos = ax[i-1].get_position()
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, '- assumed state amount in HMM: {hmm}'.format(hmm=NUMBER_OF_ASSUMED_STATE))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, '- how to mean: {how}'.format(how=HOW_TO_CALCULATE_MEAN))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, '- mean range: {range_}'.format(range_=MEAN_RANGE))
         elif i == 2:
             # 1. Factor Loading
-            ax_pos = ax.get_position()
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'Factor Loading:\n{loading}'.format(loading=input_loading))
+            ax_pos = ax[i-1].get_position()
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, '- Factor Loading:\n{loading}'.format(loading=input_loading))
         elif i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
-            ax_pos = ax.get_position()                                              # 返り値は、Bbox型
+            ax_pos = ax[i-1].get_position()                                              # 返り値は、Bbox型
             # 1. 遷移行列, 2. プロット点数, 3. 交差点内の滞在時間, 4. 状態系列の復号(最初/最後から数10点), 5. Factor Loading
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, 'transition matrix:\n{matrix}'.format(matrix=input_dict_param['遷移行列']))     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'amount of plot: {amount}'.format(amount=AMOUNT_OF_PLOT))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'stay time in crossroad and around there: {stay}'.format(stay=input_df_averaged['time'][AMOUNT_OF_PLOT-1]-input_df_averaged['time'][0]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'state series (first): {series}'.format(series=input_dict_param['状態系列の復号'][:25]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.02, 'state series (last): {series}'.format(series=input_dict_param['状態系列の復号'][-25:]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, '- transition matrix:\n{matrix}'.format(matrix=input_dict_param['遷移行列']))     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, '- amount of plot: {amount}'.format(amount=AMOUNT_OF_PLOT))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, '- stay time in crossroad and around there: {stay}'.format(stay=input_df_averaged['time'][AMOUNT_OF_PLOT-1]-input_df_averaged['time'][0]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, '- state series (first): {series}'.format(series=input_dict_param['状態系列の復号'][:25]))
+            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.02, '- state series (last): {series}'.format(series=input_dict_param['状態系列の復号'][-25:]))
         g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
                 x = 'time',
                 y = input_df_averaged.iloc[:, i-1].name,
@@ -217,7 +221,7 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         #g.xaxis.set_major_locator(ticker.FixedLocator())                                   # [*]: パラメータlocsに値が与えられていない。
         g.xaxis.set_minor_locator(ticker.NullLocator())                 # 2021.11.23: FIXME: 補助目盛りが含まれたまま。
         ## ↓y軸の設定
-        #ax.set_yticks([])
+        #ax[i-1].set_yticks([])
         #g.yaxis.set_major_locator(ticker.AutoLocator())
         #g.yaxis.set_minor_locator(ticker.AutoLocator())
         # 4-1-3. Formatterの設定
@@ -242,10 +246,11 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         #g.yaxis.set_minor_formatter(ticker.AutoFormatter())
         g.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid()
-        if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-            plt.savefig('../../plot/hoge-hoge/Figure1.png')
-        else:                       # PCA特徴量の場合、Figure3.pngとして保存
-            plt.savefig('../../plot/hoge-hoge/Figure3.png')
+    if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
+        plt.savefig('../../plot/hoge-hoge/Figure1.png')
+    else:                       # PCA特徴量の場合、Figure3.pngとして保存
+        plt.savefig('../../plot/hoge-hoge/Figure3.png')
+    plt.title(PATH_CSV_ACCELERATION_DATA)
     #4-2. 散布図プロット
     sns.pairplot(
             input_df_averaged,
@@ -335,6 +340,8 @@ def main():
     # プロットの可視化
     # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
     # [関連]: decompose_data, plot_data
+    #plt.xticks([])
+    #plt.yticks([])
     plt.show()
 
 if __name__ == '__main__':
