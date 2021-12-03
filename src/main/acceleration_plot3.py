@@ -174,12 +174,7 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     #4-1. 時系列プロット
     fig = plt.figure()
     mng = plt.get_current_fig_manager()     # Mac環境で、pltによる自動フルスクリーンを用いる。
-    #mng.resize(*mng.window.maxsize())       # TkAggバックエンド
     mng.window.showMaximized()              # QT (QtAgg5) バックエンド
-    #fig.xaxis.set_major_locator(ticker.NullLocator())
-    #fig.xaxis.set_minor_locator(ticker.NullLocator())
-    #fig.yaxis.set_major_locator(ticker.NullLocator())
-    #fig.yaxis.set_minor_locator(ticker.NullLocator())
     ax = [0 for _ in range(6)]
     for i in range(1, 6+1):
         ax[i-1] = fig.add_subplot(2, 3, i)
@@ -193,6 +188,7 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
             # 1. Factor Loading
             ax_pos = ax[i-1].get_position()
             fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, '- Factor Loading:\n{loading}'.format(loading=input_loading))
+            plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル
         elif i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
             ax_pos = ax[i-1].get_position()                                              # 返り値は、Bbox型
             # 1. 遷移行列, 2. プロット点数, 3. 交差点内の滞在時間, 4. 状態系列の復号(最初/最後から数10点), 5. Factor Loading
@@ -214,44 +210,19 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         # - xaxis: 線形目盛り
         # - yaxis: 自動目盛り (＊: 外れ値が含まれるため、ユーザが前もって目盛りの上限/下限を設定するのは望ましくない。
         xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-        #g.set_xticks(xlabels)                                          # Locatorは、FixedLocator: [*]: 目盛りに設定できない。
-        #g.set_xticks([i for i in range(len(input_df_averaged))])      # Locatorは、FixedLocator: [**]: プロットがグラフ左端に潰れた。
         g.set_xticks(input_df_averaged['time'])      # Locatorは、FixedLocator: 2021.11.23: とりあえずのプロットに成功した。
-        #g.xaxis.set_major_locator(ticker.LinearLocator(len(input_df_averaged['time'])))    # [警告]: FormatterをFixedFormatter (自由設定) する場合、LocatorもFixedLocatorが望ましい。
-        #g.xaxis.set_major_locator(ticker.FixedLocator())                                   # [*]: パラメータlocsに値が与えられていない。
-        g.xaxis.set_minor_locator(ticker.NullLocator())                 # 2021.11.23: FIXME: 補助目盛りが含まれたまま。
-        ## ↓y軸の設定
-        #ax[i-1].set_yticks([])
-        #g.yaxis.set_major_locator(ticker.AutoLocator())
-        #g.yaxis.set_minor_locator(ticker.AutoLocator())
         # 4-1-3. Formatterの設定
         # - 目盛りラベルの設定
         # - xticklabelsにリストを渡すと、その値の箇所だけ目盛りが配置される。
         # - ↑この時、FormatterはFixedFormatter
-        @ticker.FuncFormatter               # HACK: 2021.11.23: xが何なのかが分からない。
-        def tostring_formatter(x, pos):
-            '''
-            # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-            '''
-            print('x: ', x)
-            print('"[%.2f]" % x: ', "[%.2f]" % x)
-            print('pos: ', pos)
-            #return x.strftime('%M:%S.%f').split('00000')[0] if pos % 10 == 0 else ''
-            return x
-        #g.xaxis.set_major_formatter(tostring_formatter)                # 2021.11.23: HACK: ticker.FuncFormatterの仕様が分からない。
-        #print('major_formatter: ', g.xaxis.get_major_formatter())
-        g.xaxis.set_minor_formatter(ticker.NullFormatter())             # 2021.11.23: FIXME: これでも、補助目盛りが含まれたまま。
-        ## ↓y軸の設定
-        #g.yaxis.set_major_formatter(ticker.AutoFormatter())
-        #g.yaxis.set_minor_formatter(ticker.AutoFormatter())
         g.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid()
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
         plt.savefig('../../plot/hoge-hoge/Figure1.png')
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
         plt.savefig('../../plot/hoge-hoge/Figure3.png')
-    plt.title(PATH_CSV_ACCELERATION_DATA)
     #4-2. 散布図プロット
+    plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル
     sns.pairplot(
             input_df_averaged,
             diag_kind = 'kde',
@@ -340,8 +311,6 @@ def main():
     # プロットの可視化
     # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
     # [関連]: decompose_data, plot_data
-    #plt.xticks([])
-    #plt.yticks([])
     plt.show()
 
 if __name__ == '__main__':
