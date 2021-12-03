@@ -175,22 +175,21 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     fig = plt.figure()
     mng = plt.get_current_fig_manager()     # Mac環境で、pltによる自動フルスクリーンを用いる。
     mng.window.showMaximized()              # QT (QtAgg5) バックエンド
-    ax = [0 for _ in range(6)]
     for i in range(1, 6+1):
-        ax[i-1] = fig.add_subplot(2, 3, i)
+        ax = fig.add_subplot(2, 3, i)
         if i == 1:
             # 1. HMMで仮定した状態数, 2. 平均方法, 3. 平均幅
-            ax_pos = ax[i-1].get_position()
+            ax_pos = ax.get_position()
             fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, '- assumed state amount in HMM: {hmm}'.format(hmm=NUMBER_OF_ASSUMED_STATE))
             fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, '- how to mean: {how}'.format(how=HOW_TO_CALCULATE_MEAN))
             fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, '- mean range: {range_}'.format(range_=MEAN_RANGE))
         elif i == 2:
             # 1. Factor Loading
-            ax_pos = ax[i-1].get_position()
+            ax_pos = ax.get_position()
             fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, '- Factor Loading:\n{loading}'.format(loading=input_loading))
             plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル
         elif i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
-            ax_pos = ax[i-1].get_position()                                              # 返り値は、Bbox型
+            ax_pos = ax.get_position()                                              # 返り値は、Bbox型
             # 1. 遷移行列, 2. プロット点数, 3. 交差点内の滞在時間, 4. 状態系列の復号(最初/最後から数10点), 5. Factor Loading
             fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, '- transition matrix:\n{matrix}'.format(matrix=input_dict_param['遷移行列']))     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
             fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, '- amount of plot: {amount}'.format(amount=AMOUNT_OF_PLOT))
@@ -222,7 +221,7 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
         plt.savefig('../../plot/hoge-hoge/Figure3.png')
     #4-2. 散布図プロット
-    plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル
+    #plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル: この位置だと、時系列プロットの方に反映される。
     sns.pairplot(
             input_df_averaged,
             diag_kind = 'kde',
