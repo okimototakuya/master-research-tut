@@ -173,13 +173,14 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     input_df_averaged = input_df_averaged.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
     #4-1. 時系列プロット
     fig = plt.figure()
+    fig.subplots_adjust(left=0.2)
     box_dic = {
-            "facecolor" : "lightgreen",
-            "edgecolor" : "darkred",
+            "facecolor" : "white",
+            "edgecolor" : "darkblue",
             "boxstyle" : "Round",
             "linewidth" : 2
     }
-    fig.text(0.01, 0.50, bbox=box_dic, s='- assumed state amount in HMM: {hmm}\n'\
+    fig.text(0.01, 0.70, bbox=box_dic, s='- assumed state amount in HMM: {hmm}\n'\
                                          '- how to mean: {how}\n'\
                                          '- mean range: {range_}\n'\
                                          '- Factor Loading:\n{loading}\n'\
@@ -199,29 +200,11 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
                                                  series_l=input_dict_param['状態系列の復号'][-25:]
                                                  )
             )
+    fig.suptitle(PATH_CSV_ACCELERATION_DATA)
     mng = plt.get_current_fig_manager()     # Mac環境で、pltによる自動フルスクリーンを用いる。
     mng.window.showMaximized()              # QT (QtAgg5) バックエンド
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
-        if i == 1:
-            # 1. HMMで仮定した状態数, 2. 平均方法, 3. 平均幅
-            ax_pos = ax.get_position()
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, '- assumed state amount in HMM: {hmm}'.format(hmm=NUMBER_OF_ASSUMED_STATE))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, '- how to mean: {how}'.format(how=HOW_TO_CALCULATE_MEAN))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, '- mean range: {range_}'.format(range_=MEAN_RANGE))
-        elif i == 2:
-            # 1. Factor Loading
-            ax_pos = ax.get_position()
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, '- Factor Loading:\n{loading}'.format(loading=input_loading))
-            plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル
-        elif i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
-            ax_pos = ax.get_position()                                              # 返り値は、Bbox型
-            # 1. 遷移行列, 2. プロット点数, 3. 交差点内の滞在時間, 4. 状態系列の復号(最初/最後から数10点), 5. Factor Loading
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, '- transition matrix:\n{matrix}'.format(matrix=input_dict_param['遷移行列']))     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, '- amount of plot: {amount}'.format(amount=AMOUNT_OF_PLOT))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, '- stay time in crossroad and around there: {stay}'.format(stay=input_df_averaged['time'][AMOUNT_OF_PLOT-1]-input_df_averaged['time'][0]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, '- state series (first): {series}'.format(series=input_dict_param['状態系列の復号'][:25]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.02, '- state series (last): {series}'.format(series=input_dict_param['状態系列の復号'][-25:]))
         g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
                 x = 'time',
                 y = input_df_averaged.iloc[:, i-1].name,
