@@ -173,6 +173,32 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     input_df_averaged = input_df_averaged.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
     #4-1. 時系列プロット
     fig = plt.figure()
+    box_dic = {
+            "facecolor" : "lightgreen",
+            "edgecolor" : "darkred",
+            "boxstyle" : "Round",
+            "linewidth" : 2
+    }
+    fig.text(0.01, 0.50, bbox=box_dic, s='- assumed state amount in HMM: {hmm}\n'\
+                                         '- how to mean: {how}\n'\
+                                         '- mean range: {range_}\n'\
+                                         '- Factor Loading:\n{loading}\n'\
+                                         '- transition matrix:\n{matrix}\n'\
+                                         '- amount of plot: {amount}\n'\
+                                         '- stay time in crossroad and around there:\n{stay}\n'\
+                                         '- state series (first):\n{series_f}\n'\
+                                         '- state series (last):\n{series_l}'\
+                                         .format(hmm=NUMBER_OF_ASSUMED_STATE,
+                                                 how=HOW_TO_CALCULATE_MEAN,
+                                                 range_=MEAN_RANGE,
+                                                 loading=input_loading,
+                                                 matrix=input_dict_param['遷移行列'],
+                                                 amount=AMOUNT_OF_PLOT,
+                                                 stay=input_df_averaged['time'][AMOUNT_OF_PLOT-1]-input_df_averaged['time'][0],
+                                                 series_f=input_dict_param['状態系列の復号'][:25],
+                                                 series_l=input_dict_param['状態系列の復号'][-25:]
+                                                 )
+            )
     mng = plt.get_current_fig_manager()     # Mac環境で、pltによる自動フルスクリーンを用いる。
     mng.window.showMaximized()              # QT (QtAgg5) バックエンド
     for i in range(1, 6+1):
