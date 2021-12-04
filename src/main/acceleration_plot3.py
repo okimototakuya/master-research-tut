@@ -332,7 +332,7 @@ def main():
     # プロットの可視化
     # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
     # [関連]: decompose_data, plot_data
-    plt.show()
+    #plt.show()
 
 if __name__ == '__main__':
     main()
