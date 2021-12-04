@@ -228,7 +228,9 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         # - ↑この時、FormatterはFixedFormatter
         #xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
         #xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-        xlabels = input_df_averaged['time'][::10]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        #xlabels = input_df_averaged['time'][::10]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        xlabels = list(filter(lambda x: x != '', xlabels))
         ax.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid(which='major')
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
