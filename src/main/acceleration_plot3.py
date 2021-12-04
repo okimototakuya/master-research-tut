@@ -217,14 +217,20 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         # - 下記
         # - xaxis: 線形目盛り
         # - yaxis: 自動目盛り (＊: 外れ値が含まれるため、ユーザが前もって目盛りの上限/下限を設定するのは望ましくない。
-        xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-        g.set_xticks(input_df_averaged['time'])      # Locatorは、FixedLocator: 2021.11.23: とりあえずのプロットに成功した。
+        #g.set_xticks(input_df_averaged['time'])                                        # Locatorは、FixedLocator: 2021.11.23: とりあえずのプロットに成功した。
+        list_loc = list(input_df_averaged.index)
+        ax.xaxis.set_major_locator(ticker.FixedLocator(list_loc[::10]))                                                # - 主目盛り
+        ax.xaxis.set_minor_locator(ticker.FixedLocator(list(filter(lambda x: x % 10 != 0, list_loc))))                 # - 補助目盛り
+        assert list_loc == sorted(list_loc[::10] + list(filter(lambda x: x % 10 != 0, list_loc)))                      # -- アサーション: 主目盛りと補助目盛りを足して、元のlist_locの要素を網羅するかどうか
         # 4-1-3. Formatterの設定
         # - 目盛りラベルの設定
         # - xticklabelsにリストを渡すと、その値の箇所だけ目盛りが配置される。
         # - ↑この時、FormatterはFixedFormatter
-        g.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
-        plt.grid()
+        #xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        #xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        xlabels = input_df_averaged['time'][::10]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        ax.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
+        plt.grid(which='major')
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
         plt.savefig('../../plot/hoge-hoge/Figure1.png')
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
