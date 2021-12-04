@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -171,7 +172,10 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     pd.DataFrame型変数のプロットを行う関数
     '''
     input_df_averaged = input_df_averaged.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
-    #4-1. 時系列プロット
+    # 4-0. プロットの保存先パスの設定
+    str_path_to_crossroad = re.split('[/,\.]', PATH_CSV_ACCELERATION_DATA)[7]   # 交差点ラベルによるパス
+    str_path_to_how_to_mean = HOW_TO_CALCULATE_MEAN + '_' + sys.argv[1]         # 平均方法及び平均区間によるパス
+    # 4-1. 時系列プロット
     fig = plt.figure()
     fig.subplots_adjust(left=0.2)
     box_dic = {
@@ -235,9 +239,9 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         ax.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid(which='major')
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-        plt.savefig('../../plot/hoge-hoge/Figure1.png')
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure1.png')
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
-        plt.savefig('../../plot/hoge-hoge/Figure3.png')
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure3.png')
     #4-2. 散布図プロット
     #plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル: この位置だと、時系列プロットの方に反映される。
     sns.pairplot(
@@ -248,9 +252,9 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
             palette = 'rainbow',
         )
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-        plt.savefig('../../plot/hoge-hoge/Figure2.png')
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure2.png')
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
-        plt.savefig('../../plot/hoge-hoge/Figure4.png')
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure4.png')
 
 
 def main():
