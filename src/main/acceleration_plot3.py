@@ -195,22 +195,25 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
                                                  loading=input_loading,
                                                  matrix=input_dict_param['遷移行列'],
                                                  amount=AMOUNT_OF_PLOT,
-                                                 stay=input_df_averaged['time'][AMOUNT_OF_PLOT-1]-input_df_averaged['time'][0],
+                                                 stay=input_df_averaged['time'][AMOUNT_OF_PLOT-1]-input_df_averaged['time'][0],     # datetime型による演算: 日付計算
                                                  series_f=input_dict_param['状態系列の復号'][:25],
                                                  series_l=input_dict_param['状態系列の復号'][-25:]
                                                  )
             )
     fig.suptitle(PATH_CSV_ACCELERATION_DATA)
-    mng = plt.get_current_fig_manager()     # Mac環境で、pltによる自動フルスクリーンを用いる。
-    mng.window.showMaximized()              # QT (QtAgg5) バックエンド
+    mng = plt.get_current_fig_manager()                                                 # Mac環境で、pltによる自動フルスクリーンを用いる。
+    mng.window.showMaximized()                                                          # QT (QtAgg5) バックエンド
+    # 2021.12.4: 注: 'time'列の型をdatetime → object(str?) に変換
+    # - pltのformatter/locatorを用いたプロットについて、datetime型の場合は他の型と異なる独自のformatter/locator型があるよう。例.DateFormatter
+    # - DateFormatterでなく通常のFormatterを用いたところ、エラー/警告が発生することなく、ただ目盛り/ラベルが表示されないままプロットされた。
+    input_df_averaged['time'] = input_df_averaged['time'].dt.strftime('%M:%S.%f')
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
-        g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
-                x = 'time',
-                y = input_df_averaged.iloc[:, i-1].name,
-                hue = 'state',
-                palette = 'rainbow',
-                data = input_df_averaged
+        ax = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
+                x = input_df_averaged['time'],
+                y = input_df_averaged.iloc[:, i-1],
+                hue = input_df_averaged['state'],
+                palette = 'rainbow'
             )
         # 4-1-2. Locatorの設定
         # - 目盛りの設定 (例. 線形目盛り, 対数目盛りなど)
@@ -221,16 +224,14 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         list_loc = list(input_df_averaged.index)
         ax.xaxis.set_major_locator(ticker.FixedLocator(list_loc[::10]))                                                # - 主目盛り
         ax.xaxis.set_minor_locator(ticker.FixedLocator(list(filter(lambda x: x % 10 != 0, list_loc))))                 # - 補助目盛り
-        assert list_loc == sorted(list_loc[::10] + list(filter(lambda x: x % 10 != 0, list_loc)))                      # -- アサーション: 主目盛りと補助目盛りを足して、元のlist_locの要素を網羅するかどうか
+        assert list_loc == sorted(list_loc[::10] + list(filter(lambda x: x % 10 != 0, list_loc)))                      # アサーション: 主目盛りと補助目盛りを足して、元のlist_locの要素を網羅するかどうか
         # 4-1-3. Formatterの設定
         # - 目盛りラベルの設定
         # - xticklabelsにリストを渡すと、その値の箇所だけ目盛りが配置される。
         # - ↑この時、FormatterはFixedFormatter
-        #xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-        #xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-        #xlabels = input_df_averaged['time'][::10]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-        xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-        xlabels = list(filter(lambda x: x != '', xlabels))
+        xlabels_before_thinning_out = [input_df_averaged['time'][i].split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        xlabels = list(filter(lambda x: x != '', xlabels_before_thinning_out))
+        assert len(xlabels) == len(list_loc[::10])                  # アサーション: ラベルと主目盛りの個数が一致するかどうか。
         ax.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid(which='major')
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
