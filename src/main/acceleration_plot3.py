@@ -74,7 +74,7 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
     Notes
     -----
     - 関数average_dataの仕様について、
-    　-- param: pd.Dataframeを'time'列ごと与える。固定平均については、'time'列の更新が含まれるため。
+    　-- param: pd.Dataframeを6つの加速度特徴量の列に加えて、'time'列も与える。固定平均については、'time'列の更新が含まれるため。
     　-- return: pd.Dataframeを返す。ただし、'time'列は列尾に追加。
     '''
     if input_how == 'fixed_mean':  # 固定(?)平均
