@@ -59,7 +59,7 @@ def read_csv_(input_path_to_csv):
                 'AngularRate(X)[dps]':float,  'AngularRate(Y)[dps]':float,  'AngularRate(Z)[dps]':float,
                 'Temperature[degree]':float,  'Pressure[hPa]':float,  'MagnetCount':int, 'MagnetSwitch':int,
                 'onCrossroad':int, 'crossroadID':int},
-            skiprows = default_num_skip_row,
+            skiprows = 0 if 'crossroad' == re.search('crossroad', PATH_CSV_ACCELERATION_DATA).group() else default_num_skip_row,    # *crossroad*.csvの場合、列名の行はない。
             engine = 'python',
             )
 
@@ -74,7 +74,7 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
     Notes
     -----
     - 関数average_dataの仕様について、
-    　-- param: pd.Dataframeを'time'列ごと与える。固定平均については、'time'列の更新が含まれるため。
+    　-- param: pd.Dataframeを6つの加速度特徴量の列に加えて、'time'列も与える。固定平均については、'time'列の更新が含まれるため。
     　-- return: pd.Dataframeを返す。ただし、'time'列は列尾に追加。
     '''
     if input_how == 'fixed_mean':  # 固定(?)平均
@@ -214,7 +214,7 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
         ax = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
-                x = input_df_averaged['time'],
+                x = list(input_df_averaged.index),
                 y = input_df_averaged.iloc[:, i-1],
                 hue = input_df_averaged['state'],
                 palette = 'rainbow'
@@ -233,15 +233,17 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         # - 目盛りラベルの設定
         # - xticklabelsにリストを渡すと、その値の箇所だけ目盛りが配置される。
         # - ↑この時、FormatterはFixedFormatter
-        xlabels_before_thinning_out = [input_df_averaged['time'][i].split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        xlabels_before_thinning_out = [input_df_averaged['time'][i].split('00000')[0] if i % 10 == 0 else '' for i in range(0, len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
         xlabels = list(filter(lambda x: x != '', xlabels_before_thinning_out))
         assert len(xlabels) == len(list_loc[::10])                  # アサーション: ラベルと主目盛りの個数が一致するかどうか。
         ax.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid(which='major')
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure1.png')
+        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure1.png')
+        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure1.png')                                               # テストプロット画像の保存先
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
-        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure3.png')
+        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure3.png')
+        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure3.png')                                               # テストプロット画像の保存先
     #4-2. 散布図プロット
     #plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル: この位置だと、時系列プロットの方に反映される。
     sns.pairplot(
@@ -252,9 +254,11 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
             palette = 'rainbow',
         )
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure2.png')
+        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure2.png')
+        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure2.png')                                               # テストプロット画像の保存先
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
-        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure4.png')
+        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure4.png')
+        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure4.png')                                               # テストプロット画像の保存先
 
 
 def main():
@@ -270,6 +274,7 @@ def main():
     #df_read = df_read[df_read['onCrossroad']=='0']    # 全ての交差点を抽出
     #df_read = df_read[df_read['crossroadID']==83]    # 交差点83を抽出
     df_read['time'] = pd.to_datetime(df_read['time'], format='%M:%S.%f')    # 列'time'をpd.datetime64[ns]型に変換
+    time_for_assert_1 = df_read['time']                                     # アサーション用変数1: 関数plot_dataの呼び出し直前
     # 2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)
     df_averaged = average_data(
                         input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
@@ -319,6 +324,8 @@ def main():
     df_pca, loading = decompose_data(df_averaged.drop('time', axis=1))
     df_pca = df_pca.join(df_averaged['time'])
     # 5. 上記の算出結果をプロットする
+    time_for_assert_2 = df_averaged['time']                                             # アサーション用変数2: 列'time'をpd.datetime64[ns]型にキャストした直後
+    assert time_for_assert_1.values.tolist() == time_for_assert_2.values.tolist()       # アサーション: 列'time'の値が、ここまでに誤って更新されていないか。
     plot_data(  # no-pca
             input_df_averaged = df_averaged,            # PCAしていないデータ
             input_dict_param = dict_param_original,     # [＊]: 次元削減でなくデータ可視化が目的のため、HMMは原データのみに適用
