@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -171,82 +172,78 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     pd.DataFrame型変数のプロットを行う関数
     '''
     input_df_averaged = input_df_averaged.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
-    #4-1. 時系列プロット
+    # 4-0. プロットの保存先パスの設定
+    str_path_to_crossroad = re.split('[/,\.]', PATH_CSV_ACCELERATION_DATA)[7]   # 交差点ラベルによるパス
+    str_path_to_how_to_mean = HOW_TO_CALCULATE_MEAN + '_' + sys.argv[1]         # 平均方法及び平均区間によるパス
+    # 4-1. 時系列プロット
     fig = plt.figure()
-    mng = plt.get_current_fig_manager()     # Mac環境で、pltによる自動フルスクリーンを用いる。
-    #mng.resize(*mng.window.maxsize())       # TkAggバックエンド
-    mng.window.showMaximized()              # QT (QtAgg5) バックエンド
-    plt.title(PATH_CSV_ACCELERATION_DATA)
+    fig.subplots_adjust(left=0.2)
+    box_dic = {
+            "facecolor" : "white",
+            "edgecolor" : "darkblue",
+            "boxstyle" : "Round",
+            "linewidth" : 2
+    }
+    fig.text(0.01, 0.70, bbox=box_dic, s='- assumed state amount in HMM: {hmm}\n'\
+                                         '- how to mean: {how}\n'\
+                                         '- mean range: {range_}\n'\
+                                         '- Factor Loading:\n{loading}\n'\
+                                         '- transition matrix:\n{matrix}\n'\
+                                         '- amount of plot: {amount}\n'\
+                                         '- stay time in crossroad and around there:\n{stay}\n'\
+                                         '- state series (first):\n{series_f}\n'\
+                                         '- state series (last):\n{series_l}'\
+                                         .format(hmm=NUMBER_OF_ASSUMED_STATE,
+                                                 how=HOW_TO_CALCULATE_MEAN,
+                                                 range_=MEAN_RANGE,
+                                                 loading=input_loading,
+                                                 matrix=input_dict_param['遷移行列'],
+                                                 amount=AMOUNT_OF_PLOT,
+                                                 stay=input_df_averaged['time'][AMOUNT_OF_PLOT-1]-input_df_averaged['time'][0],     # datetime型による演算: 日付計算
+                                                 series_f=input_dict_param['状態系列の復号'][:25],
+                                                 series_l=input_dict_param['状態系列の復号'][-25:]
+                                                 )
+            )
+    fig.suptitle(PATH_CSV_ACCELERATION_DATA)
+    mng = plt.get_current_fig_manager()                                                 # Mac環境で、pltによる自動フルスクリーンを用いる。
+    mng.window.showMaximized()                                                          # QT (QtAgg5) バックエンド
+    # 2021.12.4: 注: 'time'列の型をdatetime → object(str?) に変換
+    # - pltのformatter/locatorを用いたプロットについて、datetime型の場合は他の型と異なる独自のformatter/locator型があるよう。例.DateFormatter
+    # - DateFormatterでなく通常のFormatterを用いたところ、エラー/警告が発生することなく、ただ目盛り/ラベルが表示されないままプロットされた。
+    input_df_averaged['time'] = input_df_averaged['time'].dt.strftime('%M:%S.%f')
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
-        if i == 1:
-            # 1. HMMで仮定した状態数, 2. 平均方法, 3. 平均幅
-            ax_pos = ax.get_position()
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, 'assumed state amount in HMM: {hmm}'.format(hmm=NUMBER_OF_ASSUMED_STATE))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'how to mean: {how}'.format(how=HOW_TO_CALCULATE_MEAN))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'mean range: {range_}'.format(range_=MEAN_RANGE))
-        elif i == 2:
-            # 1. Factor Loading
-            ax_pos = ax.get_position()
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'Factor Loading:\n{loading}'.format(loading=input_loading))
-        elif i == 3:  # 2×3サブプロットだと、[1, 3]サブプロットの上が見栄えが良い。
-            ax_pos = ax.get_position()                                              # 返り値は、Bbox型
-            # 1. 遷移行列, 2. プロット点数, 3. 交差点内の滞在時間, 4. 状態系列の復号(最初/最後から数10点), 5. Factor Loading
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.06, 'transition matrix:\n{matrix}'.format(matrix=input_dict_param['遷移行列']))     # axisオブジェクトからの相対位置によりテキストボックスの座標を指定
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.05, 'amount of plot: {amount}'.format(amount=AMOUNT_OF_PLOT))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.04, 'stay time in crossroad and around there: {stay}'.format(stay=input_df_averaged['time'][AMOUNT_OF_PLOT-1]-input_df_averaged['time'][0]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.03, 'state series (first): {series}'.format(series=input_dict_param['状態系列の復号'][:25]))
-            fig.text(ax_pos.x1-0.1, ax_pos.y1+0.02, 'state series (last): {series}'.format(series=input_dict_param['状態系列の復号'][-25:]))
-        g = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
-                x = 'time',
-                y = input_df_averaged.iloc[:, i-1].name,
-                hue = 'state',
-                palette = 'rainbow',
-                data = input_df_averaged
+        ax = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
+                x = input_df_averaged['time'],
+                y = input_df_averaged.iloc[:, i-1],
+                hue = input_df_averaged['state'],
+                palette = 'rainbow'
             )
         # 4-1-2. Locatorの設定
         # - 目盛りの設定 (例. 線形目盛り, 対数目盛りなど)
         # - 下記
         # - xaxis: 線形目盛り
         # - yaxis: 自動目盛り (＊: 外れ値が含まれるため、ユーザが前もって目盛りの上限/下限を設定するのは望ましくない。
-        xlabels = [input_df_averaged['time'][i].strftime('%M:%S.%f').split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-        #g.set_xticks(xlabels)                                          # Locatorは、FixedLocator: [*]: 目盛りに設定できない。
-        #g.set_xticks([i for i in range(len(input_df_averaged))])      # Locatorは、FixedLocator: [**]: プロットがグラフ左端に潰れた。
-        g.set_xticks(input_df_averaged['time'])      # Locatorは、FixedLocator: 2021.11.23: とりあえずのプロットに成功した。
-        #g.xaxis.set_major_locator(ticker.LinearLocator(len(input_df_averaged['time'])))    # [警告]: FormatterをFixedFormatter (自由設定) する場合、LocatorもFixedLocatorが望ましい。
-        #g.xaxis.set_major_locator(ticker.FixedLocator())                                   # [*]: パラメータlocsに値が与えられていない。
-        g.xaxis.set_minor_locator(ticker.NullLocator())                 # 2021.11.23: FIXME: 補助目盛りが含まれたまま。
-        ## ↓y軸の設定
-        #ax.set_yticks([])
-        #g.yaxis.set_major_locator(ticker.AutoLocator())
-        #g.yaxis.set_minor_locator(ticker.AutoLocator())
+        #g.set_xticks(input_df_averaged['time'])                                        # Locatorは、FixedLocator: 2021.11.23: とりあえずのプロットに成功した。
+        list_loc = list(input_df_averaged.index)
+        ax.xaxis.set_major_locator(ticker.FixedLocator(list_loc[::10]))                                                # - 主目盛り
+        ax.xaxis.set_minor_locator(ticker.FixedLocator(list(filter(lambda x: x % 10 != 0, list_loc))))                 # - 補助目盛り
+        assert list_loc == sorted(list_loc[::10] + list(filter(lambda x: x % 10 != 0, list_loc)))                      # アサーション: 主目盛りと補助目盛りを足して、元のlist_locの要素を網羅するかどうか
         # 4-1-3. Formatterの設定
         # - 目盛りラベルの設定
         # - xticklabelsにリストを渡すと、その値の箇所だけ目盛りが配置される。
         # - ↑この時、FormatterはFixedFormatter
-        @ticker.FuncFormatter               # HACK: 2021.11.23: xが何なのかが分からない。
-        def tostring_formatter(x, pos):
-            '''
-            # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-            '''
-            print('x: ', x)
-            print('"[%.2f]" % x: ', "[%.2f]" % x)
-            print('pos: ', pos)
-            #return x.strftime('%M:%S.%f').split('00000')[0] if pos % 10 == 0 else ''
-            return x
-        #g.xaxis.set_major_formatter(tostring_formatter)                # 2021.11.23: HACK: ticker.FuncFormatterの仕様が分からない。
-        #print('major_formatter: ', g.xaxis.get_major_formatter())
-        g.xaxis.set_minor_formatter(ticker.NullFormatter())             # 2021.11.23: FIXME: これでも、補助目盛りが含まれたまま。
-        ## ↓y軸の設定
-        #g.yaxis.set_major_formatter(ticker.AutoFormatter())
-        #g.yaxis.set_minor_formatter(ticker.AutoFormatter())
-        g.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
-        plt.grid()
-        if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-            plt.savefig('../../plot/hoge-hoge/Figure1.png')
-        else:                       # PCA特徴量の場合、Figure3.pngとして保存
-            plt.savefig('../../plot/hoge-hoge/Figure3.png')
+        xlabels_before_thinning_out = [input_df_averaged['time'][i].split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        xlabels = list(filter(lambda x: x != '', xlabels_before_thinning_out))
+        assert len(xlabels) == len(list_loc[::10])                  # アサーション: ラベルと主目盛りの個数が一致するかどうか。
+        ax.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
+        plt.grid(which='major')
+    if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure1.png')
+    else:                       # PCA特徴量の場合、Figure3.pngとして保存
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure3.png')
     #4-2. 散布図プロット
+    #plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル: この位置だと、時系列プロットの方に反映される。
     sns.pairplot(
             input_df_averaged,
             diag_kind = 'kde',
@@ -255,9 +252,9 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
             palette = 'rainbow',
         )
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-        plt.savefig('../../plot/hoge-hoge/Figure2.png')
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure2.png')
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
-        plt.savefig('../../plot/hoge-hoge/Figure4.png')
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure4.png')
 
 
 def main():
@@ -335,7 +332,7 @@ def main():
     # プロットの可視化
     # IPython環境でなくターミナル環境で実行する場合、プロットを可視化するのに必須
     # [関連]: decompose_data, plot_data
-    plt.show()
+    #plt.show()
 
 if __name__ == '__main__':
     main()
