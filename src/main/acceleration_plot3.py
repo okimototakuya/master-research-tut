@@ -235,6 +235,9 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         # - ↑この時、FormatterはFixedFormatter
         xlabels_before_thinning_out = [input_df_averaged['time'][i].split('00000')[0] if i % 10 == 0 else '' for i in range(len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
         xlabels = list(filter(lambda x: x != '', xlabels_before_thinning_out))
+        print('xlabels')
+        print('----------')
+        print(xlabels)
         assert len(xlabels) == len(list_loc[::10])                  # アサーション: ラベルと主目盛りの個数が一致するかどうか。
         ax.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid(which='major')
