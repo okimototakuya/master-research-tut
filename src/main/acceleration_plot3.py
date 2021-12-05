@@ -214,7 +214,7 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
         ax = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
-                x = input_df_averaged['time'],
+                x = list(input_df_averaged.index),
                 y = input_df_averaged.iloc[:, i-1],
                 hue = input_df_averaged['state'],
                 palette = 'rainbow'
