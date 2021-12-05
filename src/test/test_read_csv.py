@@ -86,7 +86,7 @@ class TestReadCsv_(unittest.TestCase):
         '''
         os.remove('./test_dataset/demo.csv')
 
-    def test_read_csv_read_right_length(self):
+    def _test_read_csv_read_right_length(self):
         '''
         テストcsvファイルをDataFrame型変数として正しい大きさで読み込めたかテスト
 
@@ -110,7 +110,7 @@ class TestReadCsv_(unittest.TestCase):
         #pd.testing.assert_frame_equal(df_test, df_real_columns)
         self.assertEqual(len(df_test), len(df_real_columns))
 
-    def test_read_csv_read_right_columns_length(self):
+    def _test_read_csv_read_right_columns_length(self):
         '''
         テストcsvファイルをDataFrame型変数として正しい列数で読み込めたかテスト
         '''
@@ -125,7 +125,7 @@ class TestReadCsv_(unittest.TestCase):
         #pd.testing.assert_frame_equal(df_test, df_real_columns)
         self.assertEqual(len(df_test.columns), len(df_real_columns.columns))
 
-    def test_read_csv_index_type(self):
+    def _test_read_csv_index_type(self):
         '''
         ap3.read_csv_関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでテスト
         '''
@@ -133,13 +133,21 @@ class TestReadCsv_(unittest.TestCase):
         # ap3.read_csv_関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでアサーション
         self.assertIsInstance(df_test.index, pd.Int64Index)
 
-    def test_read_csv_data_type(self):
+    def _test_read_csv_data_type(self):
         '''
         ap3.read_csv_関数の返す値がpd.DataFrame型かどうかでテスト
         '''
         df_test = ap3.read_csv_('./test_dataset/demo.csv')
         # ap3.read_csv_関数の返す値がpd.DataFrame型かどうかでアサーション
         self.assertIsInstance(df_test, pd.DataFrame)
+
+    def test_read_csv_match_size_read_dataframe_and_size_csv_file(self):
+        '''
+        読み込み対象のcsvファイルの大きさと、読み込み先のpd.DataFrame型の大きさが一致するかテスト
+        '''
+        file_path = './test_dataset/demo.csv'
+        df_test = ap3.read_csv_(file_path)
+        self.assertEqual(len(df_test), sum([1 for _ in open(file_path)]) - 1)   # 列名の行 (1行) 引いた。
 
 
 if __name__ == '__main__':
