@@ -274,6 +274,7 @@ def main():
     #df_read = df_read[df_read['onCrossroad']=='0']    # 全ての交差点を抽出
     #df_read = df_read[df_read['crossroadID']==83]    # 交差点83を抽出
     df_read['time'] = pd.to_datetime(df_read['time'], format='%M:%S.%f')    # 列'time'をpd.datetime64[ns]型に変換
+    time_for_assert_1 = df_read['time']                                     # アサーション用変数1: 関数plot_dataの呼び出し直前
     # 2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)
     df_averaged = average_data(
                         input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
@@ -323,6 +324,8 @@ def main():
     df_pca, loading = decompose_data(df_averaged.drop('time', axis=1))
     df_pca = df_pca.join(df_averaged['time'])
     # 5. 上記の算出結果をプロットする
+    time_for_assert_2 = df_averaged['time']                                             # アサーション用変数2: 列'time'をpd.datetime64[ns]型にキャストした直後
+    assert time_for_assert_1.values.tolist() == time_for_assert_2.values.tolist()       # アサーション: 列'time'の値が、ここまでに誤って更新されていないか。
     plot_data(  # no-pca
             input_df_averaged = df_averaged,            # PCAしていないデータ
             input_dict_param = dict_param_original,     # [＊]: 次元削減でなくデータ可視化が目的のため、HMMは原データのみに適用
