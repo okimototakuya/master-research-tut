@@ -239,11 +239,11 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         ax.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid(which='major')
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure1.png')
-        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure1.png')                                               # テストプロット画像の保存先
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure1.png')
+        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure1.png')                                               # テストプロット画像の保存先
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
-        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure3.png')
-        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure3.png')                                               # テストプロット画像の保存先
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure3.png')
+        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure3.png')                                               # テストプロット画像の保存先
     #4-2. 散布図プロット
     #plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル: この位置だと、時系列プロットの方に反映される。
     sns.pairplot(
@@ -254,11 +254,11 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
             palette = 'rainbow',
         )
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure2.png')
-        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure2.png')                                               # テストプロット画像の保存先
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure2.png')
+        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure2.png')                                               # テストプロット画像の保存先
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
-        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure4.png')
-        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure4.png')                                               # テストプロット画像の保存先
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure4.png')
+        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure4.png')                                               # テストプロット画像の保存先
 
 
 def main():
