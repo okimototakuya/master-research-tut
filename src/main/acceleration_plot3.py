@@ -23,9 +23,9 @@ from sklearn.cluster import KMeans
 # 加速度データファイル(csv)のパス
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
-#PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
+PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19(交差点ラベル付)
-PATH_CSV_ACCELERATION_DATA = "../../dataset/32crossroad_50.csv"
+#PATH_CSV_ACCELERATION_DATA = "../../dataset/32crossroad_50.csv"
 
 # グラフ内のプロット量
 AMOUNT_OF_PLOT = sum([1 for _ in open(PATH_CSV_ACCELERATION_DATA)]) - 1
@@ -59,7 +59,7 @@ def read_csv_(input_path_to_csv):
                 'AngularRate(X)[dps]':float,  'AngularRate(Y)[dps]':float,  'AngularRate(Z)[dps]':float,
                 'Temperature[degree]':float,  'Pressure[hPa]':float,  'MagnetCount':int, 'MagnetSwitch':int,
                 'onCrossroad':int, 'crossroadID':int},
-            skiprows = 0 if 'crossroad' == re.search('crossroad', PATH_CSV_ACCELERATION_DATA).group() else default_num_skip_row,    # *crossroad*.csvの場合、列名の行はない。
+            skiprows = default_num_skip_row,
             engine = 'python',
             )
 
