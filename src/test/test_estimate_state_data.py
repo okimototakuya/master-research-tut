@@ -35,7 +35,7 @@ class TestEstimateStateData(unittest.TestCase):
         '''
         pass
 
-    def test_estimate_state_data_return_state_sequence_which_size_is_input_df_averaged_length(self):
+    def _test_estimate_state_data_return_state_sequence_which_size_is_input_df_averaged_length(self):
         '''
         関数estimate_state_dataに与えるdf_averagedと、HMM適用後のdict_param_original['状態系列の復号']とで、
         シーケンスの大きさが同じであることを確認
@@ -46,6 +46,28 @@ class TestEstimateStateData(unittest.TestCase):
                 input_number_of_assumed_state = ap3.NUMBER_OF_ASSUMED_STATE,
             )
         self.assertEqual(len(self.df_averaged), len(dict_param_original['状態系列の復号']))
+
+    def test_estimate_state_data_match_state_series_when_initial_state_and_random_seed_are_fixed(self):
+        '''
+        初期状態と乱数のシードを固定した場合(プロダクトコード内)、予測結果が変わらないことをテスト
+        '''
+        dict_param_original_1 = ap3.estimate_state_data(
+                input_df_averaged = self.df_averaged.drop('time', axis=1),
+                input_how = ap3.ASSUMED_PROBABILISTIC_MODEL,
+                input_number_of_assumed_state = ap3.NUMBER_OF_ASSUMED_STATE,
+            )
+        print('dict_param_original_1の各キー列の型')
+        print('-----')
+        print([type(dict_param_original_1[key]) for key in dict_param_original_1.keys()])
+        dict_param_original_2 = ap3.estimate_state_data(
+                input_df_averaged = self.df_averaged.drop('time', axis=1),
+                input_how = ap3.ASSUMED_PROBABILISTIC_MODEL,
+                input_number_of_assumed_state = ap3.NUMBER_OF_ASSUMED_STATE,
+            )
+        #self.assertEqual(dict_param_original_1, dict_param_original_2)                         # 通らない: 辞書型変数の要素に、numpyサポートの型が含まれるため。
+        #np.testing.assert_array_equal(dict_param_original_1, dict_param_original_2)            # 通らない: コンソールに出力された値そのものは同じに見えるが、AssertionErrorを返された。
+        for key_1, key_2 in zip(dict_param_original_1.keys(), dict_param_original_2.keys()):
+            np.testing.assert_array_equal(dict_param_original_1[key_1], dict_param_original_2[key_2])
 
 
 if __name__ == '__main__':

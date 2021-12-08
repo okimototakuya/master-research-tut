@@ -84,48 +84,63 @@ class TestAverageData(unittest.TestCase):
     #    print(df_test)
     #    pd.testing.assert_series_equal(df_test, df_real_columns_average)
 
-    def _test_average_data_in_all_section_and_return_series(self):
+    def _test_average_data_in_all_section_and_return_dataframe(self):
         '''
-        各columnsについて、全区間を算術平均し、計算結果をpd.Series型オブジェクトで返したかテスト
+        各columnsについて、全区間を算術平均し、計算結果をpd.DataFrame型オブジェクトで返したかテスト
+
+        Return
+        -----
+        - 全区間を算術平均した場合、返り値は、pd.Seriesでなくpd.DataFrame。
+        - 各列(特徴量)に、値が一つずつ含まれる状態。
         '''
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
-        df_test = ap3.average_data(df_real_columns)
+        df_test = ap3.average_data(df_real_columns, len(df_real_columns), 'fixed_mean') # 全区間
         print(df_test, '\n')
-        # 2. average_data関数の返り値の型がpd.Seriesになっているかでアサーション
-        self.assertIsInstance(df_test, pd.Series)
+        # 2. average_data関数の返り値の型がpd.DataFrameになっているかでアサーション
+        self.assertIsInstance(df_test, pd.DataFrame)
 
     def _test_average_data_in_partly_section_and_return_dataframe(self):
         '''
-        '各columnsについて、部分的に区間を算術平均し、計算結果をpd.DataFrame型オブジェクトで返したかテス
+        各columnsについて、部分的に区間を算術平均し、計算結果をpd.DataFrame型オブジェクトで返したかテスト
         '''
         mean_range = 5  # 平均値をとる要素数
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
-        df_test = ap3.average_data(input_acc_ang_df = df_real_columns, \
+        df_test = ap3.average_data(
+                                input_acc_ang_df = df_real_columns, \
                                 input_mean_range = mean_range, \
+                                input_how = 'fixed_mean'
                                 )
         print(df_test, '\n')
-        # 2. average_data関数の返り値の型がpd.DataFrameになっているかでアサーション
-        #self.assertIsInstance(df_test, pd.DataFrame)
-        # 2. average_data関数の返り値(↑pd.DataFrame型)の大きさが、(元のテストDataFrame型変数df_real_columnsの大きさ)/(mean_range)
+        # 2. [テスト1]: average_data関数の返り値の型がpd.DataFrameになっているかでアサーション
+        self.assertIsInstance(df_test, pd.DataFrame)
+        # 2. [テスト2]: average_data関数の返り値(↑pd.DataFrame型)の大きさが、(元のテストDataFrame型変数df_real_columnsの大きさ)/(mean_range)
         #    になっているかでアサーション
         self.assertEqual(len(df_test), int(len(df_real_columns)/mean_range))
 
-    def _test_average_data_in_partly_section_and_return_dataframe_index_type_int(self):
+    def test_average_data_in_partly_section_and_return_dataframe_index_type_int(self):
         '''
         各columnsについて、部分的に区間を算術平均し、計算結果をpd.DataFrame型オブジェクトで返し、
         そのオブジェクトのインデックスオブジェクトの型がint型かどうかでテスト
         '''
         mean_range = 5  # 平均値をとる要素数
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
-        df_test = ap3.average_data(input_acc_ang_df = df_real_columns, \
+        df_test = ap3.average_data(
+                                input_acc_ang_df = df_real_columns, \
                                 input_mean_range = mean_range, \
+                                input_how = 'fixed_mean'
                                 )
+        print('df_test')
+        print('-----')
         print(df_test, '\n')
+        print('df_test.index')
+        print('-----')
+        print(df_test.index, '\n')
         # 2. average_data関数の返り値のインデックスオブジェクトの型がintになっているかでアサーション
         #    インデックスオブジェクトの要素をランダムに抽出し、アサーション
+        # HACK: 2021.12.8: もっと直接的な書き方があると思う。
         self.assertIsInstance(df_test.index[np.random.randint(len(df_test))], int)
 
-    def _test_average_data_mean_range_1(self):
+    def test_average_data_mean_range_1(self):
         '''
         main/ap3/average_data関数の引数について、input_mean_range=1を指定した場合、元のDataFrame型変数と値が変わらないかでテスト
         → ナイーブなやり方は、if input_mean_range=1: return input_df
@@ -160,19 +175,20 @@ class TestAverageData(unittest.TestCase):
         print('df_test\n{test}'.format(test=df_test))
         pd.testing.assert_frame_equal(df_real.drop('time', axis=1), df_test.drop('time', axis=1))   # 'time'列を除いてアサーション
 
-    def _test_average_data_index_type(self):
+    def test_average_data_index_type(self):
         '''
         ap3.average_data関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでテスト
         '''
         mean_range = 3  # 平均値をとる要素数
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
         df_test = ap3.average_data(
-                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_acc_ang_df = df_real_columns.loc[:, 'time':'AngularRate(Z)[dps]'], \
                                 input_mean_range = mean_range, \
                                 input_how = 'fixed_mean',
                                 )
         # 2. ap3.average_data関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでアサーション
-        self.assertIsInstance(df_test.index, pd.Int64Index)
+        #self.assertIsInstance(df_test.index, pd.Int64Index)    # 2021.12.8: HACK: いつの間にか、インデックスオブジェクトの型が変わっていた...
+        self.assertIsInstance(df_test.index, pd.RangeIndex)
 
     def _test_average_data_input_how_raise_exception(self):
         '''
