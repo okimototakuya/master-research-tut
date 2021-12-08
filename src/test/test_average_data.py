@@ -196,19 +196,11 @@ class TestAverageData(unittest.TestCase):
         #df_real = ap3.read_csv_("../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv")     # 本番用データセット
         df_real = ap3.read_csv_("../../dataset/32crossroad.csv").reset_index(drop='index')                              # 本番用データセット
         print(df_real)
-        df_test = ap3.average_data(
-                                input_acc_ang_df = df_real.loc[:, [                         # 注. 'time'列ごと与えること
-                                                                    'time',
-                                                                    'Acceleration(X)[g]',
-                                                                    'Acceleration(Y)[g]',
-                                                                    'Acceleration(Z)[g]',
-                                                                    'AngularRate(X)[dps]',
-                                                                    'AngularRate(Y)[dps]',
-                                                                    'AngularRate(Z)[dps]'
-                                                                    ]],
+        df_test = ap3.average_data(                         # 注. 'time'列ごと与えること
+                                input_acc_ang_df = df_real.loc[:, 'time':'AngularRate(Z)[dps]'],
                                 input_mean_range = mean_range,
                                 input_how = 'slide_median',
-                                )
+                            )
         #print('df_real\n{real}'.format(real=df_real))
         #print('----------')
         #print('df_test\n{test}'.format(test=df_test))
