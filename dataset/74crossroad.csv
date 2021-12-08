@@ -1,3 +1,4 @@
+,Unnamed: 0,line,time,Acceleration(X)[g],Acceleration(Y)[g],Acceleration(Z)[g],AngularRate(X)[dps],AngularRate(Y)[dps],AngularRate(Z)[dps],Temperature[degree],Pressure[hPa],MagnetCount,MagnetSwitch,onCrossroad,crossroadID
 78225,78225,78225,44:18.0,-1.12064,-0.2465896,-0.01562548,4.760888,11.35289,14.64888,17.59,1017.681,0,0,1,74
 78226,78226,78226,44:18.1,-0.9717094,-0.2446364,0.05175939,-6.836146,-1.403851,2.441481,17.59,1017.709,0,0,1,74
 78227,78227,78227,44:18.2,-0.7026582,-0.1049837,-0.03515732,-22.88888,13.30607,0.6714072,17.59,1017.681,0,0,1,74

@@ -1,1 +1,2 @@
+,Unnamed: 0,line,time,Acceleration(X)[g],Acceleration(Y)[g],Acceleration(Z)[g],AngularRate(X)[dps],AngularRate(Y)[dps],AngularRate(Z)[dps],Temperature[degree],Pressure[hPa],MagnetCount,MagnetSwitch,onCrossroad,crossroadID
 75250,75250,75250,40:20.0,-0.6548051,-0.2065493,0.04687643,8.178961,0.06103702,-9.582812,18.2,1017.485,0,0,1,96
