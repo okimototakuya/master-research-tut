@@ -23,9 +23,9 @@ from sklearn.cluster import KMeans
 # 加速度データファイル(csv)のパス
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/LOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/LOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19
-PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
+#PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"  # ID16(交差点ラベル付)
 #PATH_CSV_ACCELERATION_DATA = "../../dataset/labeledEditedLOG_20181219141901_00007140_00140064401733434E45.csv"  # ID19(交差点ラベル付)
-#PATH_CSV_ACCELERATION_DATA = "../../dataset/32crossroad_50.csv"
+PATH_CSV_ACCELERATION_DATA = "../../dataset/32crossroad_50.csv"
 
 # グラフ内のプロット量
 AMOUNT_OF_PLOT = sum([1 for _ in open(PATH_CSV_ACCELERATION_DATA)]) - 1
@@ -173,8 +173,8 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     '''
     input_df_averaged = input_df_averaged.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
     # 4-0. プロットの保存先パスの設定
-    str_path_to_crossroad = re.split('[/,\.]', PATH_CSV_ACCELERATION_DATA)[7]   # 交差点ラベルによるパス
-    str_path_to_how_to_mean = HOW_TO_CALCULATE_MEAN + '_' + sys.argv[1]         # 平均方法及び平均区間によるパス
+    str_path_to_crossroad = re.split('[/,\.]', PATH_CSV_ACCELERATION_DATA)[7]       # 交差点ラベルによるパス
+    str_path_to_how_to_mean = HOW_TO_CALCULATE_MEAN + '_' + str(MEAN_RANGE)         # 平均方法及び平均区間によるパス
     # 4-1. 時系列プロット
     fig = plt.figure()
     fig.subplots_adjust(left=0.2)
