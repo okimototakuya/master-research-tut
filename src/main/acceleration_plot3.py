@@ -302,32 +302,33 @@ def main():
                 input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
             )
     # 2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)
-    df_averaged = average_data(
-                        input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
-                                df_read.loc[:,[  # 行数(データ数)の指定
-                                    'time',                 # 時刻
-                                    'Acceleration(X)[g]',   # 列(特徴量)の指定
-                                    'Acceleration(Y)[g]',
-                                    'Acceleration(Z)[g]',
-                                    'AngularRate(X)[dps]',
-                                    'AngularRate(Y)[dps]',
-                                    'AngularRate(Z)[dps]',
-                                   ]],
-                        input_mean_range = MEAN_RANGE, # 引数2:平均値を計算する際の、要素数
-                        input_how = HOW_TO_CALCULATE_MEAN,   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値
-                )
+    #df_averaged = average_data(
+    #                    input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
+    #                            df_read.loc[:,[  # 行数(データ数)の指定
+    #                                'time',                 # 時刻
+    #                                'Acceleration(X)[g]',   # 列(特徴量)の指定
+    #                                'Acceleration(Y)[g]',
+    #                                'Acceleration(Z)[g]',
+    #                                'AngularRate(X)[dps]',
+    #                                'AngularRate(Y)[dps]',
+    #                                'AngularRate(Z)[dps]',
+    #                               ]],
+    #                    input_mean_range = MEAN_RANGE, # 引数2:平均値を計算する際の、要素数
+    #                    input_how = HOW_TO_CALCULATE_MEAN,   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値
+    #            )
     # 4. 主成分分析を実行する
     # FIXME2021/7/4: 上記の場合(main関数定義文下のif分岐)以外でも、切り出し区間によっては、関数decompose_dataで例外が発生する。
     # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
     # [目的]: 次元削減でなく、データ可視化
     # - 2021.11.18の進捗報告時: 局所解に陥っている可能性があることを指摘された。
-    df_pca, loading = decompose_data(df_averaged.drop('time', axis=1))
-    df_pca = df_pca.join(df_averaged['time'])
+    df_read = df_read.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'].join(df_read['time']).reset_index(drop='index')
+    df_pca, loading = decompose_data(df_read.drop('time', axis=1))
+    df_pca = df_pca.join(df_read['time'])
     # 5. 上記の算出結果をプロットする
-    time_for_assert_2 = df_averaged['time']                                             # アサーション用変数2: 列'time'をpd.datetime64[ns]型にキャストした直後
+    time_for_assert_2 = df_read['time']                                             # アサーション用変数2: 列'time'をpd.datetime64[ns]型にキャストした直後
     assert time_for_assert_1.values.tolist() == time_for_assert_2.values.tolist()       # アサーション: 列'time'の値が、ここまでに誤って更新されていないか。
     plot_data(  # no-pca
-            input_df_averaged = df_averaged,            # PCAしていないデータ
+            input_df_averaged = df_read,            # PCAしていないデータ
             input_dict_param = dict_param_original,     # [＊]: 次元削減でなくデータ可視化が目的のため、HMMは原データのみに適用
         )
     plot_data(  # pca
