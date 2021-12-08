@@ -33,8 +33,8 @@ class IterAddMicrosecond():
 # FIXME: 2021.12.5: プロダクトコードの方で、関数average_dataにpd.DataFrameを与える前に、列'time'をstring型 → pd.datetime64[ns]型にキャストしている。
 df_real_columns = pd.DataFrame(
     {    # テストDataFrame型変数
-        #'Unnamed: 0':range(AMOUNT_OF_ROW),
-        #'line':range(AMOUNT_OF_ROW),
+        'Unnamed: 0':range(AMOUNT_OF_ROW),
+        'line':range(AMOUNT_OF_ROW),
         'time':[ms for ms in IterAddMicrosecond(datetime.datetime(2018, 12, 19, 14, minute=00, second=00, microsecond=0))],
         'Acceleration(X)[g]':np.random.rand(AMOUNT_OF_ROW)*10-5,   # 一様分布に従って値を出力
         'Acceleration(Y)[g]':np.random.rand(AMOUNT_OF_ROW)*10-5,   # 一様分布に従って値を出力
@@ -49,15 +49,15 @@ df_real_columns = pd.DataFrame(
         #'AngularRate(Y)[dps]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
         #'AngularRate(Z)[dps]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
         #'Temperature[degree]':np.random.randn(AMOUNT_OF_ROW)+18,   # 正規分布に従って値を出力
-        #'Pressure[hPa]':np.random.randn(AMOUNT_OF_ROW)+1017,   # 正規分布に従って値を出力
-        #'Temperature[degree]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
-        #'Pressure[hPa]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
-        #'MagnetCount':np.zeros(AMOUNT_OF_ROW, dtype=int), # 常に値0を出力
-        #'MagnetSwitch':np.zeros(AMOUNT_OF_ROW, dtype=int), # 常に値0を出力
+        'Pressure[hPa]':np.random.randn(AMOUNT_OF_ROW)+1017,   # 正規分布に従って値を出力
+        'Temperature[degree]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
+        'Pressure[hPa]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
+        'MagnetCount':np.zeros(AMOUNT_OF_ROW, dtype=int), # 常に値0を出力
+        'MagnetSwitch':np.zeros(AMOUNT_OF_ROW, dtype=int), # 常に値0を出力
         #'onCrossroad':0, # 常に値0を出力
         #'crossroadID':0, # 常に値0を出力
-        #'onCrossroad':np.random.binomial(1, 0.01, AMOUNT_OF_ROW), #ベルヌーイ分布に従ってブール値を出力
-        #'crossroadID':np.random.binomial(1, 0.01, AMOUNT_OF_ROW), #ベルヌーイ分布に従ってブール値を出力
+        'onCrossroad':np.random.binomial(1, 0.01, AMOUNT_OF_ROW), #ベルヌーイ分布に従ってブール値を出力
+        'crossroadID':np.random.binomial(1, 0.01, AMOUNT_OF_ROW), #ベルヌーイ分布に従ってブール値を出力
     },
     )
 
@@ -66,10 +66,18 @@ class TestAverageData(unittest.TestCase):
     '''
     '''
     def setUp(self):
-        pass
+        '''
+        テストcsvファイルを書込
+        '''
+        df_real_columns.to_csv('./test_dataset/demo.csv')
+        #subprocess.call(['sed', '\'1', 's/,//\'', './test_dataset/demo.csv', '>', './test_dataset/demo.csv'])
+        #subprocess.getoutput('sed -i -e \'1 s/,//\' ./test_dataset/demo.csv')   # 書き出したテストcsvファイルの先頭行頭のカンマを削除
 
     def tearDown(self):
-        pass
+        '''
+        次回のテストのためにテストcsvファイルを削除
+        '''
+        #os.remove('./test_dataset/demo.csv')
 
     #def _test_average_data_in_all_section_and_return_series_older(self):
     #    '''
@@ -117,7 +125,7 @@ class TestAverageData(unittest.TestCase):
         #    になっているかでアサーション
         self.assertEqual(len(df_test), int(len(df_real_columns)/mean_range))
 
-    def test_average_data_in_partly_section_and_return_dataframe_index_type_int(self):
+    def _test_average_data_in_partly_section_and_return_dataframe_index_type_int(self):
         '''
         各columnsについて、部分的に区間を算術平均し、計算結果をpd.DataFrame型オブジェクトで返し、
         そのオブジェクトのインデックスオブジェクトの型がint型かどうかでテスト
@@ -140,7 +148,7 @@ class TestAverageData(unittest.TestCase):
         # HACK: 2021.12.8: もっと直接的な書き方があると思う。
         self.assertIsInstance(df_test.index[np.random.randint(len(df_test))], int)
 
-    def test_average_data_mean_range_1(self):
+    def _test_average_data_mean_range_1(self):
         '''
         main/ap3/average_data関数の引数について、input_mean_range=1を指定した場合、元のDataFrame型変数と値が変わらないかでテスト
         → ナイーブなやり方は、if input_mean_range=1: return input_df
@@ -175,7 +183,29 @@ class TestAverageData(unittest.TestCase):
         print('df_test\n{test}'.format(test=df_test))
         pd.testing.assert_frame_equal(df_real.drop('time', axis=1), df_test.drop('time', axis=1))   # 'time'列を除いてアサーション
 
-    def test_average_data_index_type(self):
+    def test_average_data_mean_range_1_df_read_is_generated_by_ap3_read_csv_(self):
+        '''
+        df_readを事前に用意するのでなく、ap3.read_csv_によりpd.DataFrame型変数を生成し、上テスト関数と同様のテストをする。
+
+        Notes
+        -----
+        - 目的は、本番環境にできる限り近づけること。
+        '''
+        mean_range = 1                                              # テスト準備1: 平均値をとる要素数
+        #df_real = ap3.read_csv_("./test_dataset/demo.csv")                                                              # テスト用データセット
+        df_real = ap3.read_csv_("../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv")     # 本番用データセット
+        print(df_real)
+        df_test = ap3.average_data(
+                                input_acc_ang_df = df_real,     # 注. 'time'列ごと与えること
+                                input_mean_range = mean_range,
+                                input_how = 'slide_median',
+                                )
+        print('df_real\n{real}'.format(real=df_real))
+        print('----------')
+        print('df_test\n{test}'.format(test=df_test))
+        pd.testing.assert_frame_equal(df_real.drop('time', axis=1), df_test.drop('time', axis=1))   # 'time'列を除いてアサーション
+
+    def _test_average_data_index_type(self):
         '''
         ap3.average_data関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでテスト
         '''
@@ -220,7 +250,7 @@ class TestAverageData(unittest.TestCase):
         #    になっているかでアサーション
         self.assertEqual(len(df_test), int(len(df_real_columns)/mean_range))
 
-    def test_average_data_slide_mean_len(self):
+    def _test_average_data_slide_mean_len(self):
         '''
         移動平均を算出した際、返り値のDataFrame型変数の大きさが適切かどうかテスト
         '''
