@@ -77,7 +77,7 @@ class TestAverageData(unittest.TestCase):
         '''
         次回のテストのためにテストcsvファイルを削除
         '''
-        #os.remove('./test_dataset/demo.csv')
+        os.remove('./test_dataset/demo.csv')
 
     #def _test_average_data_in_all_section_and_return_series_older(self):
     #    '''
@@ -193,17 +193,27 @@ class TestAverageData(unittest.TestCase):
         '''
         mean_range = 1                                              # テスト準備1: 平均値をとる要素数
         #df_real = ap3.read_csv_("./test_dataset/demo.csv")                                                              # テスト用データセット
-        df_real = ap3.read_csv_("../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv")     # 本番用データセット
+        #df_real = ap3.read_csv_("../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv")     # 本番用データセット
+        df_real = ap3.read_csv_("../../dataset/32crossroad.csv").reset_index(drop='index')                              # 本番用データセット
         print(df_real)
         df_test = ap3.average_data(
-                                input_acc_ang_df = df_real,     # 注. 'time'列ごと与えること
+                                input_acc_ang_df = df_real.loc[:, [                         # 注. 'time'列ごと与えること
+                                                                    'time',
+                                                                    'Acceleration(X)[g]',
+                                                                    'Acceleration(Y)[g]',
+                                                                    'Acceleration(Z)[g]',
+                                                                    'AngularRate(X)[dps]',
+                                                                    'AngularRate(Y)[dps]',
+                                                                    'AngularRate(Z)[dps]'
+                                                                    ]],
                                 input_mean_range = mean_range,
                                 input_how = 'slide_median',
                                 )
-        print('df_real\n{real}'.format(real=df_real))
-        print('----------')
-        print('df_test\n{test}'.format(test=df_test))
-        pd.testing.assert_frame_equal(df_real.drop('time', axis=1), df_test.drop('time', axis=1))   # 'time'列を除いてアサーション
+        #print('df_real\n{real}'.format(real=df_real))
+        #print('----------')
+        #print('df_test\n{test}'.format(test=df_test))
+        pd.testing.assert_frame_equal(df_real.loc[:, 'time':'AngularRate(Z)[dps]'].drop('time', axis=1),    \
+                df_test.drop('time', axis=1))   # 'time'列を除いてアサーション
 
     def _test_average_data_index_type(self):
         '''
