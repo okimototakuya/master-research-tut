@@ -297,20 +297,20 @@ def main():
     df_read['time'] = pd.to_datetime(df_read['time'], format='%M:%S.%f')    # 列'time'をpd.datetime64[ns]型に変換
     time_for_assert_1 = df_read['time']                                     # アサーション用変数1: 関数plot_dataの呼び出し直前
     # 2. 上記で返されたdf_readについて、平均値を計算する(df_read)
-    #df_read = average_data(
-    #                    input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
-    #                            df_read.loc[:,[  # 行数(データ数)の指定
-    #                                'time',                 # 時刻
-    #                                'Acceleration(X)[g]',   # 列(特徴量)の指定
-    #                                'Acceleration(Y)[g]',
-    #                                'Acceleration(Z)[g]',
-    #                                'AngularRate(X)[dps]',
-    #                                'AngularRate(Y)[dps]',
-    #                                'AngularRate(Z)[dps]',
-    #                               ]],
-    #                    input_mean_range = MEAN_RANGE, # 引数2:平均値を計算する際の、要素数
-    #                    input_how = HOW_TO_CALCULATE_MEAN,   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値
-    #            )
+    df_read = average_data(
+                        input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
+                                df_read.loc[:,[  # 行数(データ数)の指定
+                                    'time',                 # 時刻
+                                    'Acceleration(X)[g]',   # 列(特徴量)の指定
+                                    'Acceleration(Y)[g]',
+                                    'Acceleration(Z)[g]',
+                                    'AngularRate(X)[dps]',
+                                    'AngularRate(Y)[dps]',
+                                    'AngularRate(Z)[dps]',
+                                   ]],
+                        input_mean_range = MEAN_RANGE, # 引数2:平均値を計算する際の、要素数
+                        input_how = HOW_TO_CALCULATE_MEAN,   # 引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値
+                )
     # 3. 隠れマルコフモデルを適用する
     if NUMBER_OF_ASSUMED_STATE > AMOUNT_OF_PLOT:  # 2021/7/5 2時頃: clustering, hmm共に、全く同じ例外が投げられることを確認した。
         raise Exception('確率モデルを用いる際に仮定する状態数の値が不適切です:(状態数, サンプル数)=({wrong_number_state}, {wrong_number_sample})'  \
@@ -332,15 +332,6 @@ def main():
     else:
         # 主成分分析をせずに、隠れマルコフモデルを適用する
         # [目的]: 次元削減でなく、データ可視化
-        df_read = df_read.loc[:, ["time",
-                            "Acceleration(X)[g]",
-                            "Acceleration(Y)[g]",
-                            "Acceleration(Z)[g]",
-                            "AngularRate(X)[dps]",
-                            "AngularRate(Y)[dps]",
-                            "AngularRate(Z)[dps]",
-                            "onCrossroad",          # 交差点ラベル情報
-                            "crossroadID"]]
         dict_param_original = estimate_state_data(
                 input_df_read = df_read.drop('time', axis=1),
                 input_how = ASSUMED_PROBABILISTIC_MODEL,
