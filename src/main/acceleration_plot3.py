@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
 sys.path.append('../test')
-import test_acceleration_plot3 as tap3
 from hmmlearn import hmm
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
@@ -59,7 +58,7 @@ def read_csv_(input_path_to_csv):
                 'AngularRate(X)[dps]':float,  'AngularRate(Y)[dps]':float,  'AngularRate(Z)[dps]':float,
                 'Temperature[degree]':float,  'Pressure[hPa]':float,  'MagnetCount':int, 'MagnetSwitch':int,
                 'onCrossroad':int, 'crossroadID':int},
-            skiprows = 0 if 'crossroad' == re.search('crossroad', PATH_CSV_ACCELERATION_DATA).group() else default_num_skip_row,    # *crossroad*.csvの場合、列名の行はない。
+            skiprows = default_num_skip_row,
             engine = 'python',
             )
 
@@ -71,11 +70,19 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
     引数2:平均値を計算する際の、要素数
     引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
 
-    Notes
+    Parameters
     -----
-    - 関数average_dataの仕様について、
-    　-- param: pd.Dataframeを6つの加速度特徴量の列に加えて、'time'列も与える。固定平均については、'time'列の更新が含まれるため。
-    　-- return: pd.Dataframeを返す。ただし、'time'列は列尾に追加。
+    - input_acc_ang_df : pd.DataFrame (列 : 6つの加速度特徴量, 'time')
+        ＊固定平均については、'time'列の更新作業が含まれるため。
+    - input_mean_range : int
+        平均区間
+    - input_how : str
+        平均値の算術方法
+
+    Returns
+    -----
+    - pd.DataFrame
+        平均値を格納した配列。ただし、'time'列は列尾に追加。
     '''
     if input_how == 'fixed_mean':  # 固定(?)平均
        #len_after_division = int(len(input_acc_ang_df)/input_mean_range)    # 固定平均を算出した際、算出後のpd.DataFrame型変数の大きさ
@@ -99,22 +106,22 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
 
-def decompose_data(input_df_averaged):
+def decompose_data(input_df_read):
     '''
     主成分分析を実行する関数
     '''
     # 行列の標準化(各列に対して、平均値を引いたものを標準偏差で割る)
-    df_averaged_std = input_df_averaged.iloc[:, 0:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
+    df_read_std = input_df_read.iloc[:, 0:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
     # 主成分分析の実行
     pca = PCA()
-    pca.fit(df_averaged_std)
+    pca.fit(df_read_std)
     # データを主成分空間に写像
-    ndarray_feature = pca.transform(df_averaged_std)
+    ndarray_feature = pca.transform(df_read_std)
     # 主成分得点
-    df_pca = pd.DataFrame(ndarray_feature, columns=["PC{}".format(x+1) for x in range(len(df_averaged_std.columns))])
+    df_pca = pd.DataFrame(ndarray_feature, columns=["PC{}".format(x+1) for x in range(len(df_read_std.columns))])
     ## 第１主成分と第２主成分でプロット
     #plt.figure(figsize=(6, 6))
-    #plt.scatter(ndarray_feature[:, 0], ndarray_feature[:, 1], alpha=0.8, c=list(df_averaged_std.iloc[:, 0]))
+    #plt.scatter(ndarray_feature[:, 0], ndarray_feature[:, 1], alpha=0.8, c=list(df_read_std.iloc[:, 0]))
     #plt.grid()
     #plt.xlabel("PC1")
     #plt.ylabel("PC2")
@@ -131,26 +138,40 @@ def decompose_data(input_df_averaged):
     return df_pca, loading
 
 
-def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_state):
+def estimate_state_data(input_df_read, input_how='hmm', input_number_of_assumed_state=3):
     '''
     隠れマルコフモデルを仮定し、pd.DataFrame型引数の訓練及び状態推定を行う関数
+
+    Parameters
+    -----
+    - input_df_read : pd.DataFrame
+        入力配列。ただし、列'time'は含めない。
+    - input_how : str
+        確率モデルを表す文字列 ('clustering', 'hmm')
+    - input_number_of_assumed_state : int
+        仮定する状態数
+
+    Returns
+    -----
+    - dict_param : dict
+        推定した[パラメータ名, パラメータ値]を保持する辞書(dict)型
     '''
     if input_how == 'clustering':
         model = KMeans(n_clusters = input_number_of_assumed_state)   # クラスタリング(混合ガウス分布)の仮定
-        model.fit(input_df_averaged)    # クラスタリングにより、引数のデータを訓練
+        model.fit(input_df_read)    # クラスタリングにより、引数のデータを訓練
         return model.labels_
     elif input_how == 'hmm':
         np.random.seed(seed=7)
         model = hmm.GaussianHMM(n_components=input_number_of_assumed_state, covariance_type="full", init_params='mtc')    # 隠れマルコフモデルの仮定
         model.startprob_ = np.array([1.0 if i == 0 else 0.0 for i in range(NUMBER_OF_ASSUMED_STATE)])   # 初期状態を状態1で固定
-        model.fit(input_df_averaged)    # 隠れマルコフモデルにより、引数のデータを訓練
+        model.fit(input_df_read)    # 隠れマルコフモデルにより、引数のデータを訓練
         #np.set_printoptions(threshold=np.inf)  # 配列の要素を全て表示(状態系列)
         #print("初期確率\n", model.startprob_)
         #print("平均値\n", model.means_)
         #print("共分散値\n", model.covars_)
         #print("遷移確率\n", model.transmat_)
-        #print("対数尤度\n", model.score(input_df_averaged))
-        #print("状態系列の復号\n", model.predict(input_df_averaged))
+        #print("対数尤度\n", model.score(input_df_read))
+        #print("状態系列の復号\n", model.predict(input_df_read))
         np.set_printoptions(precision=3, suppress=True)        # 小数点以下の有効数字3桁, 指数表記しない
         dict_param = {
                  "初期確率": model.startprob_,
@@ -158,23 +179,23 @@ def estimate_state_data(input_df_averaged, input_how, input_number_of_assumed_st
                  "共分散値": model.covars_,
                  #"遷移行列": model.transmat_,  # デフォルト
                  "遷移行列": model.transmat_ * 100,   # 百分率
-                 "対数尤度": model.score(input_df_averaged),
-                 "状態系列の復号": model.predict(input_df_averaged)
+                 "対数尤度": model.score(input_df_read),
+                 "状態系列の復号": model.predict(input_df_read)
                  }
-        #return model.predict(input_df_averaged)
+        #return model.predict(input_df_read)
         return dict_param
     else:
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
 
-def plot_data(input_df_averaged, input_dict_param, input_loading=None):
+def plot_data(input_df_read, input_dict_param, input_loading=None):
     '''
     pd.DataFrame型変数のプロットを行う関数
     '''
-    input_df_averaged = input_df_averaged.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
+    input_df_read = input_df_read.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
     # 4-0. プロットの保存先パスの設定
-    str_path_to_crossroad = re.split('[/,\.]', PATH_CSV_ACCELERATION_DATA)[7]   # 交差点ラベルによるパス
-    str_path_to_how_to_mean = HOW_TO_CALCULATE_MEAN + '_' + sys.argv[1]         # 平均方法及び平均区間によるパス
+    str_path_to_crossroad = re.split('[/,\.]', PATH_CSV_ACCELERATION_DATA)[7]       # 交差点ラベルによるパス
+    str_path_to_how_to_mean = HOW_TO_CALCULATE_MEAN + '_' + str(MEAN_RANGE)         # 平均方法及び平均区間によるパス
     # 4-1. 時系列プロット
     fig = plt.figure()
     fig.subplots_adjust(left=0.2)
@@ -199,7 +220,7 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
                                                  loading=input_loading,
                                                  matrix=input_dict_param['遷移行列'],
                                                  amount=AMOUNT_OF_PLOT,
-                                                 stay=input_df_averaged['time'][AMOUNT_OF_PLOT-1]-input_df_averaged['time'][0],     # datetime型による演算: 日付計算
+                                                 stay=input_df_read['time'][AMOUNT_OF_PLOT-1]-input_df_read['time'][0],     # datetime型による演算: 日付計算
                                                  series_f=input_dict_param['状態系列の復号'][:25],
                                                  series_l=input_dict_param['状態系列の復号'][-25:]
                                                  )
@@ -210,13 +231,13 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
     # 2021.12.4: 注: 'time'列の型をdatetime → object(str?) に変換
     # - pltのformatter/locatorを用いたプロットについて、datetime型の場合は他の型と異なる独自のformatter/locator型があるよう。例.DateFormatter
     # - DateFormatterでなく通常のFormatterを用いたところ、エラー/警告が発生することなく、ただ目盛り/ラベルが表示されないままプロットされた。
-    input_df_averaged['time'] = input_df_averaged['time'].dt.strftime('%M:%S.%f')
+    input_df_read['time'] = input_df_read['time'].dt.strftime('%M:%S.%f')
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
         ax = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
-                x = list(input_df_averaged.index),
-                y = input_df_averaged.iloc[:, i-1],
-                hue = input_df_averaged['state'],
+                x = list(input_df_read.index),
+                y = input_df_read.iloc[:, i-1],
+                hue = input_df_read['state'],
                 palette = 'rainbow'
             )
         # 4-1-2. Locatorの設定
@@ -224,8 +245,8 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         # - 下記
         # - xaxis: 線形目盛り
         # - yaxis: 自動目盛り (＊: 外れ値が含まれるため、ユーザが前もって目盛りの上限/下限を設定するのは望ましくない。
-        #g.set_xticks(input_df_averaged['time'])                                        # Locatorは、FixedLocator: 2021.11.23: とりあえずのプロットに成功した。
-        list_loc = list(input_df_averaged.index)
+        #g.set_xticks(input_df_read['time'])                                        # Locatorは、FixedLocator: 2021.11.23: とりあえずのプロットに成功した。
+        list_loc = list(input_df_read.index)
         ax.xaxis.set_major_locator(ticker.FixedLocator(list_loc[::10]))                                                # - 主目盛り
         ax.xaxis.set_minor_locator(ticker.FixedLocator(list(filter(lambda x: x % 10 != 0, list_loc))))                 # - 補助目盛り
         assert list_loc == sorted(list_loc[::10] + list(filter(lambda x: x % 10 != 0, list_loc)))                      # アサーション: 主目盛りと補助目盛りを足して、元のlist_locの要素を網羅するかどうか
@@ -233,32 +254,32 @@ def plot_data(input_df_averaged, input_dict_param, input_loading=None):
         # - 目盛りラベルの設定
         # - xticklabelsにリストを渡すと、その値の箇所だけ目盛りが配置される。
         # - ↑この時、FormatterはFixedFormatter
-        xlabels_before_thinning_out = [input_df_averaged['time'][i].split('00000')[0] if i % 10 == 0 else '' for i in range(0, len(input_df_averaged))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+        xlabels_before_thinning_out = [input_df_read['time'][i].split('00000')[0] if i % 10 == 0 else '' for i in range(0, len(input_df_read))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
         xlabels = list(filter(lambda x: x != '', xlabels_before_thinning_out))
         assert len(xlabels) == len(list_loc[::10])                  # アサーション: ラベルと主目盛りの個数が一致するかどうか。
         ax.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid(which='major')
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure1.png')
-        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure1.png')                                               # テストプロット画像の保存先
+        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure1.png')
+        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure1.png')                                               # テストプロット画像の保存先
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
-        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure3.png')
-        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure3.png')                                               # テストプロット画像の保存先
+        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure3.png')
+        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure3.png')                                               # テストプロット画像の保存先
     #4-2. 散布図プロット
     #plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル: この位置だと、時系列プロットの方に反映される。
     sns.pairplot(
-            input_df_averaged,
+            input_df_read,
             diag_kind = 'kde',
             plot_kws = {'alpha': 0.2},
             hue = 'state',
             palette = 'rainbow',
         )
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure2.png')
-        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure2.png')                                               # テストプロット画像の保存先
+        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure2.png')
+        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure2.png')                                               # テストプロット画像の保存先
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
-        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure4.png')
-        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure4.png')                                               # テストプロット画像の保存先
+        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure4.png')
+        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure4.png')                                               # テストプロット画像の保存先
 
 
 def main():
@@ -269,14 +290,14 @@ def main():
         PATH_CSV_ACCELERATION_DATA = sys.argv[2]                                        # csvファイルのパス
         AMOUNT_OF_PLOT = sum([1 for _ in open(PATH_CSV_ACCELERATION_DATA)]) - 1         # プロット量
     # 1. csvファイル(加速度データ)を読み込み、pd.DataFrame型変数(df_read)を返す
-    df_read = read_csv_(PATH_CSV_ACCELERATION_DATA)
+    df_read = read_csv_(PATH_CSV_ACCELERATION_DATA).reset_index(drop='index')
     #df_read = df_read['onCrossroad']    # テスト: 列'onCrossroad'の抽出 (成功)
     #df_read = df_read[df_read['onCrossroad']=='0']    # 全ての交差点を抽出
     #df_read = df_read[df_read['crossroadID']==83]    # 交差点83を抽出
     df_read['time'] = pd.to_datetime(df_read['time'], format='%M:%S.%f')    # 列'time'をpd.datetime64[ns]型に変換
     time_for_assert_1 = df_read['time']                                     # アサーション用変数1: 関数plot_dataの呼び出し直前
-    # 2. 上記で返されたdf_readについて、平均値を計算する(df_averaged)
-    df_averaged = average_data(
+    # 2. 上記で返されたdf_readについて、平均値を計算する(df_read)
+    df_read = average_data(
                         input_acc_ang_df =  # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)
                                 df_read.loc[:,[  # 行数(データ数)の指定
                                     'time',                 # 時刻
@@ -312,7 +333,7 @@ def main():
         # 主成分分析をせずに、隠れマルコフモデルを適用する
         # [目的]: 次元削減でなく、データ可視化
         dict_param_original = estimate_state_data(
-                input_df_averaged = df_averaged.drop('time', axis=1),
+                input_df_read = df_read.drop('time', axis=1),
                 input_how = ASSUMED_PROBABILISTIC_MODEL,
                 input_number_of_assumed_state = NUMBER_OF_ASSUMED_STATE,
             )
@@ -321,17 +342,18 @@ def main():
     # 例. (DATA_SAMPLED_FIRST, DATA_SAMPLED_LAST)=(5, 9)の時、ValueError: Shape of passed values is (4, 4), indices imply (4, 5)
     # [目的]: 次元削減でなく、データ可視化
     # - 2021.11.18の進捗報告時: 局所解に陥っている可能性があることを指摘された。
-    df_pca, loading = decompose_data(df_averaged.drop('time', axis=1))
-    df_pca = df_pca.join(df_averaged['time'])
+    df_read = df_read.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'].join(df_read['time']).reset_index(drop='index')
+    df_pca, loading = decompose_data(df_read.drop('time', axis=1))
+    df_pca = df_pca.join(df_read['time'])
     # 5. 上記の算出結果をプロットする
-    time_for_assert_2 = df_averaged['time']                                             # アサーション用変数2: 列'time'をpd.datetime64[ns]型にキャストした直後
+    time_for_assert_2 = df_read['time']                                             # アサーション用変数2: 列'time'をpd.datetime64[ns]型にキャストした直後
     assert time_for_assert_1.values.tolist() == time_for_assert_2.values.tolist()       # アサーション: 列'time'の値が、ここまでに誤って更新されていないか。
     plot_data(  # no-pca
-            input_df_averaged = df_averaged,            # PCAしていないデータ
+            input_df_read = df_read,            # PCAしていないデータ
             input_dict_param = dict_param_original,     # [＊]: 次元削減でなくデータ可視化が目的のため、HMMは原データのみに適用
         )
     plot_data(  # pca
-            input_df_averaged = df_pca,                 # PCAしたデータ
+            input_df_read = df_pca,                 # PCAしたデータ
             input_dict_param = dict_param_original,
             input_loading = loading
         )

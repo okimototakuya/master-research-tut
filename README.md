@@ -25,7 +25,7 @@
 
 ### ファイル
 ---
-#### test_acceleration_plot3.py
+#### test_"hoge-hoge".py
 プロダクトコードのテストを行う。テストの例として、データ読み込み時に意図した形式で読み込めたか確認するものや、  
 データの一定区間での平均値算出が合っているか確認するものなどがある。
 #### test_learn_api.py
@@ -63,4 +63,4 @@ Pythonのライブラリや特殊メソッドのテストを行う。
 ## プロダクトコードの実行方法
 src/mainに移動し、「python acceleration_plot3.py」
 ## テストスクリプトの実行方法
-src/testに移動し、「python test_acceleration_plot3.py」
+src/testに移動し、「python test_"hoge-hoge".py」

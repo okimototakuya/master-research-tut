@@ -33,8 +33,8 @@ class IterAddMicrosecond():
 # FIXME: 2021.12.5: プロダクトコードの方で、関数average_dataにpd.DataFrameを与える前に、列'time'をstring型 → pd.datetime64[ns]型にキャストしている。
 df_real_columns = pd.DataFrame(
     {    # テストDataFrame型変数
-        #'Unnamed: 0':range(AMOUNT_OF_ROW),
-        #'line':range(AMOUNT_OF_ROW),
+        'Unnamed: 0':range(AMOUNT_OF_ROW),
+        'line':range(AMOUNT_OF_ROW),
         'time':[ms for ms in IterAddMicrosecond(datetime.datetime(2018, 12, 19, 14, minute=00, second=00, microsecond=0))],
         'Acceleration(X)[g]':np.random.rand(AMOUNT_OF_ROW)*10-5,   # 一様分布に従って値を出力
         'Acceleration(Y)[g]':np.random.rand(AMOUNT_OF_ROW)*10-5,   # 一様分布に従って値を出力
@@ -49,27 +49,36 @@ df_real_columns = pd.DataFrame(
         #'AngularRate(Y)[dps]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
         #'AngularRate(Z)[dps]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
         #'Temperature[degree]':np.random.randn(AMOUNT_OF_ROW)+18,   # 正規分布に従って値を出力
-        #'Pressure[hPa]':np.random.randn(AMOUNT_OF_ROW)+1017,   # 正規分布に従って値を出力
-        #'Temperature[degree]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
-        #'Pressure[hPa]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
-        #'MagnetCount':np.zeros(AMOUNT_OF_ROW, dtype=int), # 常に値0を出力
-        #'MagnetSwitch':np.zeros(AMOUNT_OF_ROW, dtype=int), # 常に値0を出力
+        'Pressure[hPa]':np.random.randn(AMOUNT_OF_ROW)+1017,   # 正規分布に従って値を出力
+        'Temperature[degree]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
+        'Pressure[hPa]':np.ones(AMOUNT_OF_ROW, dtype=int), # 常に値1を出力
+        'MagnetCount':np.zeros(AMOUNT_OF_ROW, dtype=int), # 常に値0を出力
+        'MagnetSwitch':np.zeros(AMOUNT_OF_ROW, dtype=int), # 常に値0を出力
         #'onCrossroad':0, # 常に値0を出力
         #'crossroadID':0, # 常に値0を出力
-        #'onCrossroad':np.random.binomial(1, 0.01, AMOUNT_OF_ROW), #ベルヌーイ分布に従ってブール値を出力
-        #'crossroadID':np.random.binomial(1, 0.01, AMOUNT_OF_ROW), #ベルヌーイ分布に従ってブール値を出力
+        'onCrossroad':np.random.binomial(1, 0.01, AMOUNT_OF_ROW), #ベルヌーイ分布に従ってブール値を出力
+        'crossroadID':np.random.binomial(1, 0.01, AMOUNT_OF_ROW), #ベルヌーイ分布に従ってブール値を出力
     },
     )
 
 
 class TestAverageData(unittest.TestCase):
     '''
+    関数ap3.average_dataについてテスト
     '''
     def setUp(self):
-        pass
+        '''
+        テストcsvファイルを書込
+        '''
+        df_real_columns.to_csv('./test_dataset/demo.csv')
+        #subprocess.call(['sed', '\'1', 's/,//\'', './test_dataset/demo.csv', '>', './test_dataset/demo.csv'])
+        #subprocess.getoutput('sed -i -e \'1 s/,//\' ./test_dataset/demo.csv')   # 書き出したテストcsvファイルの先頭行頭のカンマを削除
 
     def tearDown(self):
-        pass
+        '''
+        次回のテストのためにテストcsvファイルを削除
+        '''
+        os.remove('./test_dataset/demo.csv')
 
     #def _test_average_data_in_all_section_and_return_series_older(self):
     #    '''
@@ -84,29 +93,36 @@ class TestAverageData(unittest.TestCase):
     #    print(df_test)
     #    pd.testing.assert_series_equal(df_test, df_real_columns_average)
 
-    def _test_average_data_in_all_section_and_return_series(self):
+    def _test_average_data_in_all_section_and_return_dataframe(self):
         '''
-        各columnsについて、全区間を算術平均し、計算結果をpd.Series型オブジェクトで返したかテスト
+        各columnsについて、全区間を算術平均し、計算結果をpd.DataFrame型オブジェクトで返したかテスト
+
+        Return
+        -----
+        - 全区間を算術平均した場合、返り値は、pd.Seriesでなくpd.DataFrame。
+        - 各列(特徴量)に、値が一つずつ含まれる状態。
         '''
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
-        df_test = ap3.average_data(df_real_columns)
+        df_test = ap3.average_data(df_real_columns, len(df_real_columns), 'fixed_mean') # 全区間
         print(df_test, '\n')
-        # 2. average_data関数の返り値の型がpd.Seriesになっているかでアサーション
-        self.assertIsInstance(df_test, pd.Series)
+        # 2. average_data関数の返り値の型がpd.DataFrameになっているかでアサーション
+        self.assertIsInstance(df_test, pd.DataFrame)
 
     def _test_average_data_in_partly_section_and_return_dataframe(self):
         '''
-        '各columnsについて、部分的に区間を算術平均し、計算結果をpd.DataFrame型オブジェクトで返したかテス
+        各columnsについて、部分的に区間を算術平均し、計算結果をpd.DataFrame型オブジェクトで返したかテスト
         '''
         mean_range = 5  # 平均値をとる要素数
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
-        df_test = ap3.average_data(input_acc_ang_df = df_real_columns, \
+        df_test = ap3.average_data(
+                                input_acc_ang_df = df_real_columns, \
                                 input_mean_range = mean_range, \
+                                input_how = 'fixed_mean'
                                 )
         print(df_test, '\n')
-        # 2. average_data関数の返り値の型がpd.DataFrameになっているかでアサーション
-        #self.assertIsInstance(df_test, pd.DataFrame)
-        # 2. average_data関数の返り値(↑pd.DataFrame型)の大きさが、(元のテストDataFrame型変数df_real_columnsの大きさ)/(mean_range)
+        # 2. [テスト1]: average_data関数の返り値の型がpd.DataFrameになっているかでアサーション
+        self.assertIsInstance(df_test, pd.DataFrame)
+        # 2. [テスト2]: average_data関数の返り値(↑pd.DataFrame型)の大きさが、(元のテストDataFrame型変数df_real_columnsの大きさ)/(mean_range)
         #    になっているかでアサーション
         self.assertEqual(len(df_test), int(len(df_real_columns)/mean_range))
 
@@ -117,12 +133,20 @@ class TestAverageData(unittest.TestCase):
         '''
         mean_range = 5  # 平均値をとる要素数
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
-        df_test = ap3.average_data(input_acc_ang_df = df_real_columns, \
+        df_test = ap3.average_data(
+                                input_acc_ang_df = df_real_columns, \
                                 input_mean_range = mean_range, \
+                                input_how = 'fixed_mean'
                                 )
+        print('df_test')
+        print('-----')
         print(df_test, '\n')
+        print('df_test.index')
+        print('-----')
+        print(df_test.index, '\n')
         # 2. average_data関数の返り値のインデックスオブジェクトの型がintになっているかでアサーション
         #    インデックスオブジェクトの要素をランダムに抽出し、アサーション
+        # HACK: 2021.12.8: もっと直接的な書き方があると思う。
         self.assertIsInstance(df_test.index[np.random.randint(len(df_test))], int)
 
     def _test_average_data_mean_range_1(self):
@@ -160,6 +184,30 @@ class TestAverageData(unittest.TestCase):
         print('df_test\n{test}'.format(test=df_test))
         pd.testing.assert_frame_equal(df_real.drop('time', axis=1), df_test.drop('time', axis=1))   # 'time'列を除いてアサーション
 
+    def _test_average_data_mean_range_1_df_read_is_generated_by_ap3_read_csv_(self):
+        '''
+        df_readを事前に用意するのでなく、ap3.read_csv_によりpd.DataFrame型変数を生成し、上テスト関数と同様のテストをする。
+
+        Notes
+        -----
+        - 目的は、本番環境にできる限り近づけること。
+        '''
+        mean_range = 1                                              # テスト準備1: 平均値をとる要素数
+        #df_real = ap3.read_csv_("./test_dataset/demo.csv")                                                              # テスト用データセット
+        #df_real = ap3.read_csv_("../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv")     # 本番用データセット
+        df_real = ap3.read_csv_("../../dataset/32crossroad.csv").reset_index(drop='index')                              # 本番用データセット
+        print(df_real)
+        df_test = ap3.average_data(                         # 注. 'time'列ごと与えること
+                                input_acc_ang_df = df_real.loc[:, 'time':'AngularRate(Z)[dps]'],
+                                input_mean_range = mean_range,
+                                input_how = 'slide_median',
+                            )
+        #print('df_real\n{real}'.format(real=df_real))
+        #print('----------')
+        #print('df_test\n{test}'.format(test=df_test))
+        pd.testing.assert_frame_equal(df_real.loc[:, 'time':'AngularRate(Z)[dps]'].drop('time', axis=1),    \
+                df_test.drop('time', axis=1))   # 'time'列を除いてアサーション
+
     def _test_average_data_index_type(self):
         '''
         ap3.average_data関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでテスト
@@ -167,12 +215,13 @@ class TestAverageData(unittest.TestCase):
         mean_range = 3  # 平均値をとる要素数
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
         df_test = ap3.average_data(
-                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_acc_ang_df = df_real_columns.loc[:, 'time':'AngularRate(Z)[dps]'], \
                                 input_mean_range = mean_range, \
                                 input_how = 'fixed_mean',
                                 )
         # 2. ap3.average_data関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでアサーション
-        self.assertIsInstance(df_test.index, pd.Int64Index)
+        #self.assertIsInstance(df_test.index, pd.Int64Index)    # 2021.12.8: HACK: いつの間にか、インデックスオブジェクトの型が変わっていた...
+        self.assertIsInstance(df_test.index, pd.RangeIndex)
 
     def _test_average_data_input_how_raise_exception(self):
         '''
@@ -190,12 +239,12 @@ class TestAverageData(unittest.TestCase):
 
     def _test_average_data_fixed_mean_len(self):
         '''
-        '固定平均を算出した際、返り値のDataFrame型変数の大きさが適切かどうかテス
+        固定平均を算出した際、返り値のDataFrame型変数の大きさが適切かどうかテスト
         '''
         mean_range = 3  # 平均値をとる要素数
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
         df_test = ap3.average_data(
-                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_acc_ang_df = df_real_columns.loc[:, 'time':'AngularRate(Z)[dps]'], \
                                 input_mean_range = mean_range, \
                                 input_how = 'fixed_mean',   # 固定平均
                                 )
@@ -204,7 +253,7 @@ class TestAverageData(unittest.TestCase):
         #    になっているかでアサーション
         self.assertEqual(len(df_test), int(len(df_real_columns)/mean_range))
 
-    def test_average_data_slide_mean_len(self):
+    def _test_average_data_slide_mean_len(self):
         '''
         移動平均を算出した際、返り値のDataFrame型変数の大きさが適切かどうかテスト
         '''
@@ -229,7 +278,7 @@ class TestAverageData(unittest.TestCase):
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
         #    固定平均
         df_test_fixed = ap3.average_data(
-                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_acc_ang_df = df_real_columns.loc[:, 'time':'AngularRate(Z)[dps]'], \
                                 input_mean_range = mean_range, \
                                 input_how = 'fixed_mean',   # 固定平均
                                 )
@@ -237,7 +286,7 @@ class TestAverageData(unittest.TestCase):
         # 2. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
         #    移動平均'
         df_test_slide = ap3.average_data(
-                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_acc_ang_df = df_real_columns.loc[:, 'time':'AngularRate(Z)[dps]'], \
                                 input_mean_range = mean_range, \
                                 input_how = 'slide_mean',   # 移動平均
                                 )
