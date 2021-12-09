@@ -71,11 +71,19 @@ def average_data(input_acc_ang_df, input_mean_range, input_how):
     引数2:平均値を計算する際の、要素数
     引数3:平均値の算出方法 fixed_mean:固定(?)平均, slide_mean:移動平均, slide_median:移動中央値'
 
-    Notes
+    Parameters
     -----
-    - 関数average_dataの仕様について、
-    　-- param: pd.Dataframeを6つの加速度特徴量の列に加えて、'time'列も与える。固定平均については、'time'列の更新が含まれるため。
-    　-- return: pd.Dataframeを返す。ただし、'time'列は列尾に追加。
+    - input_acc_ang_df : pd.DataFrame (列 : 6つの加速度特徴量, 'time')
+        ＊固定平均については、'time'列の更新作業が含まれるため。
+    - input_mean_range : int
+        平均区間
+    - input_how : str
+        平均値の算術方法
+
+    Returns
+    -----
+    - pd.DataFrame
+        平均値を格納した配列。ただし、'time'列は列尾に追加。
     '''
     if input_how == 'fixed_mean':  # 固定(?)平均
        #len_after_division = int(len(input_acc_ang_df)/input_mean_range)    # 固定平均を算出した際、算出後のpd.DataFrame型変数の大きさ
@@ -131,9 +139,23 @@ def decompose_data(input_df_read):
     return df_pca, loading
 
 
-def estimate_state_data(input_df_read, input_how, input_number_of_assumed_state):
+def estimate_state_data(input_df_read, input_how='hmm', input_number_of_assumed_state=3):
     '''
     隠れマルコフモデルを仮定し、pd.DataFrame型引数の訓練及び状態推定を行う関数
+
+    Parameters
+    -----
+    - input_df_read : pd.DataFrame
+        入力配列。ただし、列'time'は含めない。
+    - input_how : str
+        確率モデルを表す文字列 ('clustering', 'hmm')
+    - input_number_of_assumed_state : int
+        仮定する状態数
+
+    Returns
+    -----
+    - dict_param : dict
+        推定した[パラメータ名, パラメータ値]を保持する辞書(dict)型
     '''
     if input_how == 'clustering':
         model = KMeans(n_clusters = input_number_of_assumed_state)   # クラスタリング(混合ガウス分布)の仮定
