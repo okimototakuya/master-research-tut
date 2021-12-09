@@ -332,6 +332,15 @@ def main():
     else:
         # 主成分分析をせずに、隠れマルコフモデルを適用する
         # [目的]: 次元削減でなく、データ可視化
+        df_read = df_read.loc[:, ["time",
+                            "Acceleration(X)[g]",
+                            "Acceleration(Y)[g]",
+                            "Acceleration(Z)[g]",
+                            "AngularRate(X)[dps]",
+                            "AngularRate(Y)[dps]",
+                            "AngularRate(Z)[dps]",
+                            "onCrossroad",          # 交差点ラベル情報
+                            "crossroadID"]]
         dict_param_original = estimate_state_data(
                 input_df_read = df_read.drop('time', axis=1),
                 input_how = ASSUMED_PROBABILISTIC_MODEL,
