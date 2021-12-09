@@ -92,20 +92,20 @@ class TestEstimateStateDataRegression(unittest.TestCase):
         df_input_naive = df_real_columns.loc[:, 'time':'AngularRate(Z)[dps]']         # 手動で生成したnp.DataFrame型変数
         #print(df_input_read_by_function_in_product_code)
         #print(df_input_naive)
-        df_averaged_input_read_by_function_in_product_code = ap3.average_data( # 通らない: pd.DataFrame型変数の作成の仕方を再現(→本番csvファイルを読込)
+        df_read_input_read_by_function_in_product_code = ap3.average_data( # 通らない: pd.DataFrame型変数の作成の仕方を再現(→本番csvファイルを読込)
                             input_acc_ang_df = df_input_read_by_function_in_product_code.loc[:, 'time':'Acceleration(Z)[g]'],
                             input_mean_range = 1,
                             input_how = 'fixed_mean'
                     )
-        df_averaged_input_naive = ap3.average_data(    # 通る: pd.DataFrame型変数をテスト用に自作
+        df_read_input_naive = ap3.average_data(    # 通る: pd.DataFrame型変数をテスト用に自作
                             input_acc_ang_df = df_input_naive.loc[:, 'time':'AngularRate(Z)[dps]'],
                             input_mean_range = 1,
                             input_how = 'fixed_mean'
                     )
-        #print(df_averaged_input_read_by_function_in_product_code)
-        #print(df_averaged_input_naive)
-        ndarray_test_input_read_by_function_in_product_code = ap3.estimate_state_data(df_averaged_input_read_by_function_in_product_code.drop('time', axis=1))
-        ndarray_test_input_naive = ap3.estimate_state_data(df_averaged_input_naive.drop('time', axis=1))
+        #print(df_read_input_read_by_function_in_product_code)
+        #print(df_read_input_naive)
+        ndarray_test_input_read_by_function_in_product_code = ap3.estimate_state_data(df_read_input_read_by_function_in_product_code.drop('time', axis=1))
+        ndarray_test_input_naive = ap3.estimate_state_data(df_read_input_naive.drop('time', axis=1))
         #print(ndarray_test_input_read_by_function_in_product_code)
         #print(ndarray_test_input_naive)
         self.assertIsInstance(ndarray_test_input_read_by_function_in_product_code, dict)
@@ -116,13 +116,13 @@ class TestEstimateStateDataRegression(unittest.TestCase):
         '''
         df_input_read_by_function_in_product_code = ap3.read_csv_(ap3.PATH_CSV_ACCELERATION_DATA)
         print(df_input_read_by_function_in_product_code)
-        df_averaged = ap3.average_data(
+        df_read = ap3.average_data(
                             input_acc_ang_df = df_input_read_by_function_in_product_code.loc[:, 'time':'Acceleration(Z)[g]'],
                             input_mean_range = 1,
                             input_how = 'fixed_mean'
                     )
-        print(df_averaged)
-        ndarray_test = ap3.estimate_state_data(df_averaged.drop('time', axis=1))
+        print(df_read)
+        ndarray_test = ap3.estimate_state_data(df_read.drop('time', axis=1))
         print(ndarray_test)
         self.assertIsInstance(ndarray_test, dict)
 
