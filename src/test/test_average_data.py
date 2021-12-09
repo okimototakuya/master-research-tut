@@ -64,6 +64,7 @@ df_real_columns = pd.DataFrame(
 
 class TestAverageData(unittest.TestCase):
     '''
+    関数ap3.average_dataについてテスト
     '''
     def setUp(self):
         '''
@@ -183,7 +184,7 @@ class TestAverageData(unittest.TestCase):
         print('df_test\n{test}'.format(test=df_test))
         pd.testing.assert_frame_equal(df_real.drop('time', axis=1), df_test.drop('time', axis=1))   # 'time'列を除いてアサーション
 
-    def test_average_data_mean_range_1_df_read_is_generated_by_ap3_read_csv_(self):
+    def _test_average_data_mean_range_1_df_read_is_generated_by_ap3_read_csv_(self):
         '''
         df_readを事前に用意するのでなく、ap3.read_csv_によりpd.DataFrame型変数を生成し、上テスト関数と同様のテストをする。
 
@@ -238,12 +239,12 @@ class TestAverageData(unittest.TestCase):
 
     def _test_average_data_fixed_mean_len(self):
         '''
-        '固定平均を算出した際、返り値のDataFrame型変数の大きさが適切かどうかテス
+        固定平均を算出した際、返り値のDataFrame型変数の大きさが適切かどうかテスト
         '''
         mean_range = 3  # 平均値をとる要素数
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
         df_test = ap3.average_data(
-                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_acc_ang_df = df_real_columns.loc[:, 'time':'AngularRate(Z)[dps]'], \
                                 input_mean_range = mean_range, \
                                 input_how = 'fixed_mean',   # 固定平均
                                 )
@@ -277,7 +278,7 @@ class TestAverageData(unittest.TestCase):
         # 1. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
         #    固定平均
         df_test_fixed = ap3.average_data(
-                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_acc_ang_df = df_real_columns.loc[:, 'time':'AngularRate(Z)[dps]'], \
                                 input_mean_range = mean_range, \
                                 input_how = 'fixed_mean',   # 固定平均
                                 )
@@ -285,7 +286,7 @@ class TestAverageData(unittest.TestCase):
         # 2. テストDataFrame型変数df_real_columnsを、ap3モジュール内average_data関数の引数にし、計算結果を保持
         #    移動平均'
         df_test_slide = ap3.average_data(
-                                input_acc_ang_df = df_real_columns.loc[:, 'Acceleration(X)[g]':'AngularRate(Z)[dps]'], \
+                                input_acc_ang_df = df_real_columns.loc[:, 'time':'AngularRate(Z)[dps]'], \
                                 input_mean_range = mean_range, \
                                 input_how = 'slide_mean',   # 移動平均
                                 )
