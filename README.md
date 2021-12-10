@@ -61,6 +61,10 @@ Pythonのライブラリや特殊メソッドのテストを行う。
 # Usage
 プログラム実行時における各パラメータの値は、import文下の定数群の値によって調整すること。
 ## プロダクトコードの実行方法
-src/mainに移動し、「python acceleration_plot3.py」
+- コマンドライン引数を与えない場合
+-- src/mainに移動し、「python acceleration_plot3.py」
+- コマンドライン引数を与える場合
+-- src/mainに移動し、「python acceleration_plot3.py [平均区間(整数)] [csvファイルの相対パス(クオーテーションは不要)]」
+
 ## テストスクリプトの実行方法
 src/testに移動し、「python test_"hoge-hoge".py」
