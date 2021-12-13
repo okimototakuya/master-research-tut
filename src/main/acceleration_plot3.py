@@ -188,7 +188,7 @@ def estimate_state_data(input_df_read, input_how='hmm', input_number_of_assumed_
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
 
-def plot_data(input_df_read, input_dict_param, input_loading=None, input_index_range=[0, None]):
+def plot_data(input_df_read, input_dict_param, input_loading=None, input_index_range=[0, None], input_how='scatter'):
     '''
     pd.DataFrame型変数のプロットを行う関数
 
@@ -260,12 +260,20 @@ def plot_data(input_df_read, input_dict_param, input_loading=None, input_index_r
     assert len(xlabels) == len(list_loc[::thinning_out_range])                  # アサーション: ラベルと主目盛りの個数が一致するかどうか。
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
-        ax = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
-                x = list(input_df_read.index),
-                y = input_df_read.iloc[:, i-1],
-                hue = input_df_read['state'],
-                palette = 'rainbow'
-            )
+        if input_how == 'scatter':
+            ax = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
+                    x = list(input_df_read.index),
+                    y = input_df_read.iloc[:, i-1],
+                    hue = input_df_read['state'],
+                    palette = 'rainbow'
+                )
+        elif input_how == 'line':
+            ax = sns.lineplot(
+                    x = list(input_df_read.index),
+                    y = input_df_read.iloc[:, i-1],
+                )
+        else:
+            raise Exception('関数plot_dataのオプションinput_howに与えられた値が不適切です。')
         # Locatorの設定
         ax.xaxis.set_major_locator(ticker.FixedLocator(list_loc[::thinning_out_range]))                                     # - 主目盛り
         ax.xaxis.set_minor_locator(ticker.FixedLocator(list(filter(lambda x: x % thinning_out_range != 0, list_loc))))      # - 補助目盛り
@@ -364,7 +372,8 @@ def main():
     plot_data(  # no-pca
             input_df_read = df_read,            # PCAしていないデータ
             input_dict_param = dict_param_original,     # [＊]: 次元削減でなくデータ可視化が目的のため、HMMは原データのみに適用
-            input_index_range = [420, 600]
+            input_index_range = [420, 600],
+            input_how = 'line'
         )
     plot_data(  # pca
             input_df_read = df_pca,                 # PCAしたデータ
