@@ -156,6 +156,8 @@ def estimate_state_data(input_df_read, input_how='hmm', input_number_of_assumed_
     - dict_param : dict
         推定した[パラメータ名, パラメータ値]を保持する辞書(dict)型
     '''
+    if None in list(map(lambda x: re.search('Acceleration|AngularRate', x), list(input_df_read.columns))):
+        raise Exception('関数estimate_state_dataに無効な特徴量が与えられています。')
     if input_how == 'clustering':
         model = KMeans(n_clusters = input_number_of_assumed_state)   # クラスタリング(混合ガウス分布)の仮定
         model.fit(input_df_read)    # クラスタリングにより、引数のデータを訓練
@@ -273,7 +275,7 @@ def plot_data(input_df_read, input_dict_param, input_loading=None, input_index_r
                     y = input_df_read.iloc[:, i-1],
                 )
         else:
-            raise Exception('関数plot_dataのオプションinput_howに与えられた値が不適切です。')
+            raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
         # Locatorの設定
         ax.xaxis.set_major_locator(ticker.FixedLocator(list_loc[::thinning_out_range]))                                     # - 主目盛り
         ax.xaxis.set_minor_locator(ticker.FixedLocator(list(filter(lambda x: x % thinning_out_range != 0, list_loc))))      # - 補助目盛り
