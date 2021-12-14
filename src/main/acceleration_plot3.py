@@ -156,6 +156,8 @@ def estimate_state_data(input_df_read, input_how='hmm', input_number_of_assumed_
     - dict_param : dict
         推定した[パラメータ名, パラメータ値]を保持する辞書(dict)型
     '''
+    if None in list(map(lambda x: re.search('Acceleration|AngularRate', x), list(input_df_read.columns))):
+        raise Exception('関数estimate_state_dataに無効な特徴量が与えられています。')
     if input_how == 'clustering':
         model = KMeans(n_clusters = input_number_of_assumed_state)   # クラスタリング(混合ガウス分布)の仮定
         model.fit(input_df_read)    # クラスタリングにより、引数のデータを訓練
@@ -188,10 +190,15 @@ def estimate_state_data(input_df_read, input_how='hmm', input_number_of_assumed_
         raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
 
 
-def plot_data(input_df_read, input_dict_param, input_loading=None):
+def plot_data(input_df_read, input_dict_param, input_loading=None, input_index_range=[0, None], input_how='scatter'):
     '''
     pd.DataFrame型変数のプロットを行う関数
+
+    Parameters
+    -----
+    - 
     '''
+    thinning_out_range = 10  # プロット時の間引き間隔
     input_df_read = input_df_read.join(pd.Series(input_dict_param['状態系列の復号'], name='state')) # DataFrame配列と状態系列ndarray配列の結合
     # 4-0. プロットの保存先パスの設定
     str_path_to_crossroad = re.split('[/,\.]', PATH_CSV_ACCELERATION_DATA)[7]       # 交差点ラベルによるパス
@@ -232,31 +239,47 @@ def plot_data(input_df_read, input_dict_param, input_loading=None):
     # - pltのformatter/locatorを用いたプロットについて、datetime型の場合は他の型と異なる独自のformatter/locator型があるよう。例.DateFormatter
     # - DateFormatterでなく通常のFormatterを用いたところ、エラー/警告が発生することなく、ただ目盛り/ラベルが表示されないままプロットされた。
     input_df_read['time'] = input_df_read['time'].dt.strftime('%M:%S.%f')
+    # 下記コード (三項演算子): x軸のプロット範囲を設定
+    # if文: デフォルト
+    # else文: 設定値
+    input_df_read = input_df_read[input_index_range[0]:len(input_df_read)]  \
+            if input_index_range[1] is None \
+            else input_df_read[input_index_range[0]:input_index_range[1]]
+    # 4-1-2. Locatorの設定
+    # - 目盛りの設定 (例. 線形目盛り, 対数目盛りなど)
+    # - 下記
+    # - xaxis: 線形目盛り
+    # - yaxis: 自動目盛り (＊: 外れ値が含まれるため、ユーザが前もって目盛りの上限/下限を設定するのは望ましくない。
+    #g.set_xticks(input_df_read['time'])                                        # Locatorは、FixedLocator: 2021.11.23: とりあえずのプロットに成功した。
+    list_loc = list(input_df_read.index)
+    assert list_loc == sorted(list_loc[::thinning_out_range] + list(filter(lambda x: x % thinning_out_range != 0, list_loc)))   # アサーション: 主目盛りと補助目盛りを足して、元のlist_locの要素を網羅するかどうか
+    # 4-1-3. Formatterの設定
+    # - 目盛りラベルの設定
+    # - xticklabelsにリストを渡すと、その値の箇所だけ目盛りが配置される。
+    # - ↑この時、FormatterはFixedFormatter
+    xlabels_before_thinning_out = [input_df_read['time'][i].split('00000')[0] if i % thinning_out_range == 0 else '' for i in range(input_index_range[0], input_index_range[0]+len(input_df_read))]  # thinning_out_range点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
+    xlabels = list(filter(lambda x: x != '', xlabels_before_thinning_out))
+    assert len(xlabels) == len(list_loc[::thinning_out_range])                  # アサーション: ラベルと主目盛りの個数が一致するかどうか。
     for i in range(1, 6+1):
         ax = fig.add_subplot(2, 3, i)
-        ax = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
-                x = list(input_df_read.index),
-                y = input_df_read.iloc[:, i-1],
-                hue = input_df_read['state'],
-                palette = 'rainbow'
-            )
-        # 4-1-2. Locatorの設定
-        # - 目盛りの設定 (例. 線形目盛り, 対数目盛りなど)
-        # - 下記
-        # - xaxis: 線形目盛り
-        # - yaxis: 自動目盛り (＊: 外れ値が含まれるため、ユーザが前もって目盛りの上限/下限を設定するのは望ましくない。
-        #g.set_xticks(input_df_read['time'])                                        # Locatorは、FixedLocator: 2021.11.23: とりあえずのプロットに成功した。
-        list_loc = list(input_df_read.index)
-        ax.xaxis.set_major_locator(ticker.FixedLocator(list_loc[::10]))                                                # - 主目盛り
-        ax.xaxis.set_minor_locator(ticker.FixedLocator(list(filter(lambda x: x % 10 != 0, list_loc))))                 # - 補助目盛り
-        assert list_loc == sorted(list_loc[::10] + list(filter(lambda x: x % 10 != 0, list_loc)))                      # アサーション: 主目盛りと補助目盛りを足して、元のlist_locの要素を網羅するかどうか
-        # 4-1-3. Formatterの設定
-        # - 目盛りラベルの設定
-        # - xticklabelsにリストを渡すと、その値の箇所だけ目盛りが配置される。
-        # - ↑この時、FormatterはFixedFormatter
-        xlabels_before_thinning_out = [input_df_read['time'][i].split('00000')[0] if i % 10 == 0 else '' for i in range(0, len(input_df_read))]  # 10点おきにx軸ラベルを表示. ただし、データそのものの間引きはなし.
-        xlabels = list(filter(lambda x: x != '', xlabels_before_thinning_out))
-        assert len(xlabels) == len(list_loc[::10])                  # アサーション: ラベルと主目盛りの個数が一致するかどうか。
+        if input_how == 'scatter':
+            ax = sns.scatterplot(              # 2021.11.17: HACK: seaborn.lineplot/scatterplotだと、plt.subplot使える。
+                    x = list(input_df_read.index),
+                    y = input_df_read.iloc[:, i-1],
+                    hue = input_df_read['state'],
+                    palette = 'rainbow'
+                )
+        elif input_how == 'line':
+            ax = sns.lineplot(
+                    x = list(input_df_read.index),
+                    y = input_df_read.iloc[:, i-1],
+                )
+        else:
+            raise Exception('input_howに無効な値{wrong_input_how}が与えられています.'.format(wrong_input_how=input_how))
+        # Locatorの設定
+        ax.xaxis.set_major_locator(ticker.FixedLocator(list_loc[::thinning_out_range]))                                     # - 主目盛り
+        ax.xaxis.set_minor_locator(ticker.FixedLocator(list(filter(lambda x: x % thinning_out_range != 0, list_loc))))      # - 補助目盛り
+        # Formatterの設定
         ax.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid(which='major')
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
@@ -351,6 +374,8 @@ def main():
     plot_data(  # no-pca
             input_df_read = df_read,            # PCAしていないデータ
             input_dict_param = dict_param_original,     # [＊]: 次元削減でなくデータ可視化が目的のため、HMMは原データのみに適用
+            input_index_range = [420, 600],
+            input_how = 'line'
         )
     plot_data(  # pca
             input_df_read = df_pca,                 # PCAしたデータ

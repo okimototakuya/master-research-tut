@@ -38,19 +38,19 @@ class TestEstimateStateData(unittest.TestCase):
         '''
         pass
 
-    def _test_estimate_state_data_return_state_sequence_which_size_is_input_df_read_length(self):
+    def test_estimate_state_data_return_state_sequence_which_size_is_input_df_read_length(self):
         '''
         関数estimate_state_dataに与えるdf_readと、HMM適用後のdict_param_original['状態系列の復号']とで、
         シーケンスの大きさが同じであることを確認
         '''
         dict_param_original = ap3.estimate_state_data(
-                input_df_read = self.df_read.drop('time', axis=1),
+                input_df_read = self.df_averaged.drop('time', axis=1),
                 input_how = ap3.ASSUMED_PROBABILISTIC_MODEL,
                 input_number_of_assumed_state = ap3.NUMBER_OF_ASSUMED_STATE,
             )
         self.assertEqual(len(self.df_averaged), len(dict_param_original['状態系列の復号']))
 
-    def _test_estimate_state_data_match_state_series_when_initial_state_and_random_seed_are_fixed(self):
+    def test_estimate_state_data_match_state_series_when_initial_state_and_random_seed_are_fixed(self):
         '''
         初期状態と乱数のシードを固定した場合(プロダクトコード内)、予測結果が変わらないことをテスト
         '''
@@ -69,7 +69,7 @@ class TestEstimateStateData(unittest.TestCase):
         for key_1, key_2 in zip(dict_param_original_1.keys(), dict_param_original_2.keys()):
             np.testing.assert_array_equal(dict_param_original_1[key_1], dict_param_original_2[key_2])
 
-    def _test_estimate_state_data_the_one_is_no_average_data_match_state_series_when_initial_state_and_random_seed_are_fixed(self):
+    def test_estimate_state_data_the_one_is_no_average_data_match_state_series_when_initial_state_and_random_seed_are_fixed(self):
         '''
         初期状態と乱数のシードを固定した場合(プロダクトコード内)、予測結果が変わらないことをテスト
         ただし、一方のpd.DataFrame配列について、関数ap3.average_dataを通していない。
@@ -100,47 +100,26 @@ class TestEstimateStateData(unittest.TestCase):
         for key_1, key_2 in zip(dict_param_original_1.keys(), dict_param_original_2.keys()):
             np.testing.assert_array_equal(dict_param_original_1[key_1], dict_param_original_2[key_2])
 
-    def test_estimate_state_data_the_one_is_no_average_data_and_has_crossroad_label_match_state_series_when_initial_state_and_random_seed_are_fixed(self):
+    def test_raise_exception_when_except_the_columns_acceleration_feature_are_given(self):
         '''
-        初期状態と乱数のシードを固定した場合(プロダクトコード内)、予測結果が変わらないことをテスト
-        ただし、一方のpd.DataFrame配列について、関数ap3.average_dataを通しておらず、交差点ラベル情報を付加した。
+        加速度, 角速度以外の特徴量が与えられた場合、例外が発生することをテスト
         '''
-        df_1 = self.df_averaged.drop('time', axis=1)
-        df_2 = self.df_read.drop('time', axis=1)
-        df_2 = df_2.loc[:, ["Acceleration(X)[g]",
-                            "Acceleration(Y)[g]",
-                            "Acceleration(Z)[g]",
-                            "AngularRate(X)[dps]",
-                            "AngularRate(Y)[dps]",
-                            "AngularRate(Z)[dps]",
-                            "onCrossroad",          # 交差点ラベル情報
-                            "crossroadID"]]
-        dict_param_original_1 = ap3.estimate_state_data(
-                input_df_read = df_1,
-                input_how = ap3.ASSUMED_PROBABILISTIC_MODEL,
-                input_number_of_assumed_state = ap3.NUMBER_OF_ASSUMED_STATE,
-            )
-        dict_param_original_2 = ap3.estimate_state_data(
-                input_df_read = df_2,
-                input_how = ap3.ASSUMED_PROBABILISTIC_MODEL,
-                input_number_of_assumed_state = ap3.NUMBER_OF_ASSUMED_STATE,
-            )
-        print("状態系列の復号1")
-        print("-----")
-        print(dict_param_original_1["状態系列の復号"])
-        print("状態系列の復号2")
-        print("-----")
-        print(dict_param_original_2["状態系列の復号"])
-        print("df_1")
-        print("-----")
-        print(df_1)
-        print("df_2")
-        print("-----")
-        print(df_2)
-        #self.assertEqual(dict_param_original_1, dict_param_original_2)                         # 通らない: 辞書型変数の要素に、numpyサポートの型が含まれるため。
-        #np.testing.assert_array_equal(dict_param_original_1, dict_param_original_2)            # 通らない: コンソールに出力された値そのものは同じに見えるが、AssertionErrorを返された。
-        for key_1, key_2 in zip(dict_param_original_1.keys(), dict_param_original_2.keys()):
-            np.testing.assert_array_equal(dict_param_original_1[key_1], dict_param_original_2[key_2])
+        df_test = self.df_read.drop('time', axis=1)
+        with self.assertRaises(Exception):
+            df_test = df_test.loc[:, [#"Acceleration(X)[g]",
+                                      #"Acceleration(Y)[g]",
+                                      "Acceleration(Z)[g]",
+                                      "AngularRate(X)[dps]",
+                                      "AngularRate(Y)[dps]",
+                                      #"AngularRate(Z)[dps]",
+                                      #]]
+                                      #"onCrossroad",           # 交差点ラベル情報
+                                      "crossroadID"]]
+            dict_param_original = ap3.estimate_state_data(      # 関数estimate_state_dataを呼出
+                    input_df_read = df_test,
+                    input_how = ap3.ASSUMED_PROBABILISTIC_MODEL,
+                    input_number_of_assumed_state = ap3.NUMBER_OF_ASSUMED_STATE,
+                )
 
 
 if __name__ == '__main__':
