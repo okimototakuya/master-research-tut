@@ -24,6 +24,7 @@ def main():
         if df_read['onCrossroad'][i] == 1 and df_read['crossroadID'][i] not in cross_list:
             cross_list.append(df_read['crossroadID'][i])                                        # 交差点番号を追加
     print('全交差点番号リスト:{list_}'.format(list_=cross_list))
+    return cross_list
 
 
 if __name__ == '__main__':
