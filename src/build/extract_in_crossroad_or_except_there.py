@@ -29,28 +29,23 @@ def main():
         if df_read['onCrossroad'][i] == 0:                          # 交差点にいない。
             if i == 0 or df_read['onCrossroad'][i-1] == 1:          # - 一つ前の要素が交差点滞在(df_read['onCrossroad']==1)ならば、そこから。
                 int_index_to_csv_start = i
-            #df_except_crossroad.append(df_read.loc[i, :])          # HACK: 2021.12.15: 遅い (pd.DataFrame.append)
-            #list_except_crossroad[i] = df_read.loc[i, :].tolist()
-            for j in range(len(df_read.columns)):
-                #list_[j] += df_read.iloc[i, j].tolist()
-                #list_[j].append(df_read.iloc[i, j])        # appendによる要素の追加: やや速い
-                #list_[j].extend([df_read.iloc[i, j]])       # extendによる要素の追加: とても速い
-                list_[j].insert(0, [df_read.iloc[i, j]])       # insertによる要素の追加: とても速い
-            #list_col.append(df_read.iloc[i, j]) for list_col in list_
-        else:                                                       # 交差点にいる。
-            if df_read['onCrossroad'][i-1] == 0:                    # - 一つ前の要素が交差点不在(df_read['onCrossroad']==0)ならば、そこまで。
-                int_index_to_csv_end = i-1
+            #int_index_to_csv_end += 1
+            elif i == len(df_read) - 1:
                 num_csv = num_csv + 1
                 print('num_csv: ', num_csv)
-            for j in range(len(df_read.columns)):
-                #list_[j] += df_read.iloc[i, j].tolist()
-                #list_[j].append(df_read.iloc[i, j])        # appendによる要素の追加: やや速い
-                #list_[j].extend([df_read.iloc[i, j]])       # extendによる要素の追加: とても速い
-                list_[j].insert(0, [df_read.iloc[i, j]])       # insertによる要素の追加: とても速い
-                #df_except_crossroad.loc[int_index_to_csv_start:int_index_to_csv_end, :].to_csv('hoge-hoge{j}.csv'.format(j=j))
-                pd.DataFrame({df_read.columns[k]: list_[k][int_index_to_csv_start:int_index_to_csv_end+1] for k in range(len(df_read.columns))}).to_csv('hoge-hoge{num_csv}.csv'.format(num_csv=num_csv))
+                dict_ = {df_read.columns[j]: df_read.loc[int_index_to_csv_start:int_index_to_csv_end, df_read.columns[j]].tolist() for j in range(len(df_read.columns))}
+                pd.DataFrame(data=dict_, columns=df_read.columns).to_csv('hoge-hoge{num_csv}.csv'.format(num_csv=num_csv))
             else:
                 pass
+        else:                                                       # 交差点にいる。
+            if df_read['onCrossroad'][i-1] == 0:                    # - 一つ前の要素が交差点不在(df_read['onCrossroad']==0)ならば、そこまで。
+                num_csv = num_csv + 1
+                print('num_csv: ', num_csv)
+                dict_ = {df_read.columns[j]: df_read.loc[int_index_to_csv_start:int_index_to_csv_end-1, df_read.columns[j]].tolist() for j in range(len(df_read.columns))}
+                pd.DataFrame(data=dict_, columns=df_read.columns).to_csv('hoge-hoge{num_csv}.csv'.format(num_csv=num_csv))
+            else:
+                pass
+        int_index_to_csv_end += 1
 
 
 if __name__ == '__main__':
