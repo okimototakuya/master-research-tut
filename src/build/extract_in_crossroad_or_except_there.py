@@ -34,7 +34,7 @@ def main():
                 num_csv = num_csv + 1
                 print('num_csv: ', num_csv)
                 dict_ = {df_read.columns[j]: df_read.loc[int_index_to_csv_start:int_index_to_csv_end, df_read.columns[j]].tolist() for j in range(len(df_read.columns))}
-                pd.DataFrame(data=dict_, columns=df_read.columns).to_csv('hoge-hoge{num_csv}.csv'.format(num_csv=num_csv))
+                pd.DataFrame(data=dict_, columns=df_read.columns).to_csv('../test/test-build/in_no_crossroad{num_csv}.csv'.format(num_csv=num_csv))
             else:
                 pass
         else:                                                       # 交差点にいる。
@@ -42,7 +42,7 @@ def main():
                 num_csv = num_csv + 1
                 print('num_csv: ', num_csv)
                 dict_ = {df_read.columns[j]: df_read.loc[int_index_to_csv_start:int_index_to_csv_end-1, df_read.columns[j]].tolist() for j in range(len(df_read.columns))}
-                pd.DataFrame(data=dict_, columns=df_read.columns).to_csv('hoge-hoge{num_csv}.csv'.format(num_csv=num_csv))
+                pd.DataFrame(data=dict_, columns=df_read.columns).to_csv('../test/test-build/in_no_crossroad{num_csv}.csv'.format(num_csv=num_csv))
             else:
                 pass
         int_index_to_csv_end += 1
