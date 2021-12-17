@@ -4,7 +4,8 @@ import acceleration_plot3 as ap3
 import pandas as pd
 
 
-num_csv = 0     # エクスポートしたcsvファイルの個数
+num_csv = 0                     # エクスポートしたcsvファイルの個数
+bool_is_oncrossroad = True     # True: 滞在時, False: 不在時
 
 def export_to_csv(df_read, int_index_to_csv_start, int_index_to_csv_end, bool_is_eof):
     '''
@@ -26,12 +27,14 @@ def main():
     -----
     - 交通時運動データについて、最初/最後の点は交差点不在と仮定する。
     '''
+    global bool_is_oncrossroad
+    int_bool_is_oncrossroad = 1 if bool_is_oncrossroad == True else 0
     str_csv_path = '../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv'  # ID16児童
     df_read = ap3.read_csv_(str_csv_path)
     int_index_to_csv_start = 0      # 切り出し区間: 始め
     int_index_to_csv_end = 0        # 切り出し区間: 終わり
     for i in range(len(df_read)):
-        if df_read['onCrossroad'][i] == 0:                          # [条件1]: 交差点にいない。
+        if df_read['onCrossroad'][i] == int_bool_is_oncrossroad:    # [条件1]: 交差点にいない。
             if i == 0 or df_read['onCrossroad'][i-1] == 1:          # - 一つ前の要素が交差点滞在(df_read['onCrossroad']==1)ならば、そこから。
                 int_index_to_csv_start = i                          # - また、最初の点は交差点不在と仮定。
             elif i == len(df_read) - 1:                             # -  "    最後  "                   。

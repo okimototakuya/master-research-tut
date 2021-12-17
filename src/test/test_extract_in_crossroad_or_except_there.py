@@ -27,13 +27,23 @@ class TestExtractCrossroad(unittest.TestCase):
             print('remove: {0}'.format(file))
             os.remove(file)
 
-    def test_extract_crossroad_right(self):
+    def test_extract_in_no_crossroad_right(self):
         '''
-        正しく交差点滞在/不在時のデータ点を抽出できたかテスト
+        正しく交差点不在時のデータ点を抽出できたかテスト
         '''
+        ece.bool_is_oncrossroad = False     # 交差点不在時を抽出
         ece.main()
         for i in range(1, len(self.cross_list)+2):
             self.assertTrue(filecmp.cmp('test-build/hoge_hoge{i}.csv'.format(i=i), 'test-build/in_no_crossroad{i}.csv'.format(i=i)))
+
+    def test_extract_in_crossroad_right(self):
+        '''
+        正しく交差点滞在時のデータ点を抽出できたかテスト
+        '''
+        ece.bool_is_oncrossroad = True     # 交差点不在時を抽出
+        ece.main()
+        for i in range(1, len(self.cross_list)+2):
+            self.assertTrue(filecmp.cmp('test-build/hoge_hoge{0}.csv'.format(i), '../../dataset/{0}crossroad.csv'.format(self.cross_list[i])))
 
 
 if __name__ == '__main__':
