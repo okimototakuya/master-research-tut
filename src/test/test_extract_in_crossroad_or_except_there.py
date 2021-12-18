@@ -40,7 +40,7 @@ class TestExtractCrossroad(unittest.TestCase):
         '''
         正しく交差点滞在時のデータ点を抽出できたかテスト
         '''
-        ece.bool_is_oncrossroad = True     # 交差点不在時を抽出
+        ece.bool_is_oncrossroad = True     # 交差点滞在時を抽出
         ece.main()
         for i in range(1, len(self.cross_list)+2):
             self.assertTrue(filecmp.cmp('test-build/hoge_hoge{0}.csv'.format(i), '../../dataset/{0}crossroad.csv'.format(self.cross_list[i])))
