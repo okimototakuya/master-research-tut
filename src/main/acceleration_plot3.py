@@ -283,11 +283,13 @@ def plot_data(input_df_read, input_dict_param, input_loading=None, input_index_r
         ax.set_xticklabels(labels=xlabels, rotation=90, fontsize=8)  # FormatterはFixedFormatter
         plt.grid(which='major')
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure1.png')
-        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure1.png')                                               # テストプロット画像の保存先
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure1.png')
+        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure1.png')                                               # テストプロット画像の保存先
+        print('{path}, {mean}: Figure1.pngを保存しました。'.format(path=str_path_to_crossroad, mean=str_path_to_how_to_mean))
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
-        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure3.png')
-        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure3.png')                                               # テストプロット画像の保存先
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure3.png')
+        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure3.png')                                               # テストプロット画像の保存先
+        print('{path}, {mean}: Figure3.pngを保存しました。'.format(path=str_path_to_crossroad, mean=str_path_to_how_to_mean))
     #4-2. 散布図プロット
     #plt.title(PATH_CSV_ACCELERATION_DATA)   # タイトル: この位置だと、時系列プロットの方に反映される。
     sns.pairplot(
@@ -298,11 +300,13 @@ def plot_data(input_df_read, input_dict_param, input_loading=None, input_index_r
             palette = 'rainbow',
         )
     if input_loading is None:   # 元特徴量の場合、Figure1.pngとして保存
-        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure2.png')
-        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure2.png')                                               # テストプロット画像の保存先
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure2.png')
+        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure2.png')                                               # テストプロット画像の保存先
+        print('{path}, {mean}: Figure2.pngを保存しました。'.format(path=str_path_to_crossroad, mean=str_path_to_how_to_mean))
     else:                       # PCA特徴量の場合、Figure3.pngとして保存
-        #plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure4.png')
-        plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure4.png')                                               # テストプロット画像の保存先
+        plt.savefig('../../plot/' + str_path_to_crossroad + '/' + str_path_to_how_to_mean + '/Figure4.png')
+        #plt.savefig('../../plot/' + 'hoge-hoge' + '/Figure4.png')                                               # テストプロット画像の保存先
+        print('{path}, {mean}: Figure4.pngを保存しました。'.format(path=str_path_to_crossroad, mean=str_path_to_how_to_mean))
 
 
 def main():
@@ -317,7 +321,7 @@ def main():
     #df_read = df_read['onCrossroad']    # テスト: 列'onCrossroad'の抽出 (成功)
     #df_read = df_read[df_read['onCrossroad']=='0']    # 全ての交差点を抽出
     #df_read = df_read[df_read['crossroadID']==83]    # 交差点83を抽出
-    df_read['time'] = pd.to_datetime(df_read['time'], format='%M:%S.%f')    # 列'time'をpd.datetime64[ns]型に変換
+    df_read['time'] = pd.to_datetime(df_read['time'], format='%H:%M:%S.%f')    # 列'time'をpd.datetime64[ns]型に変換
     time_for_assert_1 = df_read['time']                                     # アサーション用変数1: 関数plot_dataの呼び出し直前
     # 2. 上記で返されたdf_readについて、平均値を計算する(df_read)
     df_read = average_data(

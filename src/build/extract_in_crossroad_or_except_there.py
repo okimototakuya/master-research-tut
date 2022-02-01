@@ -6,6 +6,7 @@ import pandas as pd
 
 num_csv = 0                     # エクスポートしたcsvファイルの個数
 bool_is_oncrossroad = True     # True: 滞在時, False: 不在時
+path_to_export = '../test/test-build/hoge_hoge{num_csv}.csv'
 
 def export_to_csv(df_read, int_index_to_csv_start, int_index_to_csv_end, bool_is_eof):
     '''
@@ -13,14 +14,16 @@ def export_to_csv(df_read, int_index_to_csv_start, int_index_to_csv_end, bool_is
 
     Notes
     -----
-    - エクスポート先のパス: '../test/test-build/hoge_hoge{num_csv}.csv'
+    - エクスポート先のパス: path_to_export
     '''
     global num_csv
+    global path_to_export
     num_csv = num_csv + 1
     print('num_csv: ', num_csv)
-    end_index = 0 if bool_is_eof == True else 1     # csvファイル終端を調整: 最後にエクスポートするcsvファイルのみ別処理
+    end_index = 0 if bool_is_eof == True else 1     # csvファイル終端を調整: 最後にエクスポートするcsvファイルのみ別処理(off-by-oneエラーの防止)
     dict_to_csv = {df_read.columns[j]: df_read.loc[int_index_to_csv_start:int_index_to_csv_end - end_index, df_read.columns[j]].tolist() for j in range(len(df_read.columns))}
-    pd.DataFrame(data=dict_to_csv, index=list(dict_to_csv.values())[0]).to_csv('../test/test-build/hoge_hoge{num_csv}.csv'.format(num_csv=num_csv))
+    #pd.DataFrame(data=dict_to_csv, index=list(dict_to_csv.values())[0]).to_csv(path_to_export.format(num_csv=num_csv))
+    pd.DataFrame(data=dict_to_csv).to_csv(path_to_export.format(num_csv=num_csv))
 
 def main():
     '''
