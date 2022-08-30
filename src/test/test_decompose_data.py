@@ -16,7 +16,7 @@ class TestDecomposeData(unittest.TestCase):
         '''
         プロダクトコードmain関数内処理について、PCAを適用する前段階を再現
         '''
-        #self.df_read = ap3.read_csv_('./test_dataset/demo.csv')         # 1. データのロード
+        #self.df_read = ap3.read_csv_('./src/test/test-dataset/demo.csv')         # 1. データのロード
         self.df_read = ap3.read_csv_(ap3.PATH_CSV_ACCELERATION_DATA)         # 1. データのロード
         self.df_averaged = ap3.average_data(                             # 2. 平均計算
                             input_acc_ang_df =                          # 引数1:pd.DataFrame型変数の加速度/角速度の列(→pd.DataFrame型)

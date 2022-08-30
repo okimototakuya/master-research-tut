@@ -5,7 +5,7 @@ def main():
     '''
     ID16, 19児童登下校ルートの、全交差点ラベルをピックアップするスクリプトファイル
     '''
-    PATH = "../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"    # ID16
+    PATH = "./dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv"    # ID16
     df_read = pd.read_csv(
                     PATH,
                     index_col = 0,

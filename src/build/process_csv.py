@@ -11,8 +11,8 @@ def main():
     - プロダクトコードの方で、関数read_csv_のオプションをいじるのは面倒。
     - ↑同時にテストコードの方も更新する必要があり、かなり面倒。
     '''
-    #for name in glob.glob("../../dataset/hoge-hoge{num}.csv".format(num=0)):
-    for name in glob.glob("../../dataset/*crossroad*.csv"):
+    #for name in glob.glob("./dataset/hoge-hoge{num}.csv".format(num=0)):
+    for name in glob.glob("./dataset/*crossroad*.csv"):
         df_read = pd.read_csv(
                     name,
                     names = ['Unnamed: 0', 'line', 'time',

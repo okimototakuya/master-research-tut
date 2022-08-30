@@ -76,15 +76,15 @@ class TestReadCsv_(unittest.TestCase):
         '''
         テストcsvファイルを書込
         '''
-        df_real_columns.to_csv('./test_dataset/demo.csv')
-        #subprocess.call(['sed', '\'1', 's/,//\'', './test_dataset/demo.csv', '>', './test_dataset/demo.csv'])
-        subprocess.getoutput('sed -i -e \'1 s/,//\' ./test_dataset/demo.csv')   # 書き出したテストcsvファイルの先頭行頭のカンマを削除
+        df_real_columns.to_csv('./src/test/test-dataset/demo.csv')
+        #subprocess.call(['sed', '\'1', 's/,//\'', './src/test/test-dataset/demo.csv', '>', './src/test/test-dataset/demo.csv'])
+        subprocess.getoutput('sed -i -e \'1 s/,//\' ./src/test/test-dataset/demo.csv')   # 書き出したテストcsvファイルの先頭行頭のカンマを削除
 
     def tearDown(self):
         '''
         次回のテストのためにテストcsvファイルを削除
         '''
-        os.remove('./test_dataset/demo.csv')
+        os.remove('./src/test/test-dataset/demo.csv')
 
     def _test_read_csv_read_right_length(self):
         '''
@@ -100,7 +100,7 @@ class TestReadCsv_(unittest.TestCase):
         　　- 全区間を解析するという方針になり、AMOUNT_OF_PLOTで置き換えられる箇所が大半であった。
         '''
         # テストcsvファイルを読込
-        df_test = ap3.read_csv_('./test_dataset/demo.csv')
+        df_test = ap3.read_csv_('./src/test/test-dataset/demo.csv')
         #print('df_test')
         #print('-----')
         #print(df_test)
@@ -115,7 +115,7 @@ class TestReadCsv_(unittest.TestCase):
         テストcsvファイルをDataFrame型変数として正しい列数で読み込めたかテスト
         '''
         # テストcsvファイルを読込
-        df_test = ap3.read_csv_('./test_dataset/demo.csv')
+        df_test = ap3.read_csv_('./src/test/test-dataset/demo.csv')
         #print('df_test')
         #print('-----')
         #print(df_test)
@@ -129,7 +129,7 @@ class TestReadCsv_(unittest.TestCase):
         '''
         ap3.read_csv_関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでテスト
         '''
-        df_test = ap3.read_csv_('./test_dataset/demo.csv')
+        df_test = ap3.read_csv_('./src/test/test-dataset/demo.csv')
         # ap3.read_csv_関数が返すpd.DataFrame型変数のインデックスオブジェクトの型がpd.Int64Indexかどうかでアサーション
         self.assertIsInstance(df_test.index, pd.Int64Index)
 
@@ -137,7 +137,7 @@ class TestReadCsv_(unittest.TestCase):
         '''
         ap3.read_csv_関数の返す値がpd.DataFrame型かどうかでテスト
         '''
-        df_test = ap3.read_csv_('./test_dataset/demo.csv')
+        df_test = ap3.read_csv_('./src/test/test-dataset/demo.csv')
         # ap3.read_csv_関数の返す値がpd.DataFrame型かどうかでアサーション
         self.assertIsInstance(df_test, pd.DataFrame)
 
@@ -145,7 +145,7 @@ class TestReadCsv_(unittest.TestCase):
         '''
         読み込み対象のcsvファイルの大きさと、読み込み先のpd.DataFrame型の大きさが一致するかテスト
         '''
-        file_path = './test_dataset/demo.csv'
+        file_path = './src/test/test-dataset/demo.csv'
         df_test = ap3.read_csv_(file_path)
         self.assertEqual(len(df_test), sum([1 for _ in open(file_path)]) - 1)   # 列名の行 (1行) 引いた。
 

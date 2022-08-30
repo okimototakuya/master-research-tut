@@ -70,15 +70,15 @@ class TestAverageData(unittest.TestCase):
         '''
         テストcsvファイルを書込
         '''
-        df_real_columns.to_csv('./test_dataset/demo.csv')
-        #subprocess.call(['sed', '\'1', 's/,//\'', './test_dataset/demo.csv', '>', './test_dataset/demo.csv'])
-        #subprocess.getoutput('sed -i -e \'1 s/,//\' ./test_dataset/demo.csv')   # 書き出したテストcsvファイルの先頭行頭のカンマを削除
+        df_real_columns.to_csv('./src/test/test-dataset/demo.csv')
+        #subprocess.call(['sed', '\'1', 's/,//\'', './src/test/test-dataset/demo.csv', '>', './src/test/test-dataset/demo.csv'])
+        #subprocess.getoutput('sed -i -e \'1 s/,//\' ./src/test/test-dataset/demo.csv')   # 書き出したテストcsvファイルの先頭行頭のカンマを削除
 
     def tearDown(self):
         '''
         次回のテストのためにテストcsvファイルを削除
         '''
-        os.remove('./test_dataset/demo.csv')
+        os.remove('./src/test/test-dataset/demo.csv')
 
     #def _test_average_data_in_all_section_and_return_series_older(self):
     #    '''
@@ -193,9 +193,9 @@ class TestAverageData(unittest.TestCase):
         - 目的は、本番環境にできる限り近づけること。
         '''
         mean_range = 1                                              # テスト準備1: 平均値をとる要素数
-        #df_real = ap3.read_csv_("./test_dataset/demo.csv")                                                              # テスト用データセット
-        #df_real = ap3.read_csv_("../../dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv")     # 本番用データセット
-        df_real = ap3.read_csv_("../../dataset/32crossroad.csv").reset_index(drop='index')                              # 本番用データセット
+        #df_real = ap3.read_csv_("./src/test/test-dataset/demo.csv")                                                              # テスト用データセット
+        #df_real = ap3.read_csv_("./dataset/labeledEditedLOG_20181219141837_00010533_0021002B401733434E45.csv")     # 本番用データセット
+        df_real = ap3.read_csv_("./dataset/32crossroad.csv").reset_index(drop='index')                              # 本番用データセット
         print(df_real)
         df_test = ap3.average_data(                         # 注. 'time'列ごと与えること
                                 input_acc_ang_df = df_real.loc[:, 'time':'AngularRate(Z)[dps]'],
