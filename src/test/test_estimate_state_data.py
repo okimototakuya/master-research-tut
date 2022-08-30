@@ -2,7 +2,7 @@ import sys
 import unittest
 import numpy as np
 import pandas as pd
-sys.path.append('../main')
+sys.path.append('./src/main')
 import acceleration_plot3 as ap3
 
 

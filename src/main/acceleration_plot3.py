@@ -9,7 +9,7 @@ matplotlib.use('Qt5Agg')                 # 注. スクリプト環境では、py
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
-sys.path.append('../test')
+sys.path.append('./src/test')
 from hmmlearn import hmm
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
